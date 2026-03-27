@@ -18,6 +18,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { useAIModelStore } from '@/stores/aiModelStore';
 import { testConnection } from '@/api/ai-service';
 import type { ConnectionTestResult, ProviderConfig } from '@/types/ai-models';
@@ -26,12 +27,13 @@ type SettingsTab = 'general' | 'api' | 'users';
 
 export function SettingsPage() {
   const [tab, setTab] = useState<SettingsTab>('general');
+  const { t } = useTranslation();
 
   return (
     <div className="max-w-[1200px] mx-auto px-6 py-8">
-      <h1 className="text-2xl font-semibold text-[var(--foreground)] mb-1">Settings</h1>
+      <h1 className="text-2xl font-semibold text-[var(--foreground)] mb-1">{t('settings.title')}</h1>
       <p className="text-sm text-[var(--muted-foreground)] mb-8">
-        Manage your workspace preferences and configuration
+        {t('settings.subtitle')}
       </p>
 
       <div className="flex gap-8">
@@ -39,19 +41,19 @@ export function SettingsPage() {
         <nav className="w-52 flex-shrink-0 space-y-1">
           <NavItem
             icon={Settings}
-            label="General"
+            label={t('settings.general.title')}
             active={tab === 'general'}
             onClick={() => setTab('general')}
           />
           <NavItem
             icon={Key}
-            label="API Configuration"
+            label={t('settings.api.title')}
             active={tab === 'api'}
             onClick={() => setTab('api')}
           />
           <NavItem
             icon={Users}
-            label="User Management"
+            label={t('settings.users.title')}
             active={tab === 'users'}
             onClick={() => setTab('users')}
           />
@@ -188,27 +190,32 @@ function FieldRow({
 
 function GeneralSection() {
   const [autoSave, setAutoSave] = useState(true);
+  const { t, i18n } = useTranslation();
+
+  const handleLanguageChange = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
 
   return (
     <div>
       <SectionHeader
-        title="General"
-        description="Basic workspace settings and preferences"
+        title={t('settings.general.title')}
+        description={t('settings.general.description')}
       />
 
       <SectionCard>
         <FieldRow
-          label="Application Name"
-          description="The name displayed across the workspace"
+          label={t('settings.general.appName')}
+          description={t('settings.general.appNameDesc')}
         >
           <span className="text-sm text-[var(--foreground)] bg-white/5 px-3 py-1.5 rounded-lg">
-            AI Visual Workspace
+            {t('common.appName')}
           </span>
         </FieldRow>
 
         <FieldRow
-          label="Theme"
-          description="Interface color scheme. Additional themes coming soon."
+          label={t('settings.general.theme')}
+          description={t('settings.general.themeDesc')}
         >
           <div className="flex items-center gap-2">
             <Moon className="h-4 w-4 text-[var(--muted-foreground)]" />
@@ -217,26 +224,25 @@ function GeneralSection() {
               className="h-9 w-36 rounded-lg border border-[var(--border)] bg-[var(--input)] px-3 text-sm text-[var(--foreground)] appearance-none cursor-not-allowed opacity-60"
               defaultValue="dark"
             >
-              <option value="dark">Dark</option>
+              <option value="dark">{t('settings.general.dark')}</option>
             </select>
           </div>
         </FieldRow>
 
         <FieldRow
-          label="Language"
-          description="Display language for the interface"
+          label={t('settings.general.language')}
+          description={t('settings.general.languageDesc')}
         >
           <div className="flex items-center gap-2">
             <Languages className="h-4 w-4 text-[var(--muted-foreground)]" />
             <div className="relative">
               <select
                 className="h-9 w-36 rounded-lg border border-[var(--border)] bg-[var(--input)] px-3 pr-8 text-sm text-[var(--foreground)] appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-                defaultValue="en"
+                value={i18n.language}
+                onChange={(e) => handleLanguageChange(e.target.value)}
               >
                 <option value="en">English</option>
                 <option value="zh">中文</option>
-                <option value="ja">日本語</option>
-                <option value="ko">한국어</option>
               </select>
               <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--muted-foreground)] pointer-events-none" />
             </div>
@@ -244,8 +250,8 @@ function GeneralSection() {
         </FieldRow>
 
         <FieldRow
-          label="Auto-save"
-          description="Automatically save changes to your workflows"
+          label={t('settings.general.autoSave')}
+          description={t('settings.general.autoSaveDesc')}
         >
           <Toggle checked={autoSave} onChange={setAutoSave} />
         </FieldRow>
@@ -263,22 +269,23 @@ function ApiConfigurationSection() {
   const models = useAIModelStore((s) => s.models);
   const selectedChatModelId = useAIModelStore((s) => s.selectedChatModelId);
   const setSelectedChatModel = useAIModelStore((s) => s.setSelectedChatModel);
+  const { t } = useTranslation();
 
   return (
     <div>
       <SectionHeader
-        title="API Configuration"
-        description="Configure your AI service providers and credentials. API keys are stored locally and never sent to our servers."
+        title={t('settings.api.title')}
+        description={t('settings.api.description')}
       />
 
       {/* Default chat model selection */}
       <SectionCard>
         <div className="mb-5">
           <label className="block text-sm font-medium text-[var(--foreground)] mb-1">
-            Default Chat Model
+            {t('settings.api.defaultChatModel')}
           </label>
           <p className="text-xs text-[var(--muted-foreground)] mb-2">
-            Select the default AI model for chat interactions
+            {t('settings.api.defaultChatModelDesc')}
           </p>
           <div className="relative">
             <select
@@ -315,6 +322,7 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
   const updateProvider = useAIModelStore((s) => s.updateProvider);
   const addApiKey = useAIModelStore((s) => s.addApiKey);
   const removeApiKey = useAIModelStore((s) => s.removeApiKey);
+  const { t } = useTranslation();
 
   const [expanded, setExpanded] = useState(config.apiKeys.length > 0 || config.provider === 'openai');
   const [newKeyValue, setNewKeyValue] = useState('');
@@ -332,7 +340,6 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
   };
 
   const handleTestConnection = useCallback(async () => {
-    // Save base URL first
     if (baseUrl !== config.baseUrl) {
       updateProvider(config.provider, { baseUrl });
     }
@@ -342,7 +349,6 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
       const result = await testConnection(config.provider);
       setTestResult(result);
       setTestStatus(result.success ? 'success' : 'error');
-      // Reset status after a delay
       setTimeout(() => setTestStatus('idle'), 5000);
     } catch {
       setTestStatus('error');
@@ -377,7 +383,7 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
           </div>
           {config.apiKeys.length > 0 && (
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400">
-              {config.apiKeys.filter((k) => !k.disabled).length} key(s)
+              {t('settings.api.keyCount', { count: config.apiKeys.filter((k) => !k.disabled).length })}
             </span>
           )}
           <ChevronDown
@@ -398,7 +404,7 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
           {/* Base URL */}
           <div>
             <label className="block text-xs font-medium text-[var(--muted-foreground)] mb-1">
-              Base URL
+              {t('settings.api.baseUrl')}
             </label>
             <div className="flex gap-2">
               <input
@@ -414,7 +420,7 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
                   className="h-9 px-3 rounded-lg bg-[var(--primary)] text-white text-xs font-medium hover:opacity-90 transition-opacity cursor-pointer border-none flex items-center gap-1"
                 >
                   <Save className="h-3 w-3" />
-                  Save
+                  {t('common.save')}
                 </button>
               )}
             </div>
@@ -424,7 +430,7 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
           {config.apiKeys.length > 0 && (
             <div>
               <label className="block text-xs font-medium text-[var(--muted-foreground)] mb-2">
-                API Keys ({config.apiKeys.length})
+                {t('settings.api.apiKeys')} ({config.apiKeys.length})
               </label>
               <div className="space-y-2">
                 {config.apiKeys.map((keyEntry, idx) => (
@@ -446,12 +452,12 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
                         </span>
                         {idx === config.activeKeyIndex && !keyEntry.disabled && (
                           <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
-                            active
+                            {t('settings.api.active')}
                           </span>
                         )}
                         {keyEntry.disabled && (
                           <span className="text-[9px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400">
-                            disabled
+                            {t('settings.api.disabled')}
                           </span>
                         )}
                       </div>
@@ -460,7 +466,7 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
                       </p>
                       {keyEntry.lastUsedAt && (
                         <p className="text-[9px] text-[var(--muted-foreground)] mt-0.5">
-                          Last used: {new Date(keyEntry.lastUsedAt).toLocaleDateString()}
+                          {t('settings.api.lastUsed')}: {new Date(keyEntry.lastUsedAt).toLocaleDateString()}
                         </p>
                       )}
                     </div>
@@ -473,7 +479,7 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
                     <button
                       onClick={() => removeApiKey(config.provider, keyEntry.id)}
                       className="p-1 rounded text-[var(--muted-foreground)] hover:text-red-400 transition-colors bg-transparent border-none cursor-pointer"
-                      title="Remove key"
+                      title={t('settings.api.removeKey')}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -486,14 +492,14 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
           {/* Add new key */}
           <div>
             <label className="block text-xs font-medium text-[var(--muted-foreground)] mb-1">
-              Add API Key
+              {t('settings.api.addApiKey')}
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={newKeyLabel}
                 onChange={(e) => setNewKeyLabel(e.target.value)}
-                placeholder="Label (optional)"
+                placeholder={t('settings.api.labelOptional')}
                 className="h-9 w-28 rounded-lg border border-[var(--border)] bg-[var(--input)] px-2 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
               />
               <input
@@ -510,7 +516,7 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
                 className="h-9 px-3 rounded-lg bg-white/5 text-[var(--foreground)] text-xs font-medium hover:bg-white/10 transition-colors cursor-pointer border-none flex items-center gap-1 disabled:opacity-30"
               >
                 <Plus className="h-3 w-3" />
-                Add
+                {t('common.add')}
               </button>
             </div>
           </div>
@@ -535,20 +541,20 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
               {testStatus === 'error' && <AlertCircle className="h-4 w-4" />}
               {testStatus === 'idle' && <Zap className="h-4 w-4" />}
               {testStatus === 'testing'
-                ? 'Testing...'
+                ? t('settings.api.testing')
                 : testStatus === 'success'
-                  ? 'Connected'
+                  ? t('settings.api.connected')
                   : testStatus === 'error'
-                    ? 'Failed'
-                    : 'Test Connection'}
+                    ? t('settings.api.failed')
+                    : t('settings.api.testConnection')}
             </button>
 
             {testResult && (
               <div className="text-xs text-[var(--muted-foreground)]">
                 {testResult.success ? (
                   <span>
-                    {testResult.modelName && `Model: ${testResult.modelName} | `}
-                    Latency: {testResult.latencyMs}ms
+                    {testResult.modelName && `${t('settings.api.model', { name: testResult.modelName })} | `}
+                    {t('settings.api.latency', { ms: testResult.latencyMs })}
                   </span>
                 ) : (
                   <span className="text-red-400">{testResult.error}</span>
@@ -624,23 +630,36 @@ const statusStyles: Record<MockUser['status'], { dot: string; text: string }> = 
 
 function UserManagementSection() {
   const [users, setUsers] = useState<MockUser[]>(MOCK_USERS);
+  const { t } = useTranslation();
 
   const removeUser = (id: string) => {
     setUsers((prev) => prev.filter((u) => u.id !== id));
+  };
+
+  const roleLabels: Record<MockUser['role'], string> = {
+    admin: t('settings.users.admin'),
+    editor: t('settings.users.editor'),
+    viewer: t('settings.users.viewer'),
+  };
+
+  const statusLabels: Record<MockUser['status'], string> = {
+    active: t('settings.users.statusActive'),
+    inactive: t('settings.users.statusInactive'),
+    pending: t('settings.users.statusPending'),
   };
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-medium text-[var(--foreground)]">User Management</h2>
+          <h2 className="text-lg font-medium text-[var(--foreground)]">{t('settings.users.title')}</h2>
           <p className="text-sm text-[var(--muted-foreground)] mt-1">
-            Manage workspace members and their permissions
+            {t('settings.users.description')}
           </p>
         </div>
         <button className="flex items-center gap-2 h-9 px-4 rounded-lg bg-[var(--primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer border-none">
           <UserPlus className="h-4 w-4" />
-          Invite User
+          {t('settings.users.inviteUser')}
         </button>
       </div>
 
@@ -649,13 +668,13 @@ function UserManagementSection() {
           <thead>
             <tr className="border-b border-[var(--border)] bg-white/[0.02]">
               <th className="text-left px-4 py-3 text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
-                User
+                {t('settings.users.user')}
               </th>
               <th className="text-left px-4 py-3 text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
-                Role
+                {t('settings.users.role')}
               </th>
               <th className="text-left px-4 py-3 text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
-                Status
+                {t('settings.users.status')}
               </th>
               <th className="px-4 py-3 w-10" />
             </tr>
@@ -666,7 +685,6 @@ function UserManagementSection() {
                 key={user.id}
                 className="border-b border-[var(--border)] last:border-none hover:bg-white/[0.02] transition-colors"
               >
-                {/* User cell */}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     <div
@@ -686,20 +704,16 @@ function UserManagementSection() {
                     </div>
                   </div>
                 </td>
-
-                {/* Role cell */}
                 <td className="px-4 py-3">
                   <span
                     className={cn(
-                      'text-xs font-medium px-2.5 py-1 rounded-full capitalize',
+                      'text-xs font-medium px-2.5 py-1 rounded-full',
                       roleBadgeStyles[user.role],
                     )}
                   >
-                    {user.role}
+                    {roleLabels[user.role]}
                   </span>
                 </td>
-
-                {/* Status cell */}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <span
@@ -710,21 +724,19 @@ function UserManagementSection() {
                     />
                     <span
                       className={cn(
-                        'text-xs capitalize',
+                        'text-xs',
                         statusStyles[user.status].text,
                       )}
                     >
-                      {user.status}
+                      {statusLabels[user.status]}
                     </span>
                   </div>
                 </td>
-
-                {/* Actions cell */}
                 <td className="px-4 py-3">
                   <button
                     onClick={() => removeUser(user.id)}
                     className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-red-400 hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none"
-                    title="Remove user"
+                    title={t('settings.users.removeUser')}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -735,7 +747,7 @@ function UserManagementSection() {
             {users.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-4 py-12 text-center text-sm text-[var(--muted-foreground)]">
-                  No users found. Invite someone to get started.
+                  {t('settings.users.noUsers')}
                 </td>
               </tr>
             )}

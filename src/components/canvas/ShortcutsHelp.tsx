@@ -5,6 +5,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { useTranslation } from 'react-i18next';
 
 interface ShortcutsHelpProps {
   open: boolean;
@@ -13,50 +14,50 @@ interface ShortcutsHelpProps {
 
 interface ShortcutEntry {
   keys: string;
-  description: string;
+  descKey: string;
 }
 
 interface ShortcutCategory {
-  title: string;
+  titleKey: string;
   shortcuts: ShortcutEntry[];
 }
 
 const shortcutCategories: ShortcutCategory[] = [
   {
-    title: 'Selection',
+    titleKey: 'shortcuts.selection',
     shortcuts: [
-      { keys: 'Ctrl + A', description: 'Select all nodes' },
-      { keys: 'Escape', description: 'Deselect all' },
-      { keys: 'Click', description: 'Select node' },
-      { keys: 'Shift + Click', description: 'Multi-select nodes' },
+      { keys: 'Ctrl + A', descKey: 'shortcuts.selectAll' },
+      { keys: 'Escape', descKey: 'shortcuts.deselectAll' },
+      { keys: 'Click', descKey: 'shortcuts.selectNode' },
+      { keys: 'Shift + Click', descKey: 'shortcuts.multiSelect' },
     ],
   },
   {
-    title: 'Editing',
+    titleKey: 'shortcuts.editing',
     shortcuts: [
-      { keys: 'Ctrl + C', description: 'Copy selected nodes' },
-      { keys: 'Ctrl + V', description: 'Paste nodes' },
-      { keys: 'Ctrl + X', description: 'Cut selected nodes' },
-      { keys: 'Ctrl + D', description: 'Duplicate selected nodes' },
-      { keys: 'Delete', description: 'Delete selected nodes' },
-      { keys: 'Backspace', description: 'Delete selected nodes' },
+      { keys: 'Ctrl + C', descKey: 'shortcuts.copy' },
+      { keys: 'Ctrl + V', descKey: 'shortcuts.paste' },
+      { keys: 'Ctrl + X', descKey: 'shortcuts.cut' },
+      { keys: 'Ctrl + D', descKey: 'shortcuts.duplicateNodes' },
+      { keys: 'Delete', descKey: 'shortcuts.deleteNodes' },
+      { keys: 'Backspace', descKey: 'shortcuts.deleteNodes' },
     ],
   },
   {
-    title: 'View',
+    titleKey: 'shortcuts.view',
     shortcuts: [
-      { keys: 'Scroll', description: 'Zoom in / out' },
-      { keys: 'Click + Drag', description: 'Pan canvas' },
-      { keys: '?', description: 'Toggle this help overlay' },
+      { keys: 'Scroll', descKey: 'shortcuts.zoomInOut' },
+      { keys: 'Click + Drag', descKey: 'shortcuts.panCanvas' },
+      { keys: '?', descKey: 'shortcuts.toggleHelp' },
     ],
   },
   {
-    title: 'AI & Tools',
+    titleKey: 'shortcuts.aiTools',
     shortcuts: [
-      { keys: 'Ctrl + /', description: 'Toggle AI chat panel' },
-      { keys: 'Ctrl + Shift + V', description: 'Video Analysis panel' },
-      { keys: 'Ctrl + Shift + B', description: 'Storyboard panel' },
-      { keys: 'Ctrl + Shift + P', description: 'Prompt Engineer panel' },
+      { keys: 'Ctrl + /', descKey: 'shortcuts.toggleChat' },
+      { keys: 'Ctrl + Shift + V', descKey: 'shortcuts.videoAnalysisPanel' },
+      { keys: 'Ctrl + Shift + B', descKey: 'shortcuts.storyboardPanel' },
+      { keys: 'Ctrl + Shift + P', descKey: 'shortcuts.promptEngineerPanel' },
     ],
   },
 ];
@@ -84,21 +85,23 @@ function ShortcutKeys({ keys }: { keys: string }) {
 }
 
 export function ShortcutsHelp({ open, onOpenChange }: ShortcutsHelpProps) {
+  const { t } = useTranslation();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>Keyboard Shortcuts</DialogTitle>
+          <DialogTitle>{t('shortcuts.title')}</DialogTitle>
           <DialogDescription>
-            Quick reference for all available shortcuts
+            {t('shortcuts.description')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid grid-cols-2 gap-6 mt-2">
           {shortcutCategories.map((category) => (
-            <div key={category.title}>
+            <div key={category.titleKey}>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)] mb-3">
-                {category.title}
+                {t(category.titleKey)}
               </h3>
               <div className="space-y-2">
                 {category.shortcuts.map((shortcut) => (
@@ -107,7 +110,7 @@ export function ShortcutsHelp({ open, onOpenChange }: ShortcutsHelpProps) {
                     className="flex items-center justify-between gap-3"
                   >
                     <span className="text-sm text-[var(--muted-foreground)]">
-                      {shortcut.description}
+                      {t(shortcut.descKey)}
                     </span>
                     <ShortcutKeys keys={shortcut.keys} />
                   </div>
@@ -119,7 +122,7 @@ export function ShortcutsHelp({ open, onOpenChange }: ShortcutsHelpProps) {
 
         <div className="mt-4 pt-3 border-t border-[var(--border)] text-center">
           <span className="text-xs text-[var(--muted-foreground)]">
-            Press <Kbd>?</Kbd> to toggle this overlay
+            {t('shortcuts.toggleOverlay', { key: '?' })}
           </span>
         </div>
       </DialogContent>

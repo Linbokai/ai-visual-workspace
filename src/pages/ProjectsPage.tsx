@@ -7,6 +7,7 @@ import { useProjectStore } from '@/stores/useProjectStore';
 import { useNotificationStore } from '@/stores/notificationStore';
 import { motion } from 'framer-motion';
 import { Clock, Upload, Download } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ProjectCard } from '@/components/projects/ProjectCard';
 import type { Project } from '@/types';
 
@@ -16,6 +17,7 @@ export function ProjectsPage() {
   const projects = useProjectStore((s) => s.projects);
   const addProject = useProjectStore((s) => s.addProject);
   const addNotification = useNotificationStore((s) => s.addNotification);
+  const { t } = useTranslation();
 
   // Load mock data for development
   useMockData();
@@ -37,8 +39,8 @@ export function ProjectsPage() {
     URL.revokeObjectURL(url);
     addNotification({
       type: 'success',
-      title: 'Projects exported',
-      message: `${projects.length} project(s) saved to file`,
+      title: t('projects.projectExported'),
+      message: t('projects.projectExportedMsg', { count: projects.length }),
     });
   };
 
@@ -57,7 +59,7 @@ export function ProjectsPage() {
           if (p.id && p.name) {
             addProject({
               ...p,
-              id: crypto.randomUUID(), // Assign new ID to avoid collisions
+              id: crypto.randomUUID(),
               created_at: p.created_at || new Date().toISOString(),
               updated_at: new Date().toISOString(),
             });
@@ -66,19 +68,18 @@ export function ProjectsPage() {
         });
         addNotification({
           type: 'success',
-          title: 'Import complete',
-          message: `${count} project(s) imported successfully`,
+          title: t('projects.importComplete'),
+          message: t('projects.importCompleteMsg', { count }),
         });
       } catch {
         addNotification({
           type: 'error',
-          title: 'Import failed',
-          message: 'The file could not be parsed. Make sure it is valid JSON.',
+          title: t('projects.importFailed'),
+          message: t('projects.importFailedMsg'),
         });
       }
     };
     reader.readAsText(file);
-    // Reset input
     e.target.value = '';
   };
 
@@ -96,18 +97,18 @@ export function ProjectsPage() {
         <button
           onClick={handleExportAll}
           className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[var(--border)] bg-transparent text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer"
-          aria-label="Export all projects"
+          aria-label={t('projects.exportAll')}
         >
           <Download className="h-3.5 w-3.5" />
-          Export All
+          {t('projects.exportAll')}
         </button>
         <button
           onClick={() => importRef.current?.click()}
           className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[var(--border)] bg-transparent text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer"
-          aria-label="Import projects"
+          aria-label={t('common.import')}
         >
           <Upload className="h-3.5 w-3.5" />
-          Import
+          {t('common.import')}
         </button>
         <input
           ref={importRef}
@@ -129,7 +130,7 @@ export function ProjectsPage() {
         >
           <div className="flex items-center gap-2 mb-3">
             <Clock className="h-4 w-4 text-[var(--muted-foreground)]" />
-            <h2 className="text-sm font-medium text-[var(--muted-foreground)]">Recently Updated</h2>
+            <h2 className="text-sm font-medium text-[var(--muted-foreground)]">{t('projects.recentlyUpdated')}</h2>
           </div>
           <div className="grid grid-cols-4 gap-3">
             {recentProjects.map((project, i) => (
@@ -150,7 +151,7 @@ export function ProjectsPage() {
       {recentProjects.length > 0 && (
         <div className="flex items-center gap-3 mb-6">
           <div className="h-px flex-1 bg-[var(--border)]" />
-          <span className="text-xs text-[var(--muted-foreground)]">All Projects</span>
+          <span className="text-xs text-[var(--muted-foreground)]">{t('projects.allProjects')}</span>
           <div className="h-px flex-1 bg-[var(--border)]" />
         </div>
       )}

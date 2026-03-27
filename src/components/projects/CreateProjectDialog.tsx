@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -19,9 +20,10 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
   const [name, setName] = useState('');
   const addProject = useProjectStore((s) => s.addProject);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleCreate = () => {
-    const trimmed = name.trim() || 'Untitled Project';
+    const trimmed = name.trim() || t('projects.untitledProject');
     const project: Project = {
       id: crypto.randomUUID(),
       name: trimmed,
@@ -46,9 +48,9 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Create New Project</DialogTitle>
+          <DialogTitle>{t('projects.createDialog.title')}</DialogTitle>
           <DialogDescription>
-            Give your project a name to get started.
+            {t('projects.createDialog.description')}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 pt-2">
@@ -56,7 +58,7 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Project name"
+            placeholder={t('projects.createDialog.placeholder')}
             autoFocus
             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
             className="flex h-10 w-full rounded-xl border border-[var(--border)] bg-[var(--input)] px-3 py-2 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
@@ -66,13 +68,13 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
               onClick={() => onOpenChange(false)}
               className="h-9 px-4 rounded-lg border border-[var(--border)] bg-transparent text-sm text-[var(--foreground)] hover:bg-white/5 transition-colors cursor-pointer"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               onClick={handleCreate}
               className="h-9 px-4 rounded-lg bg-[var(--primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer border-none"
             >
-              Create
+              {t('common.create')}
             </button>
           </div>
         </div>

@@ -1,9 +1,10 @@
 import { Map, Grid3x3, Maximize, HelpCircle, Undo2, Redo2, Minus, Plus, ChevronDown, Zap, Gauge, ImageIcon, Check, Loader2, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { usePanelStore } from '@/stores/usePanelStore';
 import { useCanvasStore } from '@/stores/useCanvasStore';
-import { usePerformanceStore, PERFORMANCE_MODE_LABELS, type PerformanceMode } from '@/stores/performanceStore';
+import { usePerformanceStore, type PerformanceMode } from '@/stores/performanceStore';
 import { useReactFlow } from '@xyflow/react';
 import { useState, useRef, useEffect } from 'react';
 
@@ -21,6 +22,7 @@ export function CanvasBottomBar() {
   const saveStatus = usePerformanceStore((s) => s.saveStatus);
 
   const { fitView, zoomTo, zoomIn, zoomOut } = useReactFlow();
+  const { t } = useTranslation();
 
   const [zoomMenuOpen, setZoomMenuOpen] = useState(false);
   const [perfMenuOpen, setPerfMenuOpen] = useState(false);
@@ -31,6 +33,12 @@ export function CanvasBottomBar() {
   const handleRedo = () => useCanvasStore.temporal.getState().redo();
   const canUndo = useCanvasStore.temporal.getState().pastStates.length > 0;
   const canRedo = useCanvasStore.temporal.getState().futureStates.length > 0;
+
+  const perfModeLabels: Record<PerformanceMode, { label: string; description: string }> = {
+    fast: { label: t('performance.fast'), description: t('performance.fastDesc') },
+    normal: { label: t('performance.normal'), description: t('performance.normalDesc') },
+    quality: { label: t('performance.quality'), description: t('performance.qualityDesc') },
+  };
 
   useEffect(() => {
     if (!zoomMenuOpen && !perfMenuOpen) return;
@@ -68,8 +76,8 @@ export function CanvasBottomBar() {
         <button
           onClick={handleUndo}
           disabled={!canUndo}
-          title="Undo (Ctrl+Z)"
-          aria-label="Undo"
+          title={`${t('common.undo')} (Ctrl+Z)`}
+          aria-label={t('common.undo')}
           className={cn(
             'p-1.5 rounded-lg transition-colors bg-transparent border-none',
             canUndo
@@ -112,12 +120,11 @@ export function CanvasBottomBar() {
           icon={<Maximize className="h-4 w-4" />}
           active={false}
           onClick={handleFitView}
-          tooltip="Fit View (F)"
+          tooltip={`${t('canvas.fitView')} (F)`}
         />
       </div>
 
       <div className="flex items-center gap-1">
-        {/* Zoom controls */}
         <button
           onClick={() => zoomOut({ duration: 200 })}
           title="Zoom out"
@@ -127,7 +134,6 @@ export function CanvasBottomBar() {
           <Minus className="h-3.5 w-3.5" />
         </button>
 
-        {/* Zoom level with presets dropdown */}
         <div className="relative" ref={zoomMenuRef}>
           <button
             onClick={() => setZoomMenuOpen(!zoomMenuOpen)}
@@ -145,7 +151,7 @@ export function CanvasBottomBar() {
                 className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-lg text-xs text-[var(--primary)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer bg-transparent border-none text-left font-medium"
               >
                 <Maximize className="h-3 w-3" />
-                Fit View
+                {t('canvas.fitView')}
               </button>
               <div className="h-px bg-[var(--border)] my-1 -mx-1" />
               {zoomPresets.map((preset) => (
@@ -177,7 +183,6 @@ export function CanvasBottomBar() {
 
         <div className="w-px h-5 bg-[var(--border)] mx-1" />
 
-        {/* Save status indicator */}
         <SaveStatusIndicator status={saveStatus} />
 
         <div className="w-px h-5 bg-[var(--border)] mx-1" />
@@ -195,19 +200,19 @@ export function CanvasBottomBar() {
                   : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]',
               'hover:bg-[var(--hover-overlay)]',
             )}
-            title="Performance mode"
+            title={t('performance.normal')}
             aria-label="Performance mode"
             aria-expanded={perfMenuOpen}
           >
             {perfMode === 'fast' && <Zap className="h-3.5 w-3.5" />}
             {perfMode === 'normal' && <Gauge className="h-3.5 w-3.5" />}
             {perfMode === 'quality' && <ImageIcon className="h-3.5 w-3.5" />}
-            <span>{PERFORMANCE_MODE_LABELS[perfMode].label}</span>
+            <span>{perfModeLabels[perfMode].label}</span>
           </button>
           {perfMenuOpen && (
             <div className="absolute bottom-full mb-1 right-0 z-50 min-w-[160px] rounded-xl border border-[var(--border)] bg-[var(--popover)] p-1 shadow-xl">
               {(['fast', 'normal', 'quality'] as PerformanceMode[]).map((mode) => {
-                const config = PERFORMANCE_MODE_LABELS[mode];
+                const config = perfModeLabels[mode];
                 return (
                   <button
                     key={mode}
@@ -242,8 +247,8 @@ export function CanvasBottomBar() {
 
         <button
           className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer bg-transparent border-none"
-          title="Keyboard shortcuts (?)"
-          aria-label="Show keyboard shortcuts"
+          title={`${t('shortcuts.title')} (?)`}
+          aria-label={t('shortcuts.title')}
         >
           <HelpCircle className="h-4 w-4" />
         </button>
@@ -281,6 +286,7 @@ function ToggleButton({
 }
 
 function SaveStatusIndicator({ status }: { status: 'idle' | 'saving' | 'saved' | 'error' }) {
+  const { t } = useTranslation();
   if (status === 'idle') return null;
 
   return (
@@ -295,19 +301,19 @@ function SaveStatusIndicator({ status }: { status: 'idle' | 'saving' | 'saved' |
       {status === 'saving' && (
         <>
           <Loader2 className="h-3 w-3 animate-spin" />
-          <span>Saving...</span>
+          <span>{t('canvas.saving')}</span>
         </>
       )}
       {status === 'saved' && (
         <>
           <Check className="h-3 w-3" />
-          <span>Saved</span>
+          <span>{t('canvas.saved')}</span>
         </>
       )}
       {status === 'error' && (
         <>
           <AlertCircle className="h-3 w-3" />
-          <span>Save failed</span>
+          <span>{t('canvas.saveFailed')}</span>
         </>
       )}
     </div>

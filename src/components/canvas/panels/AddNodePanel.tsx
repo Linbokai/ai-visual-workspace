@@ -1,4 +1,5 @@
 import { Image, Video, Type, Music, Upload, Group, Paintbrush, PenTool, Columns2, Film, BookOpen, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import { usePanelStore } from '@/stores/usePanelStore';
 import type { LeftPanelType } from '@/stores/usePanelStore';
@@ -6,35 +7,35 @@ import type { NodeType } from '@/types';
 
 const nodeOptions: Array<{
   type: NodeType;
-  label: string;
+  labelKey: string;
   icon: React.ComponentType<{ className?: string }>;
-  description: string;
+  descKey: string;
 }> = [
-  { type: 'image', label: 'Image', icon: Image, description: 'Generate images with AI' },
-  { type: 'video', label: 'Video', icon: Video, description: 'Generate videos with AI' },
-  { type: 'text', label: 'Text', icon: Type, description: 'Add a text node' },
-  { type: 'audio', label: 'Audio', icon: Music, description: 'Add an audio node' },
-  { type: 'group', label: 'Group', icon: Group, description: 'Group nodes together' },
+  { type: 'image', labelKey: 'nodes.image', icon: Image, descKey: 'nodes.imageDesc' },
+  { type: 'video', labelKey: 'nodes.video', icon: Video, descKey: 'nodes.videoDesc' },
+  { type: 'text', labelKey: 'nodes.text', icon: Type, descKey: 'nodes.textDesc' },
+  { type: 'audio', labelKey: 'nodes.audio', icon: Music, descKey: 'nodes.audioDesc' },
+  { type: 'group', labelKey: 'nodes.group', icon: Group, descKey: 'nodes.groupDesc' },
 ];
 
 const advancedNodeOptions: Array<{
   type: NodeType;
-  label: string;
+  labelKey: string;
   icon: React.ComponentType<{ className?: string }>;
-  description: string;
+  descKey: string;
 }> = [
-  { type: 'image-editor', label: 'Image Editor', icon: Paintbrush, description: 'Crop, adjust, and filter images' },
-  { type: 'doodle-image', label: 'Doodle to Image', icon: PenTool, description: 'Sketch and convert to AI image' },
-  { type: 'compare', label: 'Compare', icon: Columns2, description: 'Side-by-side image comparison' },
+  { type: 'image-editor', labelKey: 'nodes.imageEditor', icon: Paintbrush, descKey: 'nodes.imageEditorDesc' },
+  { type: 'doodle-image', labelKey: 'nodes.doodleToImage', icon: PenTool, descKey: 'nodes.doodleToImageDesc' },
+  { type: 'compare', labelKey: 'nodes.compare', icon: Columns2, descKey: 'nodes.compareDesc' },
 ];
 
 export function AddNodePanel() {
   const addNode = useCanvasStore((s) => s.addNode);
   const closePanel = usePanelStore((s) => s.closeLeftPanel);
   const togglePanel = usePanelStore((s) => s.toggleLeftPanel);
+  const { t } = useTranslation();
 
   const handleAdd = (type: NodeType) => {
-    // Place node at a random position near center
     const x = 200 + Math.random() * 300;
     const y = 100 + Math.random() * 200;
     addNode(type, { x, y });
@@ -43,7 +44,7 @@ export function AddNodePanel() {
 
   return (
     <div className="space-y-2">
-      {nodeOptions.map(({ type, label, icon: Icon, description }) => (
+      {nodeOptions.map(({ type, labelKey, icon: Icon, descKey }) => (
         <button
           key={type}
           onClick={() => handleAdd(type)}
@@ -53,17 +54,17 @@ export function AddNodePanel() {
             <Icon className="h-5 w-5 text-[var(--primary)]" />
           </div>
           <div>
-            <p className="text-sm font-medium text-[var(--foreground)]">{label}</p>
-            <p className="text-xs text-[var(--muted-foreground)]">{description}</p>
+            <p className="text-sm font-medium text-[var(--foreground)]">{t(labelKey)}</p>
+            <p className="text-xs text-[var(--muted-foreground)]">{t(descKey)}</p>
           </div>
         </button>
       ))}
 
       <div className="pt-2 border-t border-[var(--border)]">
         <p className="text-[10px] font-medium text-[var(--muted-foreground)] uppercase tracking-wider px-3 mb-2">
-          Advanced
+          {t('sidebar.advanced')}
         </p>
-        {advancedNodeOptions.map(({ type, label, icon: Icon, description }) => (
+        {advancedNodeOptions.map(({ type, labelKey, icon: Icon, descKey }) => (
           <button
             key={type}
             onClick={() => handleAdd(type)}
@@ -73,8 +74,8 @@ export function AddNodePanel() {
               <Icon className="h-5 w-5 text-[var(--primary)]" />
             </div>
             <div>
-              <p className="text-sm font-medium text-[var(--foreground)]">{label}</p>
-              <p className="text-xs text-[var(--muted-foreground)]">{description}</p>
+              <p className="text-sm font-medium text-[var(--foreground)]">{t(labelKey)}</p>
+              <p className="text-xs text-[var(--muted-foreground)]">{t(descKey)}</p>
             </div>
           </button>
         ))}
@@ -82,13 +83,13 @@ export function AddNodePanel() {
 
       <div className="pt-2 border-t border-[var(--border)]">
         <p className="text-[10px] font-medium text-[var(--muted-foreground)] uppercase tracking-wider px-3 mb-2">
-          Analysis Tools
+          {t('nodes.analysisTools')}
         </p>
         {([
-          { panel: 'video-analysis' as LeftPanelType, label: 'Video Analysis', icon: Film, description: 'Extract keyframes and detect scenes' },
-          { panel: 'storyboard' as LeftPanelType, label: 'Storyboard', icon: BookOpen, description: 'Generate storyboard from text' },
-          { panel: 'prompt-engineer' as LeftPanelType, label: 'Prompt Engineer', icon: Sparkles, description: 'Build and manage prompts' },
-        ]).map(({ panel, label, icon: Icon, description }) => (
+          { panel: 'video-analysis' as LeftPanelType, labelKey: 'sidebar.videoAnalysis', icon: Film, descKey: 'nodes.videoAnalysisDesc' },
+          { panel: 'storyboard' as LeftPanelType, labelKey: 'sidebar.storyboard', icon: BookOpen, descKey: 'nodes.storyboardDesc' },
+          { panel: 'prompt-engineer' as LeftPanelType, labelKey: 'sidebar.promptEngineer', icon: Sparkles, descKey: 'nodes.promptEngineerDesc' },
+        ]).map(({ panel, labelKey, icon: Icon, descKey }) => (
           <button
             key={panel}
             onClick={() => togglePanel(panel)}
@@ -98,8 +99,8 @@ export function AddNodePanel() {
               <Icon className="h-5 w-5 text-[var(--primary)]" />
             </div>
             <div>
-              <p className="text-sm font-medium text-[var(--foreground)]">{label}</p>
-              <p className="text-xs text-[var(--muted-foreground)]">{description}</p>
+              <p className="text-sm font-medium text-[var(--foreground)]">{t(labelKey)}</p>
+              <p className="text-xs text-[var(--muted-foreground)]">{t(descKey)}</p>
             </div>
           </button>
         ))}
@@ -111,8 +112,8 @@ export function AddNodePanel() {
             <Upload className="h-5 w-5 text-[var(--muted-foreground)]" />
           </div>
           <div>
-            <p className="text-sm font-medium text-[var(--foreground)]">Upload</p>
-            <p className="text-xs text-[var(--muted-foreground)]">Upload from your device</p>
+            <p className="text-sm font-medium text-[var(--foreground)]">{t('nodes.upload')}</p>
+            <p className="text-xs text-[var(--muted-foreground)]">{t('nodes.uploadDesc')}</p>
           </div>
         </button>
       </div>

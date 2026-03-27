@@ -1,4 +1,5 @@
 import { Search, LayoutGrid, List, Plus, ChevronDown, ArrowUpDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { cn } from '@/lib/utils';
 import { useState, useRef, useEffect } from 'react';
@@ -19,6 +20,7 @@ export function ProjectsToolbar({ onCreateClick }: ProjectsToolbarProps) {
   const [sortBy, setSortBy] = useState<SortOption>('updated');
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!sortMenuOpen) return;
@@ -32,9 +34,9 @@ export function ProjectsToolbar({ onCreateClick }: ProjectsToolbarProps) {
   }, [sortMenuOpen]);
 
   const sortLabels: Record<SortOption, string> = {
-    updated: 'Last Updated',
-    created: 'Date Created',
-    name: 'Name',
+    updated: t('projects.sort.lastUpdated'),
+    created: t('projects.sort.dateCreated'),
+    name: t('projects.sort.name'),
   };
 
   return (
@@ -51,7 +53,7 @@ export function ProjectsToolbar({ onCreateClick }: ProjectsToolbarProps) {
               : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] bg-transparent'
           )}
         >
-          Personal
+          {t('projects.personal')}
         </button>
         <button
           onClick={() => setActiveTab('team')}
@@ -63,31 +65,29 @@ export function ProjectsToolbar({ onCreateClick }: ProjectsToolbarProps) {
               : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] bg-transparent'
           )}
         >
-          Team
+          {t('projects.team')}
         </button>
       </div>
 
       {/* Right: Search + Sort + View + Create */}
       <div className="flex items-center gap-3">
-        {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]" />
           <input
             type="text"
-            placeholder="Search projects..."
+            placeholder={t('projects.searchProjects')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="Search projects"
+            aria-label={t('projects.searchProjects')}
             className="h-9 w-56 rounded-xl border border-[var(--border)] bg-[var(--hover-overlay)] pl-9 pr-3 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/30 focus:border-[var(--primary)] transition-all"
           />
         </div>
 
-        {/* Sort */}
         <div className="relative" ref={sortRef}>
           <button
             onClick={() => setSortMenuOpen(!sortMenuOpen)}
             className="flex items-center gap-1.5 h-9 px-3 rounded-xl border border-[var(--border)] bg-transparent text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
-            aria-label="Sort projects"
+            aria-label={t('projects.sort.lastUpdated')}
             aria-expanded={sortMenuOpen}
           >
             <ArrowUpDown className="h-3.5 w-3.5" />
@@ -114,7 +114,6 @@ export function ProjectsToolbar({ onCreateClick }: ProjectsToolbarProps) {
           )}
         </div>
 
-        {/* View Toggle */}
         <div className="flex items-center gap-0.5 bg-[var(--hover-overlay)] rounded-lg p-0.5" role="radiogroup" aria-label="View mode">
           <button
             onClick={() => setViewMode('grid')}
@@ -144,13 +143,12 @@ export function ProjectsToolbar({ onCreateClick }: ProjectsToolbarProps) {
           </button>
         </div>
 
-        {/* Create */}
         <button
           onClick={onCreateClick}
           className="flex items-center gap-1.5 h-9 px-4 rounded-xl bg-[var(--primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer border-none"
         >
           <Plus className="h-4 w-4" />
-          New Project
+          {t('projects.newProject')}
         </button>
       </div>
     </div>

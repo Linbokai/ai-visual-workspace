@@ -2,7 +2,9 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 interface FormErrors {
   email?: string;
@@ -20,21 +22,22 @@ export function LoginPage() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const login = useAuthStore((s) => s.login);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const validate = useCallback((): FormErrors => {
     const errs: FormErrors = {};
     if (!email.trim()) {
-      errs.email = 'Email is required';
+      errs.email = t('login.errors.emailRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errs.email = 'Please enter a valid email address';
+      errs.email = t('login.errors.emailInvalid');
     }
     if (!password) {
-      errs.password = 'Password is required';
+      errs.password = t('login.errors.passwordRequired');
     } else if (password.length < 4) {
-      errs.password = 'Password must be at least 4 characters';
+      errs.password = t('login.errors.passwordMinLength');
     }
     return errs;
-  }, [email, password]);
+  }, [email, password, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,12 +52,11 @@ export function LoginPage() {
         localStorage.setItem('remember_me', 'true');
       }
       setLoginSuccess(true);
-      // Smooth transition before navigating
       setTimeout(() => {
         navigate('/projects', { replace: true });
       }, 600);
     } catch {
-      setErrors({ general: 'Invalid email or password. Please try again.' });
+      setErrors({ general: t('login.errors.invalidCredentials') });
       setIsLoading(false);
     }
   };
@@ -78,6 +80,11 @@ export function LoginPage() {
       <div className="login-bg-orb login-bg-orb-3" />
       <div className="login-bg-grid" />
 
+      {/* Language switcher in top-right */}
+      <div className="fixed top-4 right-4 z-50">
+        <LanguageSwitcher />
+      </div>
+
       <AnimatePresence>
         {!loginSuccess ? (
           <motion.div
@@ -99,10 +106,10 @@ export function LoginPage() {
                 <Sparkles className="h-8 w-8 text-[var(--primary)]" />
               </div>
               <h1 className="text-2xl font-semibold text-[var(--foreground)]">
-                AI Visual Workspace
+                {t('login.title')}
               </h1>
               <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                Sign in to your creative workspace
+                {t('login.subtitle')}
               </p>
             </motion.div>
 
@@ -133,14 +140,14 @@ export function LoginPage() {
             >
               <div>
                 <label htmlFor="login-email" className="block text-sm text-[var(--muted-foreground)] mb-1.5">
-                  Email
+                  {t('login.email')}
                 </label>
                 <input
                   id="login-email"
                   type="email"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); clearFieldError('email'); }}
-                  placeholder="you@example.com"
+                  placeholder={t('login.emailPlaceholder')}
                   autoComplete="email"
                   aria-invalid={!!errors.email}
                   aria-describedby={errors.email ? 'email-error' : undefined}
@@ -168,7 +175,7 @@ export function LoginPage() {
 
               <div>
                 <label htmlFor="login-password" className="block text-sm text-[var(--muted-foreground)] mb-1.5">
-                  Password
+                  {t('login.password')}
                 </label>
                 <div className="relative">
                   <input
@@ -176,7 +183,7 @@ export function LoginPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); clearFieldError('password'); }}
-                    placeholder="Enter password"
+                    placeholder={t('login.passwordPlaceholder')}
                     autoComplete="current-password"
                     aria-invalid={!!errors.password}
                     aria-describedby={errors.password ? 'password-error' : undefined}
@@ -190,7 +197,7 @@ export function LoginPage() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer bg-transparent border-none p-0"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? t('login.hidePassword') : t('login.showPassword')}
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -220,16 +227,16 @@ export function LoginPage() {
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="w-4 h-4 rounded border-[var(--border)] accent-[var(--primary)] cursor-pointer"
-                    aria-label="Remember me"
+                    aria-label={t('login.rememberMe')}
                   />
-                  <span className="text-sm text-[var(--muted-foreground)]">Remember me</span>
+                  <span className="text-sm text-[var(--muted-foreground)]">{t('login.rememberMe')}</span>
                 </label>
                 <button
                   type="button"
                   className="text-sm text-[var(--primary)] hover:underline cursor-pointer bg-transparent border-none p-0"
                   onClick={() => {/* placeholder */}}
                 >
-                  Forgot password?
+                  {t('login.forgotPassword')}
                 </button>
               </div>
 
@@ -241,10 +248,10 @@ export function LoginPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Signing in...
+                    {t('login.signingIn')}
                   </>
                 ) : (
-                  'Sign In'
+                  t('login.signIn')
                 )}
               </button>
             </motion.form>
@@ -256,7 +263,7 @@ export function LoginPage() {
               </div>
               <div className="relative flex justify-center text-xs">
                 <span className="px-3 text-[var(--muted-foreground)]" style={{ backgroundColor: 'var(--background)' }}>
-                  or continue with
+                  {t('login.orContinueWith')}
                 </span>
               </div>
             </div>
@@ -289,9 +296,9 @@ export function LoginPage() {
             </div>
 
             <p className="text-center text-xs text-[var(--muted-foreground)]">
-              By signing in, you agree to our{' '}
+              {t('login.termsPrefix')}{' '}
               <button className="text-[var(--primary)] hover:underline cursor-pointer bg-transparent border-none p-0 text-xs">
-                Terms of Service
+                {t('login.termsOfService')}
               </button>
             </p>
           </motion.div>
@@ -310,7 +317,7 @@ export function LoginPage() {
             >
               <Sparkles className="h-8 w-8 text-[var(--success)]" />
             </motion.div>
-            <p className="text-lg font-medium text-[var(--foreground)]">Welcome back!</p>
+            <p className="text-lg font-medium text-[var(--foreground)]">{t('login.welcomeBack')}</p>
           </motion.div>
         )}
       </AnimatePresence>

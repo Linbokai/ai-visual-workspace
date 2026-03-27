@@ -1,38 +1,39 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, MessageSquare, Layers, Move, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ONBOARDING_KEY = 'canvas_onboarding_seen';
 
 interface OnboardingStep {
-  title: string;
-  description: string;
+  titleKey: string;
+  descKey: string;
   icon: React.ComponentType<{ className?: string }>;
-  position: string; // Tailwind positioning
+  position: string;
 }
 
 const steps: OnboardingStep[] = [
   {
-    title: 'Add Nodes',
-    description: 'Click the + button in the left sidebar to add image, video, text, or audio nodes to your canvas.',
+    titleKey: 'onboarding.addNodes.title',
+    descKey: 'onboarding.addNodes.description',
     icon: Plus,
     position: 'left-20 top-1/3',
   },
   {
-    title: 'Connect & Process',
-    description: 'Drag from node handles to create connections. Edges represent data flow between nodes.',
+    titleKey: 'onboarding.connectProcess.title',
+    descKey: 'onboarding.connectProcess.description',
     icon: Layers,
     position: 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
   },
   {
-    title: 'AI Chat',
-    description: 'Open the AI Chat panel to get intelligent suggestions and generate content for your nodes.',
+    titleKey: 'onboarding.aiChatStep.title',
+    descKey: 'onboarding.aiChatStep.description',
     icon: MessageSquare,
     position: 'right-20 bottom-1/3',
   },
   {
-    title: 'Navigate Canvas',
-    description: 'Scroll to zoom, drag to pan. Use Ctrl+Z to undo, Ctrl+C/V to copy/paste nodes.',
+    titleKey: 'onboarding.navigateCanvas.title',
+    descKey: 'onboarding.navigateCanvas.description',
     icon: Move,
     position: 'left-1/2 bottom-20 -translate-x-1/2',
   },
@@ -41,11 +42,11 @@ const steps: OnboardingStep[] = [
 export function OnboardingOverlay() {
   const [visible, setVisible] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const seen = localStorage.getItem(ONBOARDING_KEY);
     if (!seen) {
-      // Show after a short delay so the canvas loads first
       const timer = setTimeout(() => setVisible(true), 800);
       return () => clearTimeout(timer);
     }
@@ -85,7 +86,7 @@ export function OnboardingOverlay() {
         onClick={handleDismiss}
         role="dialog"
         aria-modal="true"
-        aria-label="Canvas onboarding guide"
+        aria-label={t('onboarding.gettingStarted')}
       >
         <motion.div
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -99,12 +100,12 @@ export function OnboardingOverlay() {
           <div className="flex items-center justify-between px-5 pt-5 pb-0">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-[var(--primary)]" />
-              <h2 className="text-base font-semibold text-[var(--foreground)]">Getting Started</h2>
+              <h2 className="text-base font-semibold text-[var(--foreground)]">{t('onboarding.gettingStarted')}</h2>
             </div>
             <button
               onClick={handleDismiss}
               className="p-1 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer bg-transparent border-none"
-              aria-label="Close onboarding"
+              aria-label={t('onboarding.closeOnboarding')}
             >
               <X className="h-4 w-4" />
             </button>
@@ -125,8 +126,8 @@ export function OnboardingOverlay() {
                   <Icon className="h-6 w-6 text-[var(--primary)]" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-[var(--foreground)] mb-1">{step.title}</h3>
-                  <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">{step.description}</p>
+                  <h3 className="text-sm font-medium text-[var(--foreground)] mb-1">{t(step.titleKey)}</h3>
+                  <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">{t(step.descKey)}</p>
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -134,7 +135,6 @@ export function OnboardingOverlay() {
 
           {/* Footer */}
           <div className="flex items-center justify-between px-5 pb-5">
-            {/* Step dots */}
             <div className="flex items-center gap-1.5">
               {steps.map((_, i) => (
                 <div
@@ -152,14 +152,14 @@ export function OnboardingOverlay() {
                   onClick={handlePrev}
                   className="h-8 px-3 rounded-lg border border-[var(--border)] bg-transparent text-sm text-[var(--foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer"
                 >
-                  Back
+                  {t('common.back')}
                 </button>
               )}
               <button
                 onClick={handleNext}
                 className="h-8 px-4 rounded-lg bg-[var(--primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer border-none"
               >
-                {currentStep < steps.length - 1 ? 'Next' : 'Get Started'}
+                {currentStep < steps.length - 1 ? t('common.next') : t('onboarding.getStarted')}
               </button>
             </div>
           </div>

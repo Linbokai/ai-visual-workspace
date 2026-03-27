@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { MoreVertical, Copy, Trash2, Pencil, Download, ImageIcon, Video, Type, Music } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useNotificationStore } from '@/stores/notificationStore';
 import { cn } from '@/lib/utils';
@@ -37,6 +38,7 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
   const addProject = useProjectStore((s) => s.addProject);
   const updateProject = useProjectStore((s) => s.updateProject);
   const addNotification = useNotificationStore((s) => s.addNotification);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -56,10 +58,9 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
     }
   }, [renaming]);
 
-  const timeAgo = getTimeAgo(project.updated_at);
+  const timeAgo = getTimeAgo(project.updated_at, t);
   const nodeCount = project.canvas_data.nodes.length;
 
-  // Compute node type summary for preview
   const nodeTypeCounts = project.canvas_data.nodes.reduce((acc, n) => {
     const type = n.type || 'text';
     acc[type] = (acc[type] || 0) + 1;
@@ -72,15 +73,15 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
     const dup: Project = {
       ...project,
       id: crypto.randomUUID(),
-      name: `${project.name} (Copy)`,
+      name: `${project.name} ${t('projects.copy')}`,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
     addProject(dup);
     addNotification({
       type: 'success',
-      title: 'Project duplicated',
-      message: `"${dup.name}" has been created`,
+      title: t('projects.projectDuplicated'),
+      message: t('projects.projectDuplicatedMsg', { name: dup.name }),
     });
   };
 
@@ -90,10 +91,10 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
     removeProject(project.id);
     addNotification({
       type: 'info',
-      title: 'Project deleted',
-      message: `"${project.name}" has been removed`,
+      title: t('projects.projectDeleted'),
+      message: t('projects.projectDeletedMsg', { name: project.name }),
       action: {
-        label: 'Undo',
+        label: t('common.undo'),
         onClick: () => addProject(project),
       },
     });
@@ -112,8 +113,8 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
     URL.revokeObjectURL(url);
     addNotification({
       type: 'success',
-      title: 'Project exported',
-      message: `"${project.name}" saved to file`,
+      title: t('projects.projectExportedSingle'),
+      message: t('projects.projectExportedSingleMsg', { name: project.name }),
     });
   };
 
@@ -140,7 +141,7 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
         role="button"
         tabIndex={0}
         onKeyDown={(e) => { if (e.key === 'Enter' && !renaming) navigate(`/canvas/${project.id}`); }}
-        aria-label={`Open project ${project.name}`}
+        aria-label={`${t('projects.newProject')} ${project.name}`}
       >
         <div className="w-16 h-12 rounded-lg bg-[var(--muted)] overflow-hidden flex-shrink-0 flex items-center justify-center">
           {project.thumbnail ? (
@@ -153,7 +154,7 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
                   <span key={type} style={{ color: nodeTypeColors[type] }}><Icon className="h-3 w-3" /></span>
                 ) : null;
               })}
-              {nodeCount === 0 && <span className="text-xs text-[var(--muted-foreground)]">Empty</span>}
+              {nodeCount === 0 && <span className="text-xs text-[var(--muted-foreground)]">{t('common.empty')}</span>}
             </div>
           )}
         </div>
@@ -167,7 +168,7 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
               onKeyDown={(e) => { if (e.key === 'Enter') handleRenameConfirm(); if (e.key === 'Escape') setRenaming(false); }}
               onClick={(e) => e.stopPropagation()}
               className="h-7 w-full px-2 rounded-lg border border-[var(--border)] bg-[var(--input)] text-sm text-[var(--foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-              aria-label="Rename project"
+              aria-label={t('common.rename')}
             />
           ) : (
             <>
@@ -175,7 +176,7 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
               <div className="flex items-center gap-2 mt-0.5">
                 <p className="text-xs text-[var(--muted-foreground)]">{timeAgo}</p>
                 {nodeCount > 0 && (
-                  <span className="text-xs text-[var(--muted-foreground)]">{nodeCount} node{nodeCount > 1 ? 's' : ''}</span>
+                  <span className="text-xs text-[var(--muted-foreground)]">{t('projects.nodeCount', { count: nodeCount })}</span>
                 )}
               </div>
             </>
@@ -190,7 +191,7 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
           >
             <MoreVertical className="h-4 w-4" />
           </button>
-          {menuOpen && <CardMenu onDuplicate={handleDuplicate} onRename={handleRenameStart} onExport={handleExport} onDelete={handleDelete} />}
+          {menuOpen && <CardMenu t={t} onDuplicate={handleDuplicate} onRename={handleRenameStart} onExport={handleExport} onDelete={handleDelete} />}
         </div>
       </div>
     );
@@ -213,13 +214,11 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
           <img src={project.thumbnail} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            {/* Mini canvas preview showing node layout */}
             {nodeCount > 0 ? (
               <div className="relative w-3/4 h-3/4">
                 {project.canvas_data.nodes.slice(0, 6).map((node, i) => {
                   const Icon = nodeTypeIcons[node.type || 'text'];
                   const color = nodeTypeColors[node.type || 'text'];
-                  // Normalize positions for preview
                   const nodes = project.canvas_data.nodes;
                   const minX = Math.min(...nodes.map((n) => n.position.x));
                   const maxX = Math.max(...nodes.map((n) => n.position.x));
@@ -258,11 +257,10 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
           </div>
         )}
 
-        {/* Hover overlay with node count badge */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         {nodeCount > 0 && (
           <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/50 backdrop-blur-sm text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity">
-            {nodeCount} node{nodeCount > 1 ? 's' : ''}
+            {t('projects.nodeCount', { count: nodeCount })}
           </div>
         )}
       </div>
@@ -280,19 +278,18 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
                 onKeyDown={(e) => { if (e.key === 'Enter') handleRenameConfirm(); if (e.key === 'Escape') setRenaming(false); }}
                 onClick={(e) => e.stopPropagation()}
                 className="h-6 w-full px-1 rounded border border-[var(--border)] bg-[var(--input)] text-sm text-[var(--foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-                aria-label="Rename project"
+                aria-label={t('common.rename')}
               />
             ) : (
               <>
                 <h3 className="text-sm font-medium text-[var(--card-foreground)] truncate">{project.name}</h3>
                 <div className="flex items-center gap-2 mt-0.5">
                   <p className="text-xs text-[var(--muted-foreground)]">{timeAgo}</p>
-                  {/* Node type indicators */}
                   <div className="flex items-center gap-0.5">
                     {Object.entries(nodeTypeCounts).map(([type, count]) => {
                       const Icon = nodeTypeIcons[type];
                       return Icon ? (
-                        <div key={type} className="flex items-center gap-0.5" title={`${count} ${type} node${count > 1 ? 's' : ''}`}>
+                        <div key={type} className="flex items-center gap-0.5" title={`${count} ${type}`}>
                           <span style={{ color: nodeTypeColors[type], opacity: 0.7 }}><Icon className="h-3 w-3" /></span>
                         </div>
                       ) : null;
@@ -314,7 +311,7 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
             >
               <MoreVertical className="h-4 w-4" />
             </button>
-            {menuOpen && <CardMenu onDuplicate={handleDuplicate} onRename={handleRenameStart} onExport={handleExport} onDelete={handleDelete} />}
+            {menuOpen && <CardMenu t={t} onDuplicate={handleDuplicate} onRename={handleRenameStart} onExport={handleExport} onDelete={handleDelete} />}
           </div>
         </div>
       </div>
@@ -323,11 +320,13 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
 }
 
 function CardMenu({
+  t,
   onDuplicate,
   onRename,
   onExport,
   onDelete,
 }: {
+  t: (key: string) => string;
   onDuplicate: (e: React.MouseEvent) => void;
   onRename: (e: React.MouseEvent) => void;
   onExport: (e: React.MouseEvent) => void;
@@ -340,21 +339,21 @@ function CardMenu({
         className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-lg text-sm text-[var(--popover-foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer bg-transparent border-none text-left"
         role="menuitem"
       >
-        <Pencil className="h-3.5 w-3.5" /> Rename
+        <Pencil className="h-3.5 w-3.5" /> {t('common.rename')}
       </button>
       <button
         onClick={onDuplicate}
         className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-lg text-sm text-[var(--popover-foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer bg-transparent border-none text-left"
         role="menuitem"
       >
-        <Copy className="h-3.5 w-3.5" /> Duplicate
+        <Copy className="h-3.5 w-3.5" /> {t('common.duplicate')}
       </button>
       <button
         onClick={onExport}
         className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-lg text-sm text-[var(--popover-foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer bg-transparent border-none text-left"
         role="menuitem"
       >
-        <Download className="h-3.5 w-3.5" /> Export JSON
+        <Download className="h-3.5 w-3.5" /> {t('projects.exportJSON')}
       </button>
       <div className="h-px bg-[var(--border)] my-1 -mx-1" role="separator" />
       <button
@@ -362,22 +361,22 @@ function CardMenu({
         className="flex items-center gap-2 w-full px-2.5 py-1.5 rounded-lg text-sm text-[var(--error)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer bg-transparent border-none text-left"
         role="menuitem"
       >
-        <Trash2 className="h-3.5 w-3.5" /> Delete
+        <Trash2 className="h-3.5 w-3.5" /> {t('common.delete')}
       </button>
     </div>
   );
 }
 
-function getTimeAgo(dateStr: string): string {
+function getTimeAgo(dateStr: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
   const now = Date.now();
   const date = new Date(dateStr).getTime();
   const diffMs = now - date;
   const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffMins < 1) return t('time.justNow');
+  if (diffMins < 60) return t('time.minutesAgo', { count: diffMins });
   const diffHrs = Math.floor(diffMins / 60);
-  if (diffHrs < 24) return `${diffHrs}h ago`;
+  if (diffHrs < 24) return t('time.hoursAgo', { count: diffHrs });
   const diffDays = Math.floor(diffHrs / 24);
-  if (diffDays < 30) return `${diffDays}d ago`;
-  return `${Math.floor(diffDays / 30)}mo ago`;
+  if (diffDays < 30) return t('time.daysAgo', { count: diffDays });
+  return t('time.monthsAgo', { count: Math.floor(diffDays / 30) });
 }

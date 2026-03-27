@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Search, Plus, Trash2, LayoutGrid, List, Filter } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { mockTemplates } from '@/lib/mock-templates';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import { cn } from '@/lib/utils';
@@ -14,13 +15,13 @@ export function TemplatesPage() {
   const [view, setView] = useState<View>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [templates, setTemplates] = useState(mockTemplates);
+  const { t } = useTranslation();
 
   const nodes = useCanvasStore((s) => s.nodes);
   const edges = useCanvasStore((s) => s.edges);
   const projectId = useCanvasStore((s) => s.projectId);
   const projectName = useCanvasStore((s) => s.projectName);
 
-  // Derive unique categories from all templates
   const categories = useMemo(() => {
     const cats = new Set(templates.map((t) => t.category));
     return ['All', ...Array.from(cats).sort()];
@@ -44,9 +45,9 @@ export function TemplatesPage() {
 
     const newTemplate: Template = {
       id: `tmpl-${Date.now().toString(36)}`,
-      name: projectName || 'Untitled Template',
+      name: projectName || t('projects.untitledProject'),
       thumbnail: '',
-      description: `Saved from project "${projectName}"`,
+      description: t('templates.savedFromProject', { name: projectName }),
       category: 'Custom',
       canvas_data: {
         viewport: { x: 0, y: 0, zoom: 1 },
@@ -68,7 +69,7 @@ export function TemplatesPage() {
     <div className="max-w-[1500px] mx-auto px-6 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-[var(--foreground)]">Templates</h1>
+        <h1 className="text-2xl font-semibold text-[var(--foreground)]">{t('templates.title')}</h1>
         <button
           onClick={handleCreateTemplate}
           disabled={!hasCanvasContent}
@@ -80,14 +81,13 @@ export function TemplatesPage() {
           )}
         >
           <Plus className="h-4 w-4" />
-          Save as Template
+          {t('templates.saveAsTemplate')}
         </button>
       </div>
 
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-3">
-          {/* Tab switcher */}
           <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
             <button
               onClick={() => setTab('public')}
@@ -98,7 +98,7 @@ export function TemplatesPage() {
                   : 'text-[var(--muted-foreground)] bg-transparent'
               )}
             >
-              Public Templates
+              {t('templates.publicTemplates')}
             </button>
             <button
               onClick={() => setTab('mine')}
@@ -109,11 +109,10 @@ export function TemplatesPage() {
                   : 'text-[var(--muted-foreground)] bg-transparent'
               )}
             >
-              My Templates
+              {t('templates.myTemplates')}
             </button>
           </div>
 
-          {/* Category filter */}
           <div className="flex items-center gap-1.5">
             <Filter className="h-4 w-4 text-[var(--muted-foreground)]" />
             <select
@@ -131,19 +130,17 @@ export function TemplatesPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]" />
             <input
               type="text"
-              placeholder="Search templates..."
+              placeholder={t('templates.searchTemplates')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="h-9 w-56 rounded-xl border border-[var(--border)] bg-white/5 pl-9 pr-3 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-1 focus:ring-white/10"
             />
           </div>
 
-          {/* View toggle */}
           <div className="flex items-center gap-0.5 bg-white/5 rounded-lg p-0.5">
             <button
               onClick={() => setView('grid')}
@@ -173,16 +170,16 @@ export function TemplatesPage() {
 
       {/* Results count */}
       <p className="text-xs text-[var(--muted-foreground)] mb-4">
-        {filtered.length} template{filtered.length !== 1 ? 's' : ''} found
-        {selectedCategory !== 'All' && ` in ${selectedCategory}`}
+        {t(filtered.length !== 1 ? 'templates.templateCount_plural' : 'templates.templateCount', { count: filtered.length })}
+        {selectedCategory !== 'All' && ` ${t('templates.inCategory', { category: selectedCategory })}`}
       </p>
 
       {/* Grid / List */}
       {filtered.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-[var(--muted-foreground)]">No templates found</p>
+          <p className="text-[var(--muted-foreground)]">{t('templates.noTemplatesFound')}</p>
           <p className="text-sm text-[var(--muted-foreground)] mt-1">
-            Try adjusting your search or category filter
+            {t('templates.tryAdjusting')}
           </p>
         </div>
       ) : view === 'grid' ? (
@@ -209,6 +206,7 @@ function TemplateCard({
   template: Template;
   onDelete: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   const nodeTypes = template.canvas_data.nodes.reduce(
     (acc, n) => {
       acc[n.type as string] = (acc[n.type as string] || 0) + 1;
@@ -219,7 +217,6 @@ function TemplateCard({
 
   return (
     <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] overflow-hidden group">
-      {/* Thumbnail area */}
       <div className="h-36 bg-[var(--muted)] flex items-center justify-center">
         <div className="flex gap-2">
           {template.canvas_data.nodes.slice(0, 3).map((node, i) => (
@@ -265,11 +262,10 @@ function TemplateCard({
           {template.description}
         </p>
 
-        {/* Content preview */}
         <div className="mt-2 flex items-center gap-2 text-[10px] text-[var(--muted-foreground)]">
-          <span>{template.canvas_data.nodes.length} nodes</span>
+          <span>{t('templates.nodes', { count: template.canvas_data.nodes.length })}</span>
           <span>&middot;</span>
-          <span>{template.canvas_data.edges.length} edges</span>
+          <span>{t('templates.edges', { count: template.canvas_data.edges.length })}</span>
         </div>
         <div className="mt-1 flex flex-wrap gap-1">
           {Object.entries(nodeTypes).map(([type, count]) => (
@@ -297,6 +293,7 @@ function TemplateListItem({
   template: Template;
   onDelete: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center gap-4 p-3 rounded-xl bg-[var(--card)] group">
       <div className="w-20 h-14 rounded-lg bg-[var(--muted)] flex items-center justify-center flex-shrink-0">
@@ -313,8 +310,8 @@ function TemplateListItem({
         <p className="text-xs text-[var(--muted-foreground)] truncate">{template.description}</p>
       </div>
       <div className="flex items-center gap-3 text-xs text-[var(--muted-foreground)] flex-shrink-0">
-        <span>{template.canvas_data.nodes.length} nodes</span>
-        <span>{template.canvas_data.edges.length} edges</span>
+        <span>{t('templates.nodes', { count: template.canvas_data.nodes.length })}</span>
+        <span>{t('templates.edges', { count: template.canvas_data.edges.length })}</span>
       </div>
       <span className="text-xs text-[var(--muted-foreground)] flex-shrink-0 px-2 py-0.5 rounded-full bg-white/5">
         {template.category}

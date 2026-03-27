@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { X, Plus, Send, Mic, Paperclip, Image, Video, Type, Music, Wand2, Eye, Check, Square } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { usePanelStore } from '@/stores/usePanelStore';
 import { useChatStore } from '@/stores/useChatStore';
 import { useCanvasStore } from '@/stores/useCanvasStore';
@@ -11,7 +12,6 @@ import { useChat, rawActionsMap, executeAction } from '@/hooks/useChat';
 import type { AIAction } from '@/lib/ai-actions';
 import type { ChatMessageAction } from '@/types';
 
-// Map node types to icons for action cards
 const nodeTypeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   image: Image,
   video: Video,
@@ -27,6 +27,7 @@ export function ChatPanel() {
   const [input, setInput] = useState('');
   const [model, setModel] = useState('default');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   const { sendMessage, cancelStream } = useChat();
 
@@ -34,7 +35,6 @@ export function ChatPanel() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Apply an action card (called when user clicks "Apply to Canvas")
   const handleApplyAction = useCallback(
     (msgId: string, actionIndex: number, action: AIAction) => {
       const nodeId = executeAction(action);
@@ -52,7 +52,6 @@ export function ChatPanel() {
     [],
   );
 
-  // Focus viewport on a node
   const handleViewOnCanvas = useCallback((nodeId: string | undefined) => {
     if (!nodeId) return;
     useCanvasStore.getState().selectNodes([nodeId]);
@@ -75,15 +74,15 @@ export function ChatPanel() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 h-12 border-b border-[var(--border)] flex-shrink-0">
         <div className="flex items-center gap-2">
-          <h2 className="text-sm font-medium text-[var(--foreground)]">AI Chat</h2>
+          <h2 className="text-sm font-medium text-[var(--foreground)]">{t('canvas.aiChat')}</h2>
           {isStreaming && (
-            <span className="text-[10px] text-[var(--primary)] animate-pulse">streaming...</span>
+            <span className="text-[10px] text-[var(--primary)] animate-pulse">{t('canvas.streaming')}</span>
           )}
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={clearChat}
-            title="New Chat"
+            title={t('canvas.newChat')}
             className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer bg-transparent border-none"
           >
             <Plus className="h-4 w-4" />
@@ -127,7 +126,7 @@ export function ChatPanel() {
                 <span className="inline-block w-1.5 h-4 bg-[var(--primary)] ml-0.5 animate-pulse rounded-sm" />
               )}
               {msg.status === 'error' && (
-                <span className="inline-block text-[10px] text-red-400 ml-1">(error)</span>
+                <span className="inline-block text-[10px] text-red-400 ml-1">{t('canvas.error')}</span>
               )}
 
               {/* Action cards */}
@@ -158,7 +157,7 @@ export function ChatPanel() {
                             {actionCard.applied ? (
                               <span className="inline-flex items-center gap-1 text-[10px] text-green-400">
                                 <Check className="h-3 w-3" />
-                                Applied
+                                {t('common.applied')}
                               </span>
                             ) : (
                               rawAction && (
@@ -166,7 +165,7 @@ export function ChatPanel() {
                                   onClick={() => handleApplyAction(msg.id, idx, rawAction)}
                                   className="text-[10px] px-2.5 py-1 rounded-lg bg-[var(--primary)] text-white hover:opacity-90 transition-opacity cursor-pointer border-none"
                                 >
-                                  Apply to Canvas
+                                  {t('canvas.applyToCanvas')}
                                 </button>
                               )
                             )}
@@ -176,7 +175,7 @@ export function ChatPanel() {
                                 className="inline-flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-lg bg-[var(--hover-overlay)] text-[var(--foreground)] hover:bg-white/10 transition-colors cursor-pointer border border-[var(--border)]"
                               >
                                 <Eye className="h-3 w-3" />
-                                View on Canvas
+                                {t('canvas.viewOnCanvas')}
                               </button>
                             )}
                           </div>
@@ -209,7 +208,7 @@ export function ChatPanel() {
                 handleSend();
               }
             }}
-            placeholder="Describe what you want..."
+            placeholder={t('canvas.describePlaceholder')}
             rows={1}
             className="flex-1 bg-transparent border-none text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none resize-none min-h-[24px] max-h-[120px]"
           />
@@ -221,7 +220,7 @@ export function ChatPanel() {
             <button
               onClick={cancelStream}
               className="p-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors cursor-pointer border-none flex-shrink-0"
-              title="Stop generating"
+              title={t('canvas.stopGenerating')}
             >
               <Square className="h-4 w-4" />
             </button>

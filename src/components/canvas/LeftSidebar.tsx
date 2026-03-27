@@ -10,6 +10,7 @@ import {
   BookOpen,
   Sparkles,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePanelStore } from '@/stores/usePanelStore';
 import type { LeftPanelType } from '@/stores/usePanelStore';
 import { cn } from '@/lib/utils';
@@ -17,17 +18,17 @@ import { cn } from '@/lib/utils';
 const sidebarItems: Array<{
   id: LeftPanelType;
   icon: React.ComponentType<{ className?: string }>;
-  label: string;
+  labelKey: string;
   dividerBefore?: boolean;
 }> = [
-  { id: 'add', icon: Plus, label: 'Add Node' },
-  { id: 'assets', icon: FolderOpen, label: 'Assets' },
-  { id: 'templates', icon: LayoutTemplate, label: 'Templates' },
-  { id: 'history', icon: Clock, label: 'History' },
-  { id: 'advanced', icon: Wand2, label: 'Advanced' },
-  { id: 'video-analysis', icon: Film, label: 'Video Analysis', dividerBefore: true },
-  { id: 'storyboard', icon: BookOpen, label: 'Storyboard' },
-  { id: 'prompt-engineer', icon: Sparkles, label: 'Prompt Engineer' },
+  { id: 'add', icon: Plus, labelKey: 'sidebar.addNode' },
+  { id: 'assets', icon: FolderOpen, labelKey: 'sidebar.assets' },
+  { id: 'templates', icon: LayoutTemplate, labelKey: 'sidebar.templates' },
+  { id: 'history', icon: Clock, labelKey: 'sidebar.history' },
+  { id: 'advanced', icon: Wand2, labelKey: 'sidebar.advanced' },
+  { id: 'video-analysis', icon: Film, labelKey: 'sidebar.videoAnalysis', dividerBefore: true },
+  { id: 'storyboard', icon: BookOpen, labelKey: 'sidebar.storyboard' },
+  { id: 'prompt-engineer', icon: Sparkles, labelKey: 'sidebar.promptEngineer' },
 ];
 
 export function LeftSidebar() {
@@ -35,6 +36,7 @@ export function LeftSidebar() {
   const togglePanel = usePanelStore((s) => s.toggleLeftPanel);
   const toggleChat = usePanelStore((s) => s.toggleChatPanel);
   const chatOpen = usePanelStore((s) => s.chatPanelOpen);
+  const { t } = useTranslation();
 
   return (
     <nav
@@ -42,15 +44,15 @@ export function LeftSidebar() {
       role="toolbar"
       aria-label="Canvas tools"
     >
-      {sidebarItems.map(({ id, icon: Icon, label, dividerBefore }) => (
+      {sidebarItems.map(({ id, icon: Icon, labelKey, dividerBefore }) => (
         <span key={id} className="contents">
           {dividerBefore && (
             <div className="w-6 h-px bg-[var(--border)] my-1" aria-hidden="true" />
           )}
           <button
             onClick={() => togglePanel(id)}
-            title={label}
-            aria-label={label}
+            title={t(labelKey)}
+            aria-label={t(labelKey)}
             aria-pressed={activePanel === id}
             className={cn(
               'w-10 h-10 flex items-center justify-center rounded-xl transition-colors cursor-pointer bg-transparent border-none',
@@ -69,8 +71,8 @@ export function LeftSidebar() {
       {/* Chat toggle */}
       <button
         onClick={toggleChat}
-        title="AI Chat"
-        aria-label="AI Chat"
+        title={t('canvas.aiChat')}
+        aria-label={t('canvas.aiChat')}
         aria-pressed={chatOpen}
         className={cn(
           'w-10 h-10 flex items-center justify-center rounded-xl transition-colors cursor-pointer bg-transparent border-none',
@@ -84,8 +86,8 @@ export function LeftSidebar() {
 
       {/* AI Agent */}
       <button
-        title="AI Agent"
-        aria-label="AI Agent"
+        title={t('canvas.aiAgent')}
+        aria-label={t('canvas.aiAgent')}
         className="w-10 h-10 flex items-center justify-center rounded-xl text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer bg-transparent border-none"
       >
         <Bot className="h-5 w-5" />

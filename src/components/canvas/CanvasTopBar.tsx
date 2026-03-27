@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import { NodeToolbar } from './toolbar/NodeToolbar';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { useState } from 'react';
 
 export function CanvasTopBar() {
@@ -11,6 +13,7 @@ export function CanvasTopBar() {
   const setProjectName = useCanvasStore((s) => s.setProjectName);
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(projectName);
+  const { t } = useTranslation();
 
   const handleSave = () => {
     const trimmed = editValue.trim();
@@ -61,11 +64,12 @@ export function CanvasTopBar() {
       {/* Center: Node Toolbar */}
       <NodeToolbar />
 
-      {/* Right: Credits + Theme */}
+      {/* Right: Credits + Language + Theme */}
       <div className="flex items-center gap-3">
         <span className="text-xs text-[var(--muted-foreground)]">
-          Credits: ∞
+          {t('canvas.credits')}
         </span>
+        <LanguageSwitcher />
         <ThemeToggle />
       </div>
     </motion.header>
