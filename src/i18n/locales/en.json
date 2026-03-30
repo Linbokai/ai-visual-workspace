@@ -282,7 +282,16 @@
     "createScene": "Create Scene",
     "createSceneDesc": "Author a new scene with environment details",
     "generateCharacterVideoDesc": "Generate character reference videos",
-    "generateSceneVideoDesc": "Generate scene concept videos"
+    "generateSceneVideoDesc": "Generate scene concept videos",
+    "replace": "Replace",
+    "uploadImage": "Click to upload image",
+    "imageGeneration": "Image Generation",
+    "videoGeneration": "Video Generation",
+    "generateHint": "Enter prompt to generate image",
+    "generateVideoHint": "Enter prompt to generate video",
+    "insertRef": "Click to insert reference",
+    "addRef": "Connect more images",
+    "uploadVideo": "Upload video or enter prompt to generate"
   },
   "properties": {
     "label": "Label",

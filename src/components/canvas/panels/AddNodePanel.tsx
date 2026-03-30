@@ -31,16 +31,6 @@ const advancedNodeOptions: Array<{
   { type: 'mask-editor', labelKey: 'nodes.maskEditor', icon: Paintbrush, descKey: 'nodes.maskEditorDesc' },
 ];
 
-const generationNodeOptions: Array<{
-  type: NodeType;
-  labelKey: string;
-  icon: React.ComponentType<{ className?: string }>;
-  descKey: string;
-}> = [
-  { type: 'gen-image', labelKey: 'nodes.genImage', icon: Sparkles, descKey: 'nodes.genImageDesc' },
-  { type: 'gen-video', labelKey: 'nodes.genVideo', icon: Film, descKey: 'nodes.genVideoDesc' },
-];
-
 const storyNodeOptions: Array<{
   type: NodeType;
   labelKey: string;
@@ -118,27 +108,6 @@ export function AddNodePanel() {
           {t('sidebar.advanced')}
         </p>
         {advancedNodeOptions.map(({ type, labelKey, icon: Icon, descKey }) => (
-          <button
-            key={type}
-            onClick={() => handleAdd(type)}
-            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none text-left"
-          >
-            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-              <Icon className="h-5 w-5 text-[var(--primary)]" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-[var(--foreground)]">{t(labelKey)}</p>
-              <p className="text-xs text-[var(--muted-foreground)]">{t(descKey)}</p>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      <div className="pt-2 border-t border-[var(--border)]">
-        <p className="text-[10px] font-medium text-[var(--muted-foreground)] uppercase tracking-wider px-3 mb-2">
-          {t('nodes.aiGeneration')}
-        </p>
-        {generationNodeOptions.map(({ type, labelKey, icon: Icon, descKey }) => (
           <button
             key={type}
             onClick={() => handleAdd(type)}

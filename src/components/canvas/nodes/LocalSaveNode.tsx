@@ -2,10 +2,7 @@ import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { HardDrive, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
-import { NodeStatusBadge } from './NodeStatusBadge';
-import { NodePromptEditor } from './NodePromptEditor';
 import { useCanvasStore } from '@/stores/useCanvasStore';
-import type { NodeStatus } from '@/types';
 
 interface LocalSaveNodeDataType {
   label: string;
@@ -18,7 +15,6 @@ interface LocalSaveNodeDataType {
 
 export function LocalSaveNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as LocalSaveNodeDataType;
-  const status = (nodeData as any).status || 'idle';
   const updateNode = useCanvasStore((s) => s.updateNode);
   const { t } = useTranslation();
 
@@ -31,7 +27,12 @@ export function LocalSaveNode({ id, data, selected }: NodeProps) {
       style={{ '--glow-color': '#64748b' } as React.CSSProperties}
     >
       <Handle type="target" position={Position.Left} className="!w-3 !h-3 !bg-slate-500 !border-2 !border-[var(--card)]" />
-      <div className="h-1 w-full bg-slate-500" />
+
+      {/* Header */}
+      <div className="px-3 py-1.5 border-b border-[var(--border)] flex items-center gap-1.5">
+        <HardDrive className="h-3.5 w-3.5 text-slate-500" />
+        <p className="text-xs font-medium text-[var(--card-foreground)]">{nodeData.label}</p>
+      </div>
 
       <div className="p-3 space-y-2 nodrag">
         <div>
@@ -80,16 +81,6 @@ export function LocalSaveNode({ id, data, selected }: NodeProps) {
         )}
       </div>
 
-      <div className="px-3 py-2 border-t border-[var(--border)]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <HardDrive className="h-3.5 w-3.5 text-slate-500" />
-            <p className="text-xs font-medium text-[var(--card-foreground)]">{nodeData.label}</p>
-          </div>
-          <NodeStatusBadge status={status as NodeStatus} />
-        </div>
-      </div>
-      <NodePromptEditor nodeId={id} prompt={nodeData.prompt || ''} onChange={(prompt) => updateNode(id, { prompt })} />
       <Handle type="source" position={Position.Right} className="!w-3 !h-3 !bg-slate-500 !border-2 !border-[var(--card)]" />
     </div>
   );

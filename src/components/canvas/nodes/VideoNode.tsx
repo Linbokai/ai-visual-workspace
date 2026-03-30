@@ -1,19 +1,11 @@
-import { useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import {
-  Video,
-  Loader2,
-  AlertCircle,
-  ChevronDown,
-  Camera,
-} from 'lucide-react';
+import { Video, Upload, Film, Loader2, Clock, Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
-import { NodeStatusBadge } from './NodeStatusBadge';
-import { NodePromptEditor } from './NodePromptEditor';
 import { NodeGenerateButton } from './NodeGenerateButton';
+import { RichPromptEditor } from './RichPromptEditor';
 import { useCanvasStore } from '@/stores/useCanvasStore';
-import type { NodeStatus, VideoModel, CameraMotion } from '@/types';
 
 interface VideoNodeDataType {
   label: string;
@@ -22,271 +14,211 @@ interface VideoNodeDataType {
   duration: number;
   status?: string;
   prompt?: string;
-  model?: VideoModel;
-  fps?: number;
-  resolution?: string;
-  cameraMotion?: CameraMotion;
-  keyframes?: Array<{ time: number; label: string }>;
+  model?: string;
   progress?: number;
+  aspectRatio?: string;
+  cameraMotion?: string;
 }
 
-const VIDEO_MODELS: { value: VideoModel; label: string }[] = [
-  { value: 'sora', label: 'Sora' },
-  { value: 'veo', label: 'Veo' },
-  { value: 'runway', label: 'Runway' },
+const VIDEO_MODELS = [
+  { value: 'sora-2', label: 'Sora 2' },
+  { value: 'veo3', label: 'Veo 3' },
+  { value: 'runway', label: 'Runway Gen-3' },
   { value: 'pika', label: 'Pika' },
   { value: 'kling', label: 'Kling' },
+  { value: 'jimeng-video-3.5', label: '即梦 3.5' },
+  { value: 'grok-video', label: 'Grok Video' },
+  { value: 'sora', label: 'Sora' },
+  { value: 'veo', label: 'Veo' },
 ];
 
-const CAMERA_MOTION_KEYS: { value: CameraMotion; key: string }[] = [
-  { value: 'none', key: 'none' },
-  { value: 'pan-left', key: 'panL' },
-  { value: 'pan-right', key: 'panR' },
-  { value: 'pan-up', key: 'panUp' },
-  { value: 'pan-down', key: 'panDn' },
-  { value: 'zoom-in', key: 'zoomIn' },
-  { value: 'zoom-out', key: 'zoomOut' },
-  { value: 'orbit', key: 'orbit' },
-  { value: 'dolly-in', key: 'dollyIn' },
-  { value: 'dolly-out', key: 'dollyOut' },
-  { value: 'tilt-up', key: 'tiltUp' },
-  { value: 'tilt-down', key: 'tiltDn' },
+const DURATIONS = [
+  { value: 3, label: '3s' },
+  { value: 5, label: '5s' },
+  { value: 8, label: '8s' },
+  { value: 10, label: '10s' },
+  { value: 15, label: '15s' },
 ];
 
-const FPS_OPTIONS = [12, 24, 30, 60];
-const RESOLUTION_OPTIONS = ['480p', '720p', '1080p', '4K'];
+const ASPECT_RATIOS = [
+  { value: '16:9', label: '16:9' },
+  { value: '9:16', label: '9:16' },
+  { value: '1:1', label: '1:1' },
+  { value: '4:3', label: '4:3' },
+];
 
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
+const CAMERA_MOTIONS = [
+  { value: 'none', label: '摄影机控制' },
+  { value: 'pan-left', label: '左移' },
+  { value: 'pan-right', label: '右移' },
+  { value: 'zoom-in', label: '推近' },
+  { value: 'zoom-out', label: '拉远' },
+  { value: 'orbit', label: '环绕' },
+];
+
+interface RefImage {
+  nodeId: string;
+  label: string;
+  imageUrl: string;
+  index: number;
 }
 
 export function VideoNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as VideoNodeDataType;
-  const status = nodeData.status || 'idle';
+  const status = (nodeData.status || 'idle') as string;
   const updateNode = useCanvasStore((s) => s.updateNode);
+  const nodes = useCanvasStore((s) => s.nodes);
+  const edges = useCanvasStore((s) => s.edges);
   const { t } = useTranslation();
-  const [showControls, setShowControls] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const progress = nodeData.progress ?? 0;
-  const model = nodeData.model ?? 'sora';
-  const cameraMotion = nodeData.cameraMotion ?? 'none';
-  const fps = nodeData.fps ?? 24;
-  const resolution = nodeData.resolution ?? '1080p';
+  const model = nodeData.model || 'sora-2';
   const duration = nodeData.duration ?? 5;
-  const keyframes = nodeData.keyframes ?? [];
+  const aspectRatio = nodeData.aspectRatio || '16:9';
+  const cameraMotion = nodeData.cameraMotion || 'none';
+
+  const refImages = useMemo((): RefImage[] => {
+    const refs: RefImage[] = [];
+    let index = 1;
+    for (const edge of edges) {
+      if (edge.target === id) {
+        const sourceNode = nodes.find((n) => n.id === edge.source);
+        if (sourceNode) {
+          const srcData = sourceNode.data as Record<string, any>;
+          if (srcData.imageUrl) {
+            refs.push({ nodeId: sourceNode.id, label: srcData.label || `Image ${index}`, imageUrl: srcData.imageUrl, index });
+            index++;
+          }
+        }
+      }
+    }
+    return refs;
+  }, [id, nodes, edges]);
+
+  const insertImageRef = (ref: RefImage) => {
+    const tag = `@[${ref.nodeId}:${ref.label}]`;
+    const currentPrompt = nodeData.prompt || '';
+    if (!currentPrompt.includes(tag)) {
+      updateNode(id, { prompt: currentPrompt ? `${currentPrompt} ${tag} ` : `${tag} ` });
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    updateNode(id, { videoUrl: URL.createObjectURL(file), label: file.name });
+  };
+
+  const triggerUpload = () => { fileInputRef.current?.click(); };
 
   return (
-    <div
-      className={cn(
-        'rounded-xl overflow-hidden bg-[var(--card)] border-2 transition-colors min-w-[240px]',
-        selected ? 'border-[var(--node-video)] node-selected-glow' : 'border-[var(--border)]',
-        status === 'processing' && 'node-processing'
-      )}
-      style={{ '--glow-color': 'var(--node-video)' } as React.CSSProperties}
-    >
-      <Handle type="target" position={Position.Left} className="!w-3 !h-3 !bg-[var(--node-video)] !border-2 !border-[var(--card)]" />
-
-      {/* Color bar */}
-      <div className="h-1 w-full bg-[var(--node-video)]" />
-
-      {/* Model selector bar */}
-      <div className="px-2 py-1.5 border-b border-[var(--border)] flex items-center gap-1.5 nodrag">
-        <select
-          className="flex-1 bg-[var(--muted)] text-[var(--foreground)] text-[10px] rounded px-1.5 py-0.5 border border-[var(--border)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)] cursor-pointer"
-          value={model}
-          onChange={(e) => updateNode(id, { model: e.target.value })}
-        >
-          {VIDEO_MODELS.map((m) => (
-            <option key={m.value} value={m.value}>{m.label}</option>
-          ))}
-        </select>
-        <button
-          onClick={() => setShowControls(!showControls)}
-          className={cn(
-            'p-0.5 rounded transition-colors cursor-pointer bg-transparent border-none',
-            showControls ? 'text-[var(--primary)]' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
-          )}
-        >
-          <ChevronDown className={cn('h-3 w-3 transition-transform', showControls && 'rotate-180')} />
-        </button>
-      </div>
-
-      {/* Expandable controls */}
-      {showControls && (
-        <div className="px-2 py-2 border-b border-[var(--border)] space-y-2 nodrag">
-          {/* Duration and FPS */}
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <p className="text-[9px] text-[var(--muted-foreground)]">{t('properties.durationLabel', { value: duration })}</p>
-              <input
-                type="range"
-                className="w-full accent-[var(--primary)] h-1"
-                min={1}
-                max={60}
-                value={duration}
-                onChange={(e) => updateNode(id, { duration: Number(e.target.value) })}
-              />
-            </div>
-            <div>
-              <p className="text-[9px] text-[var(--muted-foreground)]">{t('properties.fpsLabel')}</p>
-              <div className="flex gap-0.5">
-                {FPS_OPTIONS.map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => updateNode(id, { fps: f })}
-                    className={cn(
-                      'flex-1 text-[8px] py-0.5 rounded border transition-colors cursor-pointer',
-                      fps === f
-                        ? 'bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]'
-                        : 'border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)]'
-                    )}
-                  >
-                    {f}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Resolution */}
-          <div>
-            <p className="text-[9px] text-[var(--muted-foreground)] mb-0.5">{t('properties.resolutionLabel')}</p>
-            <div className="flex gap-0.5">
-              {RESOLUTION_OPTIONS.map((r) => (
-                <button
-                  key={r}
-                  onClick={() => updateNode(id, { resolution: r })}
-                  className={cn(
-                    'flex-1 text-[8px] py-0.5 rounded border transition-colors cursor-pointer',
-                    resolution === r
-                      ? 'bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]'
-                      : 'border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)]'
-                  )}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Camera Motion */}
-          <div>
-            <p className="text-[9px] text-[var(--muted-foreground)] uppercase tracking-wider mb-1 flex items-center gap-1">
-              <Camera className="h-2.5 w-2.5" /> {t('properties.cameraMotionLabel')}
-            </p>
-            <div className="flex flex-wrap gap-0.5">
-              {CAMERA_MOTION_KEYS.map((cm) => (
-                <button
-                  key={cm.value}
-                  onClick={() => updateNode(id, { cameraMotion: cm.value })}
-                  className={cn(
-                    'text-[8px] px-1.5 py-0.5 rounded border transition-colors cursor-pointer',
-                    cameraMotion === cm.value
-                      ? 'bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]'
-                      : 'border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)]'
-                  )}
-                >
-                  {t(`properties.cameraMotionShort.${cm.key}`)}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Video display area */}
-      <div className="w-[240px] h-[160px] flex items-center justify-center bg-[var(--muted)] relative">
-        {nodeData.thumbnailUrl ? (
-          <>
-            <img src={nodeData.thumbnailUrl} alt="" className="w-full h-full object-cover" />
-            <div className="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
-              {formatDuration(duration)}
-            </div>
-            {/* Keyframe timeline preview */}
-            {keyframes.length > 0 && (
-              <div className="absolute bottom-0 left-0 right-0 h-4 bg-black/40 flex items-center px-1">
-                {keyframes.map((kf, i) => (
-                  <div
-                    key={i}
-                    className="absolute w-1 h-2.5 bg-[var(--node-video)] rounded-sm"
-                    style={{ left: `${(kf.time / Math.max(duration, 1)) * 100}%` }}
-                    title={`${kf.label} @ ${kf.time.toFixed(1)}s`}
-                  />
-                ))}
-              </div>
-            )}
-          </>
-        ) : status === 'processing' ? (
-          <div className="flex flex-col items-center gap-2">
-            <Loader2 className="h-8 w-8 text-[var(--primary)] animate-spin" />
-            {progress > 0 && (
-              <div className="w-24">
-                <div className="h-1 w-full bg-[var(--border)] rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-[var(--node-video)] rounded-full transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-                <p className="text-[9px] text-[var(--muted-foreground)] text-center mt-0.5">{progress}%</p>
-              </div>
-            )}
-          </div>
-        ) : status === 'error' ? (
-          <AlertCircle className="h-8 w-8 text-[var(--error)]" />
-        ) : (
-          <Video className="h-8 w-8 text-[var(--muted-foreground)]" />
+    <div className={cn('transition-colors', selected && 'z-10')}>
+      {/* ── Node card ── */}
+      <div
+        className={cn(
+          'rounded-xl overflow-hidden bg-[var(--card)] border transition-all w-[260px]',
+          selected ? 'border-[var(--node-video)]/60' : 'border-[var(--border)]',
         )}
-      </div>
+      >
+        <Handle type="target" position={Position.Left} className="!w-3 !h-3 !bg-[var(--node-video)] !border-2 !border-[var(--card)]" />
 
-      {/* Progress bar for processing */}
-      {status === 'processing' && progress > 0 && (
-        <div className="h-0.5 w-full bg-[var(--border)]">
-          <div
-            className="h-full bg-[var(--node-video)] transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      )}
+        <input ref={fileInputRef} type="file" accept="video/*" onChange={handleFileSelect} className="hidden" />
 
-      {/* Label */}
-      <div className="px-3 py-2 border-t border-[var(--border)]">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <Video className="h-3.5 w-3.5 text-[var(--node-video)] flex-shrink-0" />
-            <p className="text-xs font-medium text-[var(--card-foreground)] truncate">
-              {nodeData.label}
-            </p>
-          </div>
-          <NodeStatusBadge status={status as NodeStatus} />
-        </div>
-        <div className="flex items-center gap-2 mt-0.5">
-          <p className="text-[10px] text-[var(--muted-foreground)]">
-            {resolution} {fps}fps {formatDuration(duration)}
-          </p>
-          <span className="text-[9px] px-1 py-px rounded bg-[var(--muted)] text-[var(--muted-foreground)]">
-            {VIDEO_MODELS.find((m) => m.value === model)?.label ?? model}
-          </span>
-          {cameraMotion !== 'none' && (
-            <span className="text-[9px] px-1 py-px rounded bg-[var(--node-video)]/15 text-[var(--node-video)]">
-              {t(`properties.cameraMotionShort.${CAMERA_MOTION_KEYS.find((cm) => cm.value === cameraMotion)?.key}`)}
-            </span>
+        {/* Title bar */}
+        <div className="px-2.5 py-1.5 flex items-center gap-1.5">
+          <Video className="h-3 w-3 text-[var(--muted-foreground)]" />
+          <span className="text-[11px] text-[var(--muted-foreground)] truncate">{nodeData.label}</span>
+          {!nodeData.videoUrl && (
+            <button
+              onClick={triggerUpload}
+              className="ml-auto flex items-center gap-1 px-2 py-0.5 rounded-md border border-[var(--border)] text-[10px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--foreground)]/30 transition-colors cursor-pointer bg-transparent"
+            >
+              <Upload className="h-3 w-3" />
+              {t('nodes.upload', '上传')}
+            </button>
           )}
         </div>
+
+        {/* Video display */}
+        <div className="w-full aspect-video flex items-center justify-center bg-[var(--muted)] relative overflow-hidden">
+          {nodeData.videoUrl ? (
+            <div className="relative group w-full h-full">
+              <video src={nodeData.videoUrl} poster={nodeData.thumbnailUrl || undefined} className="w-full h-full object-contain" controls muted />
+              <button onClick={triggerUpload} className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-md border border-white/20 bg-black/50 text-white text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm hover:bg-black/70">
+                <Upload className="h-3 w-3" />{t('nodes.upload', '上传')}
+              </button>
+            </div>
+          ) : status === 'processing' ? (
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 className="h-6 w-6 text-[var(--muted-foreground)] animate-spin" />
+              {progress > 0 && (
+                <div className="w-20">
+                  <div className="h-1 w-full bg-[var(--border)] rounded-full overflow-hidden">
+                    <div className="h-full bg-[var(--node-video)] rounded-full transition-all" style={{ width: `${progress}%` }} />
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Video className="h-8 w-8 text-[var(--muted-foreground)]/30" />
+          )}
+        </div>
+
+        {status === 'processing' && progress > 0 && (
+          <div className="h-0.5 w-full bg-[var(--border)]"><div className="h-full bg-[var(--node-video)] transition-all" style={{ width: `${progress}%` }} /></div>
+        )}
+
+        <Handle type="source" position={Position.Right} className="!w-3 !h-3 !bg-[var(--node-video)] !border-2 !border-[var(--card)]" />
       </div>
 
-      {/* Prompt Editor */}
-      <NodePromptEditor
-        nodeId={id}
-        prompt={nodeData.prompt || ''}
-        onChange={(prompt) => updateNode(id, { prompt })}
-      />
+      {/* ── Editing panel (selected only) ── */}
+      {selected && (
+        <div className="mt-2 rounded-xl bg-[var(--card)] border border-[var(--border)] overflow-hidden w-[360px] -ml-[50px] shadow-xl">
+          <RichPromptEditor
+            nodeId={id}
+            prompt={nodeData.prompt || ''}
+            onChange={(prompt) => updateNode(id, { prompt })}
+            refImages={refImages}
+            onInsertRef={insertImageRef}
+            placeholder={t('properties.nodePromptPlaceholder', '描述你想生成的视频...')}
+            accentColor="rgb(168, 85, 247)"
+          />
 
-      {/* Generate Button */}
-      <NodeGenerateButton nodeId={id} status={status} mode="video" />
-
-      <Handle type="source" position={Position.Right} className="!w-3 !h-3 !bg-[var(--node-video)] !border-2 !border-[var(--card)]" />
+          <div className="px-3 py-2 border-t border-[var(--border)] flex items-center gap-2 flex-wrap nodrag text-[11px] text-[var(--muted-foreground)]">
+            <div className="flex items-center gap-1 cursor-pointer hover:text-[var(--foreground)] transition-colors">
+              <Film className="h-3 w-3" />
+              <select className="bg-transparent text-inherit text-[11px] focus:outline-none cursor-pointer appearance-none" value={model} onChange={(e) => updateNode(id, { model: e.target.value })}>
+                {VIDEO_MODELS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+              </select>
+            </div>
+            <span className="text-[var(--border)]">|</span>
+            <div className="flex items-center gap-1 cursor-pointer hover:text-[var(--foreground)] transition-colors">
+              <span>⬡</span>
+              <select className="bg-transparent text-inherit text-[11px] focus:outline-none cursor-pointer appearance-none" value={aspectRatio} onChange={(e) => updateNode(id, { aspectRatio: e.target.value })}>
+                {ASPECT_RATIOS.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+              </select>
+            </div>
+            <span className="text-[var(--border)]">|</span>
+            <div className="flex items-center gap-1 cursor-pointer hover:text-[var(--foreground)] transition-colors">
+              <Clock className="h-3 w-3" />
+              <select className="bg-transparent text-inherit text-[11px] focus:outline-none cursor-pointer appearance-none" value={duration} onChange={(e) => updateNode(id, { duration: Number(e.target.value) })}>
+                {DURATIONS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+              </select>
+            </div>
+            <span className="text-[var(--border)]">|</span>
+            <div className="flex items-center gap-1 cursor-pointer hover:text-[var(--foreground)] transition-colors">
+              <Camera className="h-3 w-3" />
+              <select className="bg-transparent text-inherit text-[11px] focus:outline-none cursor-pointer appearance-none" value={cameraMotion} onChange={(e) => updateNode(id, { cameraMotion: e.target.value })}>
+                {CAMERA_MOTIONS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+            </div>
+            <div className="ml-auto">
+              <NodeGenerateButton nodeId={id} status={status} mode="video" />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

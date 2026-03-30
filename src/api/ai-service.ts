@@ -141,6 +141,7 @@ function buildHeaders(provider: AIProvider, apiKey: string | null, extra?: Recor
       case 'openai':
       case 'custom':
       case 'replicate':
+      case 'openrouter':
         headers['Authorization'] = `Bearer ${apiKey}`;
         break;
       case 'anthropic':
@@ -254,8 +255,9 @@ async function parseSSEStream(
 function extractContentFromSSE(data: Record<string, unknown>, provider: AIProvider): string {
   switch (provider) {
     case 'openai':
-    case 'custom': {
-      // OpenAI: choices[0].delta.content
+    case 'custom':
+    case 'openrouter': {
+      // OpenAI-compatible: choices[0].delta.content
       const choices = data.choices as Array<{ delta?: { content?: string }; finish_reason?: string }> | undefined;
       return choices?.[0]?.delta?.content || '';
     }
@@ -373,6 +375,7 @@ function buildChatRequestBody(
 
     case 'openai':
     case 'custom':
+    case 'openrouter':
     default: {
       // OpenAI-compatible format
       const messages: Array<{ role: string; content: string }> = [];
@@ -456,6 +459,7 @@ function extractNonStreamingContent(data: Record<string, unknown>, provider: AIP
     }
     case 'openai':
     case 'custom':
+    case 'openrouter':
     default: {
       const choices = data.choices as Array<{ message?: { content?: string } }> | undefined;
       return choices?.[0]?.message?.content || '';
@@ -649,6 +653,21 @@ export async function testConnection(provider: AIProvider): Promise<ConnectionTe
         const data = await res.json();
         const models = (data.models as Array<{ name: string }>)?.map((m) => m.name);
         return { success: true, latencyMs, modelName: models?.[0] || 'Ollama' };
+      }
+
+      case 'openrouter': {
+        if (!apiKey) return { success: false, latencyMs: 0, error: 'No API key' };
+        const res = await fetch(`${cfg.baseUrl}/models`, {
+          headers: buildHeaders('openrouter', apiKey, cfg.customHeaders),
+        });
+        const latencyMs = Math.round(performance.now() - start);
+        if (!res.ok) {
+          const errText = await res.text().catch(() => '');
+          return { success: false, latencyMs, error: `HTTP ${res.status}: ${errText.slice(0, 200)}` };
+        }
+        const data = await res.json();
+        const modelCount = (data.data as Array<unknown>)?.length ?? 0;
+        return { success: true, latencyMs, modelName: `${modelCount} models available` };
       }
 
       case 'custom': {

@@ -14,7 +14,8 @@ export type AIProvider =
   | 'midjourney'
   | 'google'
   | 'grok'
-  | 'deepseek';
+  | 'deepseek'
+  | 'openrouter';
 
 /** Capability categories a model can support */
 export type ModelCapability =
@@ -490,6 +491,126 @@ export const BUILTIN_MODELS: AIModelDefinition[] = [
     ],
     enabled: false,
   },
+  // -- OpenRouter (aggregated models) --
+  {
+    id: 'or-claude-sonnet-4',
+    name: 'Claude Sonnet 4 (OpenRouter)',
+    provider: 'openrouter',
+    capabilities: ['text-generation', 'vision'],
+    description: 'Anthropic Claude Sonnet 4 via OpenRouter',
+    apiModelId: 'anthropic/claude-sonnet-4',
+    endpointPath: '/chat/completions',
+    supportsStreaming: true,
+    maxTokens: 8192,
+    contextWindow: 200000,
+    parameters: [
+      { key: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 1, step: 0.1 },
+      { key: 'max_tokens', label: 'Max Tokens', type: 'number', default: 4096, min: 1, max: 8192, step: 1 },
+    ],
+    enabled: true,
+  },
+  {
+    id: 'or-gpt-4o',
+    name: 'GPT-4o (OpenRouter)',
+    provider: 'openrouter',
+    capabilities: ['text-generation', 'vision'],
+    description: 'OpenAI GPT-4o via OpenRouter',
+    apiModelId: 'openai/gpt-4o',
+    endpointPath: '/chat/completions',
+    supportsStreaming: true,
+    maxTokens: 16384,
+    contextWindow: 128000,
+    parameters: [
+      { key: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 2, step: 0.1 },
+      { key: 'max_tokens', label: 'Max Tokens', type: 'number', default: 4096, min: 1, max: 16384, step: 1 },
+    ],
+    enabled: true,
+  },
+  {
+    id: 'or-gemini-2.5-pro',
+    name: 'Gemini 2.5 Pro (OpenRouter)',
+    provider: 'openrouter',
+    capabilities: ['text-generation', 'vision'],
+    description: 'Google Gemini 2.5 Pro via OpenRouter',
+    apiModelId: 'google/gemini-2.5-pro-preview',
+    endpointPath: '/chat/completions',
+    supportsStreaming: true,
+    maxTokens: 8192,
+    contextWindow: 1000000,
+    parameters: [
+      { key: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 2, step: 0.1 },
+      { key: 'max_tokens', label: 'Max Tokens', type: 'number', default: 4096, min: 1, max: 8192, step: 1 },
+    ],
+    enabled: true,
+  },
+  {
+    id: 'or-deepseek-chat',
+    name: 'DeepSeek V3 (OpenRouter)',
+    provider: 'openrouter',
+    capabilities: ['text-generation'],
+    description: 'DeepSeek V3 via OpenRouter',
+    apiModelId: 'deepseek/deepseek-chat',
+    endpointPath: '/chat/completions',
+    supportsStreaming: true,
+    maxTokens: 8192,
+    contextWindow: 128000,
+    parameters: [
+      { key: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 2, step: 0.1 },
+      { key: 'max_tokens', label: 'Max Tokens', type: 'number', default: 4096, min: 1, max: 8192, step: 1 },
+    ],
+    enabled: true,
+  },
+  {
+    id: 'or-deepseek-r1',
+    name: 'DeepSeek R1 (OpenRouter)',
+    provider: 'openrouter',
+    capabilities: ['text-generation'],
+    description: 'DeepSeek R1 reasoning model via OpenRouter',
+    apiModelId: 'deepseek/deepseek-r1',
+    endpointPath: '/chat/completions',
+    supportsStreaming: true,
+    maxTokens: 8192,
+    contextWindow: 128000,
+    parameters: [
+      { key: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 2, step: 0.1 },
+      { key: 'max_tokens', label: 'Max Tokens', type: 'number', default: 4096, min: 1, max: 8192, step: 1 },
+    ],
+    enabled: true,
+  },
+  {
+    id: 'or-llama-4-maverick',
+    name: 'Llama 4 Maverick (OpenRouter)',
+    provider: 'openrouter',
+    capabilities: ['text-generation'],
+    description: 'Meta Llama 4 Maverick via OpenRouter',
+    apiModelId: 'meta-llama/llama-4-maverick',
+    endpointPath: '/chat/completions',
+    supportsStreaming: true,
+    maxTokens: 8192,
+    contextWindow: 128000,
+    parameters: [
+      { key: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 2, step: 0.1 },
+      { key: 'max_tokens', label: 'Max Tokens', type: 'number', default: 4096, min: 1, max: 8192, step: 1 },
+    ],
+    enabled: true,
+  },
+  {
+    id: 'or-qwen-2.5-72b',
+    name: 'Qwen 2.5 72B (OpenRouter)',
+    provider: 'openrouter',
+    capabilities: ['text-generation'],
+    description: 'Alibaba Qwen 2.5 72B via OpenRouter',
+    apiModelId: 'qwen/qwen-2.5-72b-instruct',
+    endpointPath: '/chat/completions',
+    supportsStreaming: true,
+    maxTokens: 8192,
+    contextWindow: 128000,
+    parameters: [
+      { key: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 2, step: 0.1 },
+      { key: 'max_tokens', label: 'Max Tokens', type: 'number', default: 4096, min: 1, max: 8192, step: 1 },
+    ],
+    enabled: true,
+  },
   // -- Local / Custom --
   {
     id: 'local-llm',
@@ -668,6 +789,19 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
     activeKeyIndex: 0,
     enabled: false,
     defaultModelId: 'deepseek-v3',
+  },
+  {
+    provider: 'openrouter',
+    displayName: 'OpenRouter',
+    baseUrl: 'https://openrouter.ai/api/v1',
+    apiKeys: [],
+    activeKeyIndex: 0,
+    enabled: false,
+    defaultModelId: 'or-claude-sonnet-4',
+    customHeaders: {
+      'HTTP-Referer': 'https://ai-visual-workspace.app',
+      'X-Title': 'AI Visual Workspace',
+    },
   },
   {
     provider: 'custom',

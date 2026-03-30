@@ -50,14 +50,12 @@ import { VideoAnalyzeNode } from '@/components/canvas/nodes/VideoAnalyzeNode';
 import { ExtractNode } from '@/components/canvas/nodes/ExtractNode';
 import { CharacterDescriptionNode } from '@/components/canvas/nodes/CharacterDescriptionNode';
 import { SceneDescriptionNode } from '@/components/canvas/nodes/SceneDescriptionNode';
-import { GenerateImageNode } from '@/components/canvas/nodes/GenerateImageNode';
 import { StoryboardNode } from '@/components/canvas/nodes/StoryboardNode';
 import { PreviewNode } from '@/components/canvas/nodes/PreviewNode';
 import { LocalSaveNode } from '@/components/canvas/nodes/LocalSaveNode';
 import { MaskEditorNode } from '@/components/canvas/nodes/MaskEditorNode';
 import { CreateCharacterNode } from '@/components/canvas/nodes/CreateCharacterNode';
 import { CreateSceneNode } from '@/components/canvas/nodes/CreateSceneNode';
-import { GenerateVideoNode } from '@/components/canvas/nodes/GenerateVideoNode';
 import { ProcessEdge } from '@/components/canvas/edges/ProcessEdge';
 import { useTranslation } from 'react-i18next';
 import { CanvasContextMenu } from '@/components/canvas/CanvasContextMenu';
@@ -89,14 +87,12 @@ const MemoizedVideoAnalyzeNode = memo(VideoAnalyzeNode, areNodePropsEqual);
 const MemoizedExtractNode = memo(ExtractNode, areNodePropsEqual);
 const MemoizedCharacterDescriptionNode = memo(CharacterDescriptionNode, areNodePropsEqual);
 const MemoizedSceneDescriptionNode = memo(SceneDescriptionNode, areNodePropsEqual);
-const MemoizedGenerateImageNode = memo(GenerateImageNode, areNodePropsEqual);
 const MemoizedStoryboardNode = memo(StoryboardNode, areNodePropsEqual);
 const MemoizedPreviewNode = memo(PreviewNode, areNodePropsEqual);
 const MemoizedLocalSaveNode = memo(LocalSaveNode, areNodePropsEqual);
 const MemoizedMaskEditorNode = memo(MaskEditorNode, areNodePropsEqual);
 const MemoizedCreateCharacterNode = memo(CreateCharacterNode, areNodePropsEqual);
 const MemoizedCreateSceneNode = memo(CreateSceneNode, areNodePropsEqual);
-const MemoizedGenerateVideoNode = memo(GenerateVideoNode, areNodePropsEqual);
 
 const nodeTypes = {
   image: MemoizedImageNode,
@@ -112,12 +108,13 @@ const nodeTypes = {
   'extract-characters-scenes': MemoizedExtractNode,
   'character-description': MemoizedCharacterDescriptionNode,
   'scene-description': MemoizedSceneDescriptionNode,
-  'gen-image': MemoizedGenerateImageNode,
-  'gen-video': MemoizedGenerateVideoNode,
-  'generate-character-image': MemoizedGenerateImageNode,
-  'generate-character-video': MemoizedGenerateVideoNode,
-  'generate-scene-image': MemoizedGenerateImageNode,
-  'generate-scene-video': MemoizedGenerateVideoNode,
+  // gen-image/gen-video now use the merged Image/Video nodes
+  'gen-image': MemoizedImageNode,
+  'gen-video': MemoizedVideoNode,
+  'generate-character-image': MemoizedImageNode,
+  'generate-character-video': MemoizedVideoNode,
+  'generate-scene-image': MemoizedImageNode,
+  'generate-scene-video': MemoizedVideoNode,
   'create-character': MemoizedCreateCharacterNode,
   'create-scene': MemoizedCreateSceneNode,
   'storyboard-node': MemoizedStoryboardNode,
@@ -203,11 +200,41 @@ function CanvasPageInner() {
     [setEdges],
   );
 
+  const updateNode = useCanvasStore((s) => s.updateNode);
+
   const onConnect: OnConnect = useCallback(
     (connection) => {
       setEdges((prev) => addEdge({ ...connection, type: 'process' }, prev as Edge[]) as typeof prev);
+
+      // Auto-transfer data: when connecting a source with imageUrl to a target node,
+      // automatically add the source image as a reference in the target's prompt
+      if (connection.source && connection.target) {
+        const sourceNode = nodes.find((n) => n.id === connection.source);
+        const targetNode = nodes.find((n) => n.id === connection.target);
+        if (sourceNode && targetNode) {
+          const srcData = sourceNode.data as Record<string, any>;
+          const tgtData = targetNode.data as Record<string, any>;
+
+          // If source has an image and target has a prompt field, auto-insert reference
+          if (srcData.imageUrl && 'prompt' in tgtData) {
+            const tag = `@[${sourceNode.id}:${srcData.label || 'Image'}]`;
+            const currentPrompt = tgtData.prompt || '';
+            if (!currentPrompt.includes(tag)) {
+              updateNode(connection.target, { prompt: currentPrompt ? `${currentPrompt} ${tag} ` : `${tag} ` });
+            }
+          }
+
+          // If source has character/scene data, auto-fill the target
+          if (srcData.character && tgtData.character === null) {
+            updateNode(connection.target, { character: srcData.character });
+          }
+          if (srcData.scene && tgtData.scene === null) {
+            updateNode(connection.target, { scene: srcData.scene });
+          }
+        }
+      }
     },
-    [setEdges],
+    [setEdges, nodes, updateNode],
   );
 
   const onSelectionChange = useCallback(

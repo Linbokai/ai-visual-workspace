@@ -12,10 +12,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NodeStatusBadge } from './NodeStatusBadge';
-import { NodePromptEditor } from './NodePromptEditor';
 import { useCanvasStore } from '@/stores/useCanvasStore';
-import type { NodeStatus } from '@/types';
 
 interface ImageEditorNodeDataType {
   label: string;
@@ -44,24 +41,12 @@ function getFilterCss(filter: string, brightness: number, contrast: number, satu
   parts.push(`saturate(${saturation / 100})`);
   if (blur > 0) parts.push(`blur(${blur}px)`);
   switch (filter) {
-    case 'grayscale':
-      parts.push('grayscale(1)');
-      break;
-    case 'sepia':
-      parts.push('sepia(0.8)');
-      break;
-    case 'vintage':
-      parts.push('sepia(0.3) contrast(1.1) brightness(1.1)');
-      break;
-    case 'warm':
-      parts.push('sepia(0.15) saturate(1.3)');
-      break;
-    case 'cool':
-      parts.push('hue-rotate(20deg) saturate(0.9)');
-      break;
-    case 'dramatic':
-      parts.push('contrast(1.4) saturate(1.2) brightness(0.9)');
-      break;
+    case 'grayscale': parts.push('grayscale(1)'); break;
+    case 'sepia': parts.push('sepia(0.8)'); break;
+    case 'vintage': parts.push('sepia(0.3) contrast(1.1) brightness(1.1)'); break;
+    case 'warm': parts.push('sepia(0.15) saturate(1.3)'); break;
+    case 'cool': parts.push('hue-rotate(20deg) saturate(0.9)'); break;
+    case 'dramatic': parts.push('contrast(1.4) saturate(1.2) brightness(0.9)'); break;
   }
   return parts.join(' ');
 }
@@ -88,23 +73,16 @@ export function ImageEditorNode({ id, data, selected }: NodeProps) {
   const saturation = nodeData.saturation ?? 100;
   const blur = nodeData.blur ?? 0;
   const activeFilter = nodeData.activeFilter ?? 'none';
-
   const filterCss = getFilterCss(activeFilter, brightness, contrast, saturation, blur);
 
   const handleReset = () => {
-    updateNode(id, {
-      brightness: 100,
-      contrast: 100,
-      saturation: 100,
-      blur: 0,
-      activeFilter: 'none',
-    });
+    updateNode(id, { brightness: 100, contrast: 100, saturation: 100, blur: 0, activeFilter: 'none' });
   };
 
   return (
     <div
       className={cn(
-        'rounded-xl overflow-hidden bg-[var(--card)] border-2 transition-colors min-w-[260px]',
+        'rounded-xl overflow-hidden bg-[var(--card)] border-2 transition-colors w-[260px]',
         selected ? 'border-[var(--node-image)] node-selected-glow' : 'border-[var(--border)]',
         status === 'processing' && 'node-processing'
       )}
@@ -112,10 +90,7 @@ export function ImageEditorNode({ id, data, selected }: NodeProps) {
     >
       <Handle type="target" position={Position.Left} className="!w-3 !h-3 !bg-[var(--node-image)] !border-2 !border-[var(--card)]" />
 
-      {/* Color bar */}
-      <div className="h-1 w-full bg-[var(--node-image)]" />
-
-      {/* Tab bar */}
+      {/* Header with tabs */}
       <div className="flex items-center border-b border-[var(--border)] nodrag">
         {(['adjust', 'filter', 'crop'] as const).map((tab) => (
           <button
@@ -140,15 +115,10 @@ export function ImageEditorNode({ id, data, selected }: NodeProps) {
         </button>
       </div>
 
-      {/* Image preview with filters applied */}
-      <div className="w-[260px] h-[160px] flex items-center justify-center bg-[var(--muted)] relative overflow-hidden">
+      {/* Image preview */}
+      <div className="w-full h-[160px] flex items-center justify-center bg-[var(--muted)] relative overflow-hidden">
         {nodeData.imageUrl ? (
-          <img
-            src={nodeData.imageUrl}
-            alt={nodeData.label}
-            className="w-full h-full object-cover"
-            style={{ filter: filterCss }}
-          />
+          <img src={nodeData.imageUrl} alt={nodeData.label} className="w-full h-full object-cover" style={{ filter: filterCss }} />
         ) : status === 'processing' ? (
           <Loader2 className="h-8 w-8 text-[var(--primary)] animate-spin" />
         ) : status === 'error' ? (
@@ -164,59 +134,21 @@ export function ImageEditorNode({ id, data, selected }: NodeProps) {
           <>
             <div className="flex items-center gap-1.5">
               <Sun className="h-3 w-3 text-[var(--muted-foreground)] flex-shrink-0" />
-              <p className="text-[9px] text-[var(--muted-foreground)] w-10">{t('properties.bright')}</p>
-              <input
-                type="range"
-                className="flex-1 accent-[var(--primary)] h-1"
-                min={0}
-                max={200}
-                value={brightness}
-                onChange={(e) => updateNode(id, { brightness: Number(e.target.value) })}
-              />
-              <span className="text-[9px] text-[var(--muted-foreground)] w-6 text-right">{brightness}%</span>
+              <input type="range" className="flex-1 accent-[var(--primary)] h-1" min={0} max={200} value={brightness} onChange={(e) => updateNode(id, { brightness: Number(e.target.value) })} />
+              <span className="text-[9px] text-[var(--muted-foreground)] w-8 text-right">{brightness}%</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Contrast className="h-3 w-3 text-[var(--muted-foreground)] flex-shrink-0" />
-              <p className="text-[9px] text-[var(--muted-foreground)] w-10">{t('properties.contr')}</p>
-              <input
-                type="range"
-                className="flex-1 accent-[var(--primary)] h-1"
-                min={0}
-                max={200}
-                value={contrast}
-                onChange={(e) => updateNode(id, { contrast: Number(e.target.value) })}
-              />
-              <span className="text-[9px] text-[var(--muted-foreground)] w-6 text-right">{contrast}%</span>
+              <input type="range" className="flex-1 accent-[var(--primary)] h-1" min={0} max={200} value={contrast} onChange={(e) => updateNode(id, { contrast: Number(e.target.value) })} />
+              <span className="text-[9px] text-[var(--muted-foreground)] w-8 text-right">{contrast}%</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Droplets className="h-3 w-3 text-[var(--muted-foreground)] flex-shrink-0" />
-              <p className="text-[9px] text-[var(--muted-foreground)] w-10">{t('properties.satur')}</p>
-              <input
-                type="range"
-                className="flex-1 accent-[var(--primary)] h-1"
-                min={0}
-                max={200}
-                value={saturation}
-                onChange={(e) => updateNode(id, { saturation: Number(e.target.value) })}
-              />
-              <span className="text-[9px] text-[var(--muted-foreground)] w-6 text-right">{saturation}%</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Droplets className="h-3 w-3 text-[var(--muted-foreground)] flex-shrink-0" />
-              <p className="text-[9px] text-[var(--muted-foreground)] w-10">{t('properties.blur')}</p>
-              <input
-                type="range"
-                className="flex-1 accent-[var(--primary)] h-1"
-                min={0}
-                max={20}
-                value={blur}
-                onChange={(e) => updateNode(id, { blur: Number(e.target.value) })}
-              />
-              <span className="text-[9px] text-[var(--muted-foreground)] w-6 text-right">{blur}px</span>
+              <input type="range" className="flex-1 accent-[var(--primary)] h-1" min={0} max={200} value={saturation} onChange={(e) => updateNode(id, { saturation: Number(e.target.value) })} />
+              <span className="text-[9px] text-[var(--muted-foreground)] w-8 text-right">{saturation}%</span>
             </div>
           </>
         )}
-
         {activeTab === 'filter' && (
           <div className="flex flex-wrap gap-1">
             {FILTERS.map((f) => (
@@ -235,39 +167,21 @@ export function ImageEditorNode({ id, data, selected }: NodeProps) {
             ))}
           </div>
         )}
-
         {activeTab === 'crop' && (
           <div className="text-center py-2">
             <Crop className="h-5 w-5 text-[var(--muted-foreground)] mx-auto mb-1" />
-            <p className="text-[9px] text-[var(--muted-foreground)]">
-              {t('properties.dragHandlesToCrop')}
-            </p>
-            <p className="text-[9px] text-[var(--muted-foreground)]">
-              {nodeData.width}x{nodeData.height}
-            </p>
+            <p className="text-[9px] text-[var(--muted-foreground)]">{nodeData.width}x{nodeData.height}</p>
           </div>
         )}
       </div>
 
-      {/* Label */}
-      <div className="px-3 py-2 border-t border-[var(--border)]">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <Paintbrush className="h-3.5 w-3.5 text-[var(--node-image)] flex-shrink-0" />
-            <p className="text-xs font-medium text-[var(--card-foreground)] truncate">
-              {nodeData.label}
-            </p>
-          </div>
-          <NodeStatusBadge status={status as NodeStatus} />
+      {/* Footer */}
+      <div className="px-3 py-1.5 border-t border-[var(--border)]">
+        <div className="flex items-center gap-1.5">
+          <Paintbrush className="h-3 w-3 text-[var(--node-image)]" />
+          <p className="text-[10px] font-medium text-[var(--card-foreground)] truncate">{nodeData.label}</p>
         </div>
       </div>
-
-      {/* Prompt Editor */}
-      <NodePromptEditor
-        nodeId={id}
-        prompt={nodeData.prompt || ''}
-        onChange={(prompt) => updateNode(id, { prompt })}
-      />
 
       <Handle type="source" position={Position.Right} className="!w-3 !h-3 !bg-[var(--node-image)] !border-2 !border-[var(--card)]" />
     </div>

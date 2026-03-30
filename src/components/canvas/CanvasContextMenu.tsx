@@ -46,14 +46,6 @@ const menuGroups: Array<{ id: string; labelKey: string; items: MenuItem[] }> = [
     ],
   },
   {
-    id: 'generation',
-    labelKey: 'nodes.aiGeneration',
-    items: [
-      { type: 'gen-image', labelKey: 'nodes.genImage', icon: Sparkles, group: 'generation' },
-      { type: 'gen-video', labelKey: 'nodes.genVideo', icon: Film, group: 'generation' },
-    ],
-  },
-  {
     id: 'story',
     labelKey: 'nodes.storyAnalysis',
     items: [

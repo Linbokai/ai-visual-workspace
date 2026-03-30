@@ -282,7 +282,16 @@
     "createScene": "创建场景",
     "createSceneDesc": "创建新场景并设置环境细节",
     "generateCharacterVideoDesc": "生成角色参考视频",
-    "generateSceneVideoDesc": "生成场景概念视频"
+    "generateSceneVideoDesc": "生成场景概念视频",
+    "replace": "替换",
+    "uploadImage": "点击上传图片",
+    "imageGeneration": "图片生成",
+    "videoGeneration": "视频生成",
+    "generateHint": "输入提示词生成图片",
+    "generateVideoHint": "输入提示词生成视频",
+    "insertRef": "点击插入引用",
+    "addRef": "连接更多图片",
+    "uploadVideo": "上传视频或输入提示词生成"
   },
   "properties": {
     "label": "标签",

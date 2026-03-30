@@ -1,4 +1,4 @@
-import { Play, Square } from 'lucide-react';
+import { ArrowUp, Square } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import { generateImage, AIServiceError } from '@/api/ai-service';
@@ -29,7 +29,6 @@ export function NodeGenerateButton({ nodeId, status, mode }: NodeGenerateButtonP
 
     try {
       if (mode === 'image') {
-        // Simulate progress while waiting for API
         let progress = 0;
         const progressInterval = setInterval(() => {
           progress = Math.min(progress + Math.random() * 10 + 2, 90);
@@ -52,26 +51,20 @@ export function NodeGenerateButton({ nodeId, status, mode }: NodeGenerateButtonP
           });
 
           clearInterval(progressInterval);
-          updateNode(nodeId, {
-            imageUrl: result.imageUrl,
-            progress: 100,
-          });
+          updateNode(nodeId, { imageUrl: result.imageUrl, progress: 100 });
           setNodeStatus(nodeId, 'completed');
         } catch (err) {
           clearInterval(progressInterval);
           throw err;
         }
       } else if (mode === 'video') {
-        // Simulate video generation (no real API yet)
         await simulateProgress(nodeId, updateNode, 5000);
         setNodeStatus(nodeId, 'completed');
       } else if (mode === 'text') {
-        // Simulate text generation
         await simulateProgress(nodeId, updateNode, 2000);
         updateNode(nodeId, { content: `Generated content for: ${prompt}` });
         setNodeStatus(nodeId, 'completed');
       } else if (mode === 'extract') {
-        // Simulate extraction
         await simulateProgress(nodeId, updateNode, 3000);
         setNodeStatus(nodeId, 'completed');
       }
@@ -90,32 +83,32 @@ export function NodeGenerateButton({ nodeId, status, mode }: NodeGenerateButtonP
     setNodeStatus(nodeId, 'idle');
   };
 
-  const label = mode === 'extract' ? 'Extract' : 'Generate';
-
   return (
-    <div className="px-2 py-1.5 border-t border-[var(--border)] nodrag">
+    <div className="nodrag inline-flex">
       {isProcessing ? (
         <button
           onClick={handleAbort}
-          className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-medium bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 transition-colors cursor-pointer"
+          className="flex items-center justify-center w-9 h-9 rounded-full bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25 transition-all cursor-pointer"
+          title="Stop"
         >
-          <Square className="h-3 w-3" />
-          Stop
+          <Square className="h-3.5 w-3.5" />
         </button>
       ) : (
         <button
           onClick={handleGenerate}
           className={cn(
-            'w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-medium transition-colors cursor-pointer border',
+            'flex items-center justify-center w-9 h-9 rounded-full transition-all cursor-pointer border',
             status === 'error'
-              ? 'bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500/20'
-              : status === 'completed'
-                ? 'bg-green-500/10 text-green-400 border-green-500/30 hover:bg-green-500/20'
-                : 'bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]/30 hover:bg-[var(--primary)]/20'
+              ? 'bg-red-500/15 text-red-400 border-red-500/30 hover:bg-red-500/25'
+              : 'bg-[var(--primary)] text-white border-[var(--primary)] hover:opacity-90 shadow-lg shadow-[var(--primary)]/20'
           )}
+          title={status === 'error' ? 'Retry' : 'Generate'}
         >
-          <Play className="h-3 w-3" />
-          {status === 'error' ? 'Retry' : status === 'completed' ? 'Regenerate' : label}
+          {status === 'error' ? (
+            <ArrowUp className="h-4 w-4" />
+          ) : (
+            <ArrowUp className="h-4 w-4" />
+          )}
         </button>
       )}
     </div>
