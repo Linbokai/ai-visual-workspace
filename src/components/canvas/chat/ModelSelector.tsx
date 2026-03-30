@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { ChevronDown, Sparkles, Zap, Brain, Globe, Cpu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { useAIModelStore } from '@/stores/aiModelStore';
 
@@ -19,12 +20,14 @@ const providerIcons: Record<string, React.ComponentType<{ className?: string }>>
   custom: Globe,
 };
 
-// Fallback models when no AI models are configured
-const fallbackModels: ModelOption[] = [
-  { id: 'default', name: 'Auto', icon: Sparkles, description: 'Best model for the task' },
-  { id: 'fast', name: 'Fast', icon: Zap, description: 'Quick generation' },
-  { id: 'quality', name: 'Quality', icon: Brain, description: 'Highest quality output' },
-];
+// Fallback models are built dynamically to pick up current language
+function getFallbackModels(t: (key: string) => string): ModelOption[] {
+  return [
+    { id: 'default', name: t('modelSelector.auto'), icon: Sparkles, description: t('modelSelector.autoDesc') },
+    { id: 'fast', name: t('modelSelector.fast'), icon: Zap, description: t('modelSelector.fastDesc') },
+    { id: 'quality', name: t('modelSelector.quality'), icon: Brain, description: t('modelSelector.qualityDesc') },
+  ];
+}
 
 interface ModelSelectorProps {
   value: string;
@@ -32,6 +35,7 @@ interface ModelSelectorProps {
 }
 
 export function ModelSelector({ value, onChange }: ModelSelectorProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -55,11 +59,11 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
         enabledProviders.has(m.provider),
     );
 
-    if (chatModels.length === 0) return fallbackModels;
+    if (chatModels.length === 0) return getFallbackModels(t);
 
     // Prepend "Auto" option
     const options: ModelOption[] = [
-      { id: 'default', name: 'Auto', icon: Sparkles, description: 'Best model for the task' },
+      { id: 'default', name: t('modelSelector.auto'), icon: Sparkles, description: t('modelSelector.autoDesc') },
     ];
 
     for (const m of chatModels) {

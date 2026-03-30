@@ -14,6 +14,7 @@ import {
   Settings,
   Layers,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePanelStore } from '@/stores/usePanelStore';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 
@@ -26,6 +27,7 @@ interface CanvasSettings {
 }
 
 export function AdvancedPanel() {
+  const { t } = useTranslation();
   const showGrid = usePanelStore((s) => s.showGrid);
   const toggleGrid = usePanelStore((s) => s.toggleGrid);
   const showMinimap = usePanelStore((s) => s.showMinimap);
@@ -57,7 +59,6 @@ export function AdvancedPanel() {
 
   const handleExportPNG = () => {
     console.log('Export as PNG');
-    // Would trigger canvas-to-PNG export
   };
 
   const handleExportJSON = () => {
@@ -78,36 +79,41 @@ export function AdvancedPanel() {
 
   const handleBatchStart = () => {
     setBatchRunning(true);
-    // Simulate batch processing
     setTimeout(() => setBatchRunning(false), 3000);
   };
 
-  const performanceModes: { value: PerformanceMode; label: string; description: string; icon: React.ComponentType<{ className?: string }> }[] = [
-    { value: 'fast', label: 'Fast', description: 'Reduced quality, faster response', icon: Zap },
-    { value: 'normal', label: 'Normal', description: 'Balanced quality and speed', icon: Monitor },
-    { value: 'quality', label: 'Quality', description: 'Maximum quality, slower', icon: Sparkles },
+  const performanceModes: { value: PerformanceMode; labelKey: string; descKey: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { value: 'fast', labelKey: 'advanced.perfFast', descKey: 'advanced.perfFastDesc', icon: Zap },
+    { value: 'normal', labelKey: 'advanced.perfNormal', descKey: 'advanced.perfNormalDesc', icon: Monitor },
+    { value: 'quality', labelKey: 'advanced.perfQuality', descKey: 'advanced.perfQualityDesc', icon: Sparkles },
   ];
 
   const bgPresets = [
-    { label: 'Dark', value: '#0a0a1a' },
-    { label: 'Charcoal', value: '#1a1a2e' },
-    { label: 'Navy', value: '#0f1729' },
-    { label: 'Black', value: '#000000' },
-    { label: 'Light', value: '#f5f5f5' },
+    { labelKey: 'advanced.bgDark', value: '#0a0a1a' },
+    { labelKey: 'advanced.bgCharcoal', value: '#1a1a2e' },
+    { labelKey: 'advanced.bgNavy', value: '#0f1729' },
+    { labelKey: 'advanced.bgBlack', value: '#000000' },
+    { labelKey: 'advanced.bgLight', value: '#f5f5f5' },
   ];
 
-  // Debug info
-  const debugInfo = {
-    'Total Nodes': nodes.length,
-    'Total Edges': edges.length,
-    'Image Nodes': nodes.filter((n) => n.type === 'image').length,
-    'Video Nodes': nodes.filter((n) => n.type === 'video').length,
-    'Text Nodes': nodes.filter((n) => n.type === 'text').length,
-    'Audio Nodes': nodes.filter((n) => n.type === 'audio').length,
-    'Processing': nodes.filter((n) => n.status === 'processing').length,
-    'Completed': nodes.filter((n) => n.status === 'completed').length,
-    'Errors': nodes.filter((n) => n.status === 'error').length,
+  const perfModeLabelMap: Record<PerformanceMode, string> = {
+    fast: 'advanced.perfFast',
+    normal: 'advanced.perfNormal',
+    quality: 'advanced.perfQuality',
   };
+
+  // Debug info
+  const debugInfo: { labelKey: string; value: number; colorKey?: string }[] = [
+    { labelKey: 'advanced.totalNodes', value: nodes.length },
+    { labelKey: 'advanced.totalEdges', value: edges.length },
+    { labelKey: 'advanced.imageNodes', value: nodes.filter((n) => n.type === 'image').length },
+    { labelKey: 'advanced.videoNodes', value: nodes.filter((n) => n.type === 'video').length },
+    { labelKey: 'advanced.textNodes', value: nodes.filter((n) => n.type === 'text').length },
+    { labelKey: 'advanced.audioNodes', value: nodes.filter((n) => n.type === 'audio').length },
+    { labelKey: 'advanced.processingCount', value: nodes.filter((n) => n.status === 'processing').length, colorKey: 'warning' },
+    { labelKey: 'advanced.completed', value: nodes.filter((n) => n.status === 'completed').length },
+    { labelKey: 'advanced.errors', value: nodes.filter((n) => n.status === 'error').length, colorKey: 'error' },
+  ];
 
   return (
     <div className="space-y-1">
@@ -118,7 +124,7 @@ export function AdvancedPanel() {
           className="w-full flex items-center gap-2 p-3 text-left cursor-pointer bg-transparent border-none hover:bg-white/5 transition-colors"
         >
           <Settings className="h-4 w-4 text-[var(--primary)]" />
-          <span className="text-sm font-medium text-[var(--foreground)] flex-1">Canvas Settings</span>
+          <span className="text-sm font-medium text-[var(--foreground)] flex-1">{t('advanced.canvasSettings')}</span>
           <ChevronDown className={`h-3.5 w-3.5 text-[var(--muted-foreground)] transition-transform ${expandedSections.canvas ? 'rotate-180' : ''}`} />
         </button>
         {expandedSections.canvas && (
@@ -127,7 +133,7 @@ export function AdvancedPanel() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Grid3X3 className="h-3.5 w-3.5 text-[var(--muted-foreground)]" />
-                <span className="text-xs text-[var(--foreground)]">Show Grid</span>
+                <span className="text-xs text-[var(--foreground)]">{t('advanced.showGrid')}</span>
               </div>
               <button
                 onClick={toggleGrid}
@@ -144,7 +150,7 @@ export function AdvancedPanel() {
             {/* Grid Size */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] text-[var(--muted-foreground)]">Grid Size: {canvasSettings.gridSize}px</span>
+                <span className="text-[11px] text-[var(--muted-foreground)]">{t('advanced.gridSize', { value: canvasSettings.gridSize })}</span>
               </div>
               <input
                 type="range"
@@ -161,7 +167,7 @@ export function AdvancedPanel() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Magnet className="h-3.5 w-3.5 text-[var(--muted-foreground)]" />
-                <span className="text-xs text-[var(--foreground)]">Snap to Grid</span>
+                <span className="text-xs text-[var(--foreground)]">{t('advanced.snapToGrid')}</span>
               </div>
               <button
                 onClick={() => setCanvasSettings({ ...canvasSettings, snapToGrid: !canvasSettings.snapToGrid })}
@@ -179,7 +185,7 @@ export function AdvancedPanel() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Layers className="h-3.5 w-3.5 text-[var(--muted-foreground)]" />
-                <span className="text-xs text-[var(--foreground)]">Minimap</span>
+                <span className="text-xs text-[var(--foreground)]">{t('advanced.minimap')}</span>
               </div>
               <button
                 onClick={toggleMinimap}
@@ -195,7 +201,7 @@ export function AdvancedPanel() {
 
             {/* Background Color */}
             <div>
-              <span className="text-[11px] text-[var(--muted-foreground)] block mb-1">Background</span>
+              <span className="text-[11px] text-[var(--muted-foreground)] block mb-1">{t('advanced.background')}</span>
               <div className="flex gap-1">
                 {bgPresets.map((bg) => (
                   <button
@@ -208,7 +214,7 @@ export function AdvancedPanel() {
                     }`}
                     style={{ backgroundColor: bg.value + '40' }}
                   >
-                    {bg.label}
+                    {t(bg.labelKey)}
                   </button>
                 ))}
               </div>
@@ -224,7 +230,7 @@ export function AdvancedPanel() {
           className="w-full flex items-center gap-2 p-3 text-left cursor-pointer bg-transparent border-none hover:bg-white/5 transition-colors"
         >
           <Download className="h-4 w-4 text-[var(--primary)]" />
-          <span className="text-sm font-medium text-[var(--foreground)] flex-1">Export</span>
+          <span className="text-sm font-medium text-[var(--foreground)] flex-1">{t('advanced.export')}</span>
           <ChevronDown className={`h-3.5 w-3.5 text-[var(--muted-foreground)] transition-transform ${expandedSections.export ? 'rotate-180' : ''}`} />
         </button>
         {expandedSections.export && (
@@ -237,8 +243,8 @@ export function AdvancedPanel() {
                 <Image className="h-4 w-4 text-[var(--node-image)]" />
               </div>
               <div>
-                <p className="text-xs font-medium text-[var(--foreground)]">Export as PNG</p>
-                <p className="text-[10px] text-[var(--muted-foreground)]">Save canvas as image</p>
+                <p className="text-xs font-medium text-[var(--foreground)]">{t('advanced.exportPNG')}</p>
+                <p className="text-[10px] text-[var(--muted-foreground)]">{t('advanced.exportPNGDesc')}</p>
               </div>
             </button>
             <button
@@ -249,8 +255,8 @@ export function AdvancedPanel() {
                 <FileJson className="h-4 w-4 text-[var(--primary)]" />
               </div>
               <div>
-                <p className="text-xs font-medium text-[var(--foreground)]">Export Workflow JSON</p>
-                <p className="text-[10px] text-[var(--muted-foreground)]">Save node graph as JSON</p>
+                <p className="text-xs font-medium text-[var(--foreground)]">{t('advanced.exportWorkflowJSON')}</p>
+                <p className="text-[10px] text-[var(--muted-foreground)]">{t('advanced.exportWorkflowJSONDesc')}</p>
               </div>
             </button>
           </div>
@@ -264,8 +270,8 @@ export function AdvancedPanel() {
           className="w-full flex items-center gap-2 p-3 text-left cursor-pointer bg-transparent border-none hover:bg-white/5 transition-colors"
         >
           <Zap className="h-4 w-4 text-[var(--primary)]" />
-          <span className="text-sm font-medium text-[var(--foreground)] flex-1">Performance</span>
-          <span className="text-[10px] text-[var(--primary)] capitalize mr-1">{performanceMode}</span>
+          <span className="text-sm font-medium text-[var(--foreground)] flex-1">{t('advanced.performance')}</span>
+          <span className="text-[10px] text-[var(--primary)] mr-1">{t(perfModeLabelMap[performanceMode])}</span>
           <ChevronDown className={`h-3.5 w-3.5 text-[var(--muted-foreground)] transition-transform ${expandedSections.performance ? 'rotate-180' : ''}`} />
         </button>
         {expandedSections.performance && (
@@ -284,8 +290,8 @@ export function AdvancedPanel() {
                 >
                   <Icon className="h-4 w-4 flex-shrink-0" />
                   <div>
-                    <p className="text-xs font-medium">{mode.label}</p>
-                    <p className="text-[10px] text-[var(--muted-foreground)]">{mode.description}</p>
+                    <p className="text-xs font-medium">{t(mode.labelKey)}</p>
+                    <p className="text-[10px] text-[var(--muted-foreground)]">{t(mode.descKey)}</p>
                   </div>
                 </button>
               );
@@ -301,14 +307,14 @@ export function AdvancedPanel() {
           className="w-full flex items-center gap-2 p-3 text-left cursor-pointer bg-transparent border-none hover:bg-white/5 transition-colors"
         >
           <Play className="h-4 w-4 text-[var(--primary)]" />
-          <span className="text-sm font-medium text-[var(--foreground)] flex-1">Batch Processing</span>
+          <span className="text-sm font-medium text-[var(--foreground)] flex-1">{t('advanced.batchProcessing')}</span>
           <ChevronDown className={`h-3.5 w-3.5 text-[var(--muted-foreground)] transition-transform ${expandedSections.batch ? 'rotate-180' : ''}`} />
         </button>
         {expandedSections.batch && (
           <div className="px-3 pb-3 space-y-2">
             <div>
               <span className="text-[11px] text-[var(--muted-foreground)] block mb-1">
-                Parallel tasks: {batchCount}
+                {t('advanced.parallelTasks', { count: batchCount })}
               </span>
               <input
                 type="range"
@@ -320,7 +326,7 @@ export function AdvancedPanel() {
               />
             </div>
             <p className="text-[10px] text-[var(--muted-foreground)]">
-              Process all idle nodes in the current workflow simultaneously. Higher parallelism uses more API credits.
+              {t('advanced.batchDesc')}
             </p>
             <button
               onClick={handleBatchStart}
@@ -332,7 +338,7 @@ export function AdvancedPanel() {
               }`}
             >
               <Play className="h-3.5 w-3.5" />
-              {batchRunning ? 'Processing...' : 'Run All Nodes'}
+              {batchRunning ? t('advanced.processing') : t('advanced.runAllNodes')}
             </button>
           </div>
         )}
@@ -345,23 +351,23 @@ export function AdvancedPanel() {
           className="w-full flex items-center gap-2 p-3 text-left cursor-pointer bg-transparent border-none hover:bg-white/5 transition-colors"
         >
           <Bug className="h-4 w-4 text-[var(--primary)]" />
-          <span className="text-sm font-medium text-[var(--foreground)] flex-1">Debug Info</span>
+          <span className="text-sm font-medium text-[var(--foreground)] flex-1">{t('advanced.debugInfo')}</span>
           <ChevronDown className={`h-3.5 w-3.5 text-[var(--muted-foreground)] transition-transform ${expandedSections.debug ? 'rotate-180' : ''}`} />
         </button>
         {expandedSections.debug && (
           <div className="px-3 pb-3">
             <div className="rounded-lg bg-[var(--muted)] p-2.5 space-y-1 font-mono">
-              {Object.entries(debugInfo).map(([key, value]) => (
-                <div key={key} className="flex justify-between text-[10px]">
-                  <span className="text-[var(--muted-foreground)]">{key}</span>
+              {debugInfo.map((item) => (
+                <div key={item.labelKey} className="flex justify-between text-[10px]">
+                  <span className="text-[var(--muted-foreground)]">{t(item.labelKey)}</span>
                   <span className={`${
-                    key === 'Errors' && value > 0
+                    item.colorKey === 'error' && item.value > 0
                       ? 'text-[var(--error)]'
-                      : key === 'Processing' && value > 0
+                      : item.colorKey === 'warning' && item.value > 0
                         ? 'text-[var(--warning)]'
                         : 'text-[var(--foreground)]'
                   }`}>
-                    {value}
+                    {item.value}
                   </span>
                 </div>
               ))}

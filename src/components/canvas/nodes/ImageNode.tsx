@@ -9,8 +9,10 @@ import {
   ArrowLeftRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { NodeStatusBadge } from './NodeStatusBadge';
 import { NodePromptEditor } from './NodePromptEditor';
+import { NodeGenerateButton } from './NodeGenerateButton';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import type { NodeStatus, ImageModel, ResolutionPreset } from '@/types';
 
@@ -55,6 +57,7 @@ export function ImageNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as ImageNodeDataType;
   const status = nodeData.status || 'idle';
   const updateNode = useCanvasStore((s) => s.updateNode);
+  const { t } = useTranslation();
   const [showControls, setShowControls] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
 
@@ -102,7 +105,7 @@ export function ImageNode({ id, data, selected }: NodeProps) {
         <div className="px-2 py-2 border-b border-[var(--border)] space-y-2 nodrag">
           {/* Resolution presets */}
           <div>
-            <p className="text-[9px] text-[var(--muted-foreground)] uppercase tracking-wider mb-1">Resolution</p>
+            <p className="text-[9px] text-[var(--muted-foreground)] uppercase tracking-wider mb-1">{t('properties.resolutionLabel')}</p>
             <div className="flex flex-wrap gap-1">
               {RESOLUTION_PRESETS.map((r) => (
                 <button
@@ -124,7 +127,7 @@ export function ImageNode({ id, data, selected }: NodeProps) {
           {/* Parameters */}
           <div className="grid grid-cols-2 gap-x-2 gap-y-1">
             <div>
-              <p className="text-[9px] text-[var(--muted-foreground)]">Steps: {nodeData.samplingSteps ?? 20}</p>
+              <p className="text-[9px] text-[var(--muted-foreground)]">{t('properties.steps', { value: nodeData.samplingSteps ?? 20 })}</p>
               <input
                 type="range"
                 className="w-full accent-[var(--primary)] h-1"
@@ -135,7 +138,7 @@ export function ImageNode({ id, data, selected }: NodeProps) {
               />
             </div>
             <div>
-              <p className="text-[9px] text-[var(--muted-foreground)]">CFG: {nodeData.cfgScale ?? 7}</p>
+              <p className="text-[9px] text-[var(--muted-foreground)]">{t('properties.cfg', { value: nodeData.cfgScale ?? 7 })}</p>
               <input
                 type="range"
                 className="w-full accent-[var(--primary)] h-1"
@@ -149,7 +152,7 @@ export function ImageNode({ id, data, selected }: NodeProps) {
 
           {/* Seed */}
           <div className="flex items-center gap-1">
-            <p className="text-[9px] text-[var(--muted-foreground)] flex-shrink-0">Seed:</p>
+            <p className="text-[9px] text-[var(--muted-foreground)] flex-shrink-0">{t('properties.seedLabel')}</p>
             <input
               type="number"
               className="flex-1 bg-[var(--muted)] text-[var(--foreground)] text-[9px] rounded px-1.5 py-0.5 border border-[var(--border)] focus:outline-none w-full min-w-0"
@@ -160,7 +163,7 @@ export function ImageNode({ id, data, selected }: NodeProps) {
 
           {/* Image-to-Image reference */}
           <div>
-            <p className="text-[9px] text-[var(--muted-foreground)] uppercase tracking-wider mb-1">Reference Image (img2img)</p>
+            <p className="text-[9px] text-[var(--muted-foreground)] uppercase tracking-wider mb-1">{t('properties.referenceImageI2I')}</p>
             <div className="flex items-center gap-1">
               {nodeData.referenceImageUrl ? (
                 <div className="w-10 h-10 rounded border border-[var(--border)] overflow-hidden flex-shrink-0">
@@ -173,7 +176,7 @@ export function ImageNode({ id, data, selected }: NodeProps) {
               )}
               {nodeData.referenceImageUrl && (
                 <div className="flex-1">
-                  <p className="text-[9px] text-[var(--muted-foreground)]">Strength: {((nodeData.denoisingStrength ?? 0.75) * 100).toFixed(0)}%</p>
+                  <p className="text-[9px] text-[var(--muted-foreground)]">{t('properties.strength', { value: ((nodeData.denoisingStrength ?? 0.75) * 100).toFixed(0) })}</p>
                   <input
                     type="range"
                     className="w-full accent-[var(--primary)] h-1"
@@ -211,8 +214,8 @@ export function ImageNode({ id, data, selected }: NodeProps) {
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-px h-full bg-white/60" />
               </div>
-              <div className="absolute bottom-1 left-1 px-1 py-0.5 rounded bg-black/60 text-[8px] text-white">Before</div>
-              <div className="absolute bottom-1 right-1 px-1 py-0.5 rounded bg-black/60 text-[8px] text-white">After</div>
+              <div className="absolute bottom-1 left-1 px-1 py-0.5 rounded bg-black/60 text-[8px] text-white">{t('properties.before')}</div>
+              <div className="absolute bottom-1 right-1 px-1 py-0.5 rounded bg-black/60 text-[8px] text-white">{t('properties.after')}</div>
             </div>
           ) : (
             <img
@@ -294,6 +297,9 @@ export function ImageNode({ id, data, selected }: NodeProps) {
         prompt={nodeData.prompt || ''}
         onChange={(prompt) => updateNode(id, { prompt })}
       />
+
+      {/* Generate Button */}
+      <NodeGenerateButton nodeId={id} status={status} mode="image" />
 
       <Handle type="source" position={Position.Right} className="!w-3 !h-3 !bg-[var(--node-image)] !border-2 !border-[var(--card)]" />
     </div>

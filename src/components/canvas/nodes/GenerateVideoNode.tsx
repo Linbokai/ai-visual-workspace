@@ -3,6 +3,7 @@ import { Film, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NodeStatusBadge } from './NodeStatusBadge';
 import { NodePromptEditor } from './NodePromptEditor';
+import { NodeGenerateButton } from './NodeGenerateButton';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import type { NodeStatus } from '@/types';
 
@@ -115,6 +116,7 @@ export function GenerateVideoNode({ id, data, selected }: NodeProps) {
         </div>
       </div>
       <NodePromptEditor nodeId={id} prompt={nodeData.prompt || ''} onChange={(prompt) => updateNode(id, { prompt })} />
+      <NodeGenerateButton nodeId={id} status={status} mode="video" />
       <Handle type="source" position={Position.Right} className="!w-3 !h-3 !bg-purple-500 !border-2 !border-[var(--card)]" />
     </div>
   );

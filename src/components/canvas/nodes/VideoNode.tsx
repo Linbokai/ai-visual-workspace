@@ -8,8 +8,10 @@ import {
   Camera,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { NodeStatusBadge } from './NodeStatusBadge';
 import { NodePromptEditor } from './NodePromptEditor';
+import { NodeGenerateButton } from './NodeGenerateButton';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import type { NodeStatus, VideoModel, CameraMotion } from '@/types';
 
@@ -36,19 +38,19 @@ const VIDEO_MODELS: { value: VideoModel; label: string }[] = [
   { value: 'kling', label: 'Kling' },
 ];
 
-const CAMERA_MOTIONS: { value: CameraMotion; label: string }[] = [
-  { value: 'none', label: 'None' },
-  { value: 'pan-left', label: 'Pan L' },
-  { value: 'pan-right', label: 'Pan R' },
-  { value: 'pan-up', label: 'Pan Up' },
-  { value: 'pan-down', label: 'Pan Dn' },
-  { value: 'zoom-in', label: 'Zoom+' },
-  { value: 'zoom-out', label: 'Zoom-' },
-  { value: 'orbit', label: 'Orbit' },
-  { value: 'dolly-in', label: 'Dolly+' },
-  { value: 'dolly-out', label: 'Dolly-' },
-  { value: 'tilt-up', label: 'Tilt Up' },
-  { value: 'tilt-down', label: 'Tilt Dn' },
+const CAMERA_MOTION_KEYS: { value: CameraMotion; key: string }[] = [
+  { value: 'none', key: 'none' },
+  { value: 'pan-left', key: 'panL' },
+  { value: 'pan-right', key: 'panR' },
+  { value: 'pan-up', key: 'panUp' },
+  { value: 'pan-down', key: 'panDn' },
+  { value: 'zoom-in', key: 'zoomIn' },
+  { value: 'zoom-out', key: 'zoomOut' },
+  { value: 'orbit', key: 'orbit' },
+  { value: 'dolly-in', key: 'dollyIn' },
+  { value: 'dolly-out', key: 'dollyOut' },
+  { value: 'tilt-up', key: 'tiltUp' },
+  { value: 'tilt-down', key: 'tiltDn' },
 ];
 
 const FPS_OPTIONS = [12, 24, 30, 60];
@@ -64,6 +66,7 @@ export function VideoNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as VideoNodeDataType;
   const status = nodeData.status || 'idle';
   const updateNode = useCanvasStore((s) => s.updateNode);
+  const { t } = useTranslation();
   const [showControls, setShowControls] = useState(false);
 
   const progress = nodeData.progress ?? 0;
@@ -116,7 +119,7 @@ export function VideoNode({ id, data, selected }: NodeProps) {
           {/* Duration and FPS */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <p className="text-[9px] text-[var(--muted-foreground)]">Duration: {duration}s</p>
+              <p className="text-[9px] text-[var(--muted-foreground)]">{t('properties.durationLabel', { value: duration })}</p>
               <input
                 type="range"
                 className="w-full accent-[var(--primary)] h-1"
@@ -127,7 +130,7 @@ export function VideoNode({ id, data, selected }: NodeProps) {
               />
             </div>
             <div>
-              <p className="text-[9px] text-[var(--muted-foreground)]">FPS</p>
+              <p className="text-[9px] text-[var(--muted-foreground)]">{t('properties.fpsLabel')}</p>
               <div className="flex gap-0.5">
                 {FPS_OPTIONS.map((f) => (
                   <button
@@ -149,7 +152,7 @@ export function VideoNode({ id, data, selected }: NodeProps) {
 
           {/* Resolution */}
           <div>
-            <p className="text-[9px] text-[var(--muted-foreground)] mb-0.5">Resolution</p>
+            <p className="text-[9px] text-[var(--muted-foreground)] mb-0.5">{t('properties.resolutionLabel')}</p>
             <div className="flex gap-0.5">
               {RESOLUTION_OPTIONS.map((r) => (
                 <button
@@ -171,10 +174,10 @@ export function VideoNode({ id, data, selected }: NodeProps) {
           {/* Camera Motion */}
           <div>
             <p className="text-[9px] text-[var(--muted-foreground)] uppercase tracking-wider mb-1 flex items-center gap-1">
-              <Camera className="h-2.5 w-2.5" /> Camera Motion
+              <Camera className="h-2.5 w-2.5" /> {t('properties.cameraMotionLabel')}
             </p>
             <div className="flex flex-wrap gap-0.5">
-              {CAMERA_MOTIONS.map((cm) => (
+              {CAMERA_MOTION_KEYS.map((cm) => (
                 <button
                   key={cm.value}
                   onClick={() => updateNode(id, { cameraMotion: cm.value })}
@@ -185,7 +188,7 @@ export function VideoNode({ id, data, selected }: NodeProps) {
                       : 'border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)]'
                   )}
                 >
-                  {cm.label}
+                  {t(`properties.cameraMotionShort.${cm.key}`)}
                 </button>
               ))}
             </div>
@@ -267,7 +270,7 @@ export function VideoNode({ id, data, selected }: NodeProps) {
           </span>
           {cameraMotion !== 'none' && (
             <span className="text-[9px] px-1 py-px rounded bg-[var(--node-video)]/15 text-[var(--node-video)]">
-              {CAMERA_MOTIONS.find((cm) => cm.value === cameraMotion)?.label}
+              {t(`properties.cameraMotionShort.${CAMERA_MOTION_KEYS.find((cm) => cm.value === cameraMotion)?.key}`)}
             </span>
           )}
         </div>
@@ -279,6 +282,9 @@ export function VideoNode({ id, data, selected }: NodeProps) {
         prompt={nodeData.prompt || ''}
         onChange={(prompt) => updateNode(id, { prompt })}
       />
+
+      {/* Generate Button */}
+      <NodeGenerateButton nodeId={id} status={status} mode="video" />
 
       <Handle type="source" position={Position.Right} className="!w-3 !h-3 !bg-[var(--node-video)] !border-2 !border-[var(--card)]" />
     </div>

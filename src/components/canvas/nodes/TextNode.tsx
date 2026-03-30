@@ -2,6 +2,7 @@ import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { Type } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NodePromptEditor } from './NodePromptEditor';
+import { NodeGenerateButton } from './NodeGenerateButton';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 
 interface TextNodeDataType {
@@ -51,6 +52,9 @@ export function TextNode({ id, data, selected }: NodeProps) {
         prompt={nodeData.prompt || ''}
         onChange={(prompt) => updateNode(id, { prompt })}
       />
+
+      {/* Generate Button */}
+      <NodeGenerateButton nodeId={id} status={status} mode="text" />
 
       <Handle type="source" position={Position.Right} className="!w-3 !h-3 !bg-[var(--node-text)] !border-2 !border-[var(--card)]" />
     </div>

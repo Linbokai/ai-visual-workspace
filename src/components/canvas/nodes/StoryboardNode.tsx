@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { LayoutGrid, Plus } from 'lucide-react';
+import { LayoutGrid, Plus, Sparkles, Loader2 } from 'lucide-react';
 import { cn, generateId } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { NodeStatusBadge } from './NodeStatusBadge';
 import { NodePromptEditor } from './NodePromptEditor';
 import { useCanvasStore } from '@/stores/useCanvasStore';
+import { usePanelStore } from '@/stores/usePanelStore';
 import type { NodeStatus } from '@/types';
 
 interface Shot {
@@ -19,6 +22,7 @@ interface Shot {
 interface StoryboardNodeDataType {
   label: string;
   shots?: Shot[];
+  storyText?: string;
   prompt?: string;
 }
 
@@ -26,7 +30,10 @@ export function StoryboardNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as StoryboardNodeDataType;
   const status = (nodeData as any).status || 'idle';
   const updateNode = useCanvasStore((s) => s.updateNode);
+  const togglePanel = usePanelStore((s) => s.toggleLeftPanel);
+  const { t } = useTranslation();
   const shots = nodeData.shots || [];
+  const [generating, setGenerating] = useState(false);
 
   const addShot = () => {
     const newShot: Shot = {
@@ -41,6 +48,12 @@ export function StoryboardNode({ id, data, selected }: NodeProps) {
     updateNode(id, { shots: [...shots, newShot] });
   };
 
+  const handleGenerate = () => {
+    setGenerating(true);
+    togglePanel('storyboard');
+    setTimeout(() => setGenerating(false), 1500);
+  };
+
   return (
     <div
       className={cn(
@@ -52,7 +65,36 @@ export function StoryboardNode({ id, data, selected }: NodeProps) {
       <Handle type="target" position={Position.Left} className="!w-3 !h-3 !bg-orange-500 !border-2 !border-[var(--card)]" />
       <div className="h-1 w-full bg-orange-500" />
 
-      <div className="max-h-[300px] overflow-y-auto nodrag">
+      {/* Story text input */}
+      <div className="px-2 py-2 nodrag">
+        <textarea
+          className="w-full h-16 bg-[var(--muted)] text-[var(--foreground)] text-[10px] rounded-lg p-2 border border-[var(--border)] focus:outline-none focus:ring-1 focus:ring-orange-500 resize-none"
+          placeholder={t('storyboard.pasteText')}
+          value={nodeData.storyText || ''}
+          onChange={(e) => updateNode(id, { storyText: e.target.value })}
+        />
+
+        {/* Generate storyboard button */}
+        <button
+          onClick={handleGenerate}
+          disabled={generating}
+          className={cn(
+            'w-full mt-1.5 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-medium transition-colors cursor-pointer border-none',
+            !generating
+              ? 'bg-orange-500 text-white hover:bg-orange-600'
+              : 'bg-[var(--muted)] text-[var(--muted-foreground)]'
+          )}
+        >
+          {generating ? (
+            <><Loader2 className="h-3 w-3 animate-spin" />{t('storyboard.analyzing')}</>
+          ) : (
+            <><Sparkles className="h-3 w-3" />{t('storyboard.generateAll')}</>
+          )}
+        </button>
+      </div>
+
+      {/* Shots list */}
+      <div className="max-h-[240px] overflow-y-auto nodrag">
         {shots.length > 0 ? (
           <div className="divide-y divide-[var(--border)]">
             {shots.map((shot) => (
@@ -70,15 +112,15 @@ export function StoryboardNode({ id, data, selected }: NodeProps) {
                     <span className="text-[9px] px-1 rounded bg-[var(--muted)] text-[var(--muted-foreground)]">{shot.cameraAngle}</span>
                     <span className="text-[9px] text-[var(--muted-foreground)]">{shot.duration}s</span>
                   </div>
-                  <p className="text-[10px] text-[var(--foreground)] truncate mt-0.5">{shot.description || 'No description'}</p>
+                  <p className="text-[10px] text-[var(--foreground)] truncate mt-0.5">{shot.description || t('storyboard.setting')}</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="px-3 py-6 flex flex-col items-center gap-1">
-            <LayoutGrid className="h-6 w-6 text-[var(--muted-foreground)]" />
-            <p className="text-[10px] text-[var(--muted-foreground)]">No shots yet</p>
+          <div className="px-3 py-4 flex flex-col items-center gap-1">
+            <LayoutGrid className="h-5 w-5 text-[var(--muted-foreground)]" />
+            <p className="text-[10px] text-[var(--muted-foreground)]">{t('nodes.storyboardNodeDesc')}</p>
           </div>
         )}
       </div>
@@ -88,7 +130,7 @@ export function StoryboardNode({ id, data, selected }: NodeProps) {
           onClick={addShot}
           className="w-full flex items-center justify-center gap-1 py-1 rounded-lg border border-dashed border-[var(--border)] text-[10px] text-[var(--muted-foreground)] hover:bg-white/5 transition-colors cursor-pointer bg-transparent"
         >
-          <Plus className="h-3 w-3" /> Add Shot
+          <Plus className="h-3 w-3" /> {t('sidebar.addNode')}
         </button>
       </div>
 
@@ -100,7 +142,7 @@ export function StoryboardNode({ id, data, selected }: NodeProps) {
           </div>
           <div className="flex items-center gap-1">
             {shots.length > 0 && (
-              <span className="text-[9px] px-1 py-px rounded bg-orange-500/20 text-orange-400">{shots.length} shots</span>
+              <span className="text-[9px] px-1 py-px rounded bg-orange-500/20 text-orange-400">{shots.length} {t('storyboard.cameraShots')}</span>
             )}
             <NodeStatusBadge status={status as NodeStatus} />
           </div>

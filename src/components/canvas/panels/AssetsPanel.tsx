@@ -34,7 +34,7 @@ interface Asset {
 const mockAssets: Asset[] = [
   {
     id: 'a1',
-    name: 'Hero Banner.png',
+    name: '主视觉横幅.png',
     type: 'image',
     url: '',
     thumbnail: '',
@@ -44,7 +44,7 @@ const mockAssets: Asset[] = [
   },
   {
     id: 'a2',
-    name: 'Product Shot.jpg',
+    name: '产品照片.jpg',
     type: 'image',
     url: '',
     thumbnail: '',
@@ -54,7 +54,7 @@ const mockAssets: Asset[] = [
   },
   {
     id: 'a3',
-    name: 'Promo Clip.mp4',
+    name: '宣传片段.mp4',
     type: 'video',
     url: '',
     thumbnail: '',
@@ -64,7 +64,7 @@ const mockAssets: Asset[] = [
   },
   {
     id: 'a4',
-    name: 'Background Music.mp3',
+    name: '背景音乐.mp3',
     type: 'audio',
     url: '',
     thumbnail: '',
@@ -74,7 +74,7 @@ const mockAssets: Asset[] = [
   },
   {
     id: 'a5',
-    name: 'Logo Design.png',
+    name: 'Logo 设计.png',
     type: 'image',
     url: '',
     thumbnail: '',
@@ -84,7 +84,7 @@ const mockAssets: Asset[] = [
   },
   {
     id: 'a6',
-    name: 'Narration.wav',
+    name: '旁白配音.wav',
     type: 'audio',
     url: '',
     thumbnail: '',
@@ -276,7 +276,7 @@ export function AssetsPanel() {
                 </button>
                 {/* Type badge */}
                 <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/60 text-[9px] text-white uppercase">
-                  {asset.type}
+                  {t(`nodes.${asset.type}`)}
                 </div>
               </div>
             );
@@ -338,7 +338,7 @@ export function AssetsPanel() {
             </div>
             <div className="flex justify-between">
               <span className="text-[var(--muted-foreground)]">{t('assets.type')}</span>
-              <span className="text-[var(--foreground)] capitalize">{selected.type}</span>
+              <span className="text-[var(--foreground)]">{t(`nodes.${selected.type}`)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-[var(--muted-foreground)]">{t('assets.size')}</span>

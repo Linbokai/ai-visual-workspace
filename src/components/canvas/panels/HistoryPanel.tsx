@@ -77,7 +77,7 @@ export function HistoryPanel() {
     const y = 100 + Math.random() * 200;
     const nodeType = item.type === 'video' ? 'video' : 'image';
     addNode(nodeType, { x, y }, {
-      label: `From History: ${(item.prompt ?? 'Untitled').slice(0, 30)}`,
+      label: t('properties.fromHistory', { prompt: (item.prompt ?? t('properties.untitled')).slice(0, 30) }),
       prompt: item.prompt ?? '',
     });
     closePanel();

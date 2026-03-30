@@ -7,9 +7,9 @@ const LANGUAGE_KEY = 'app-language';
 
 function getStoredLanguage(): string {
   try {
-    return localStorage.getItem(LANGUAGE_KEY) || 'en';
+    return localStorage.getItem(LANGUAGE_KEY) || 'zh';
   } catch {
-    return 'en';
+    return 'zh';
   }
 }
 
@@ -19,7 +19,7 @@ i18n.use(initReactI18next).init({
     zh: { translation: zh },
   },
   lng: getStoredLanguage(),
-  fallbackLng: 'en',
+  fallbackLng: 'zh',
   interpolation: {
     escapeValue: false,
   },

@@ -3,7 +3,7 @@ import type { Project } from '@/types';
 export const mockProjects: Project[] = [
   {
     id: 'proj-001',
-    name: 'Product Photography',
+    name: '产品摄影',
     thumbnail: null,
     owner_id: '1',
     team_id: null,
@@ -17,7 +17,7 @@ export const mockProjects: Project[] = [
           type: 'image' as const,
           position: { x: 100, y: 100 },
           data: {
-            label: 'Product Shot',
+            label: '产品照片',
             imageUrl: null,
             width: 1024,
             height: 1024,
@@ -30,8 +30,8 @@ export const mockProjects: Project[] = [
           type: 'text' as const,
           position: { x: 400, y: 100 },
           data: {
-            label: 'Description',
-            content: 'A professional product photo on white background with soft lighting',
+            label: '描述',
+            content: '白色背景、柔光的专业产品照片',
           },
           status: 'idle' as const,
         },
@@ -41,7 +41,7 @@ export const mockProjects: Project[] = [
   },
   {
     id: 'proj-002',
-    name: 'Social Media Campaign',
+    name: '社交媒体营销',
     thumbnail: null,
     owner_id: '1',
     team_id: null,
@@ -55,7 +55,7 @@ export const mockProjects: Project[] = [
           type: 'image' as const,
           position: { x: 100, y: 80 },
           data: {
-            label: 'Hero Banner',
+            label: '主视觉横幅',
             imageUrl: null,
             width: 1920,
             height: 1080,
@@ -68,7 +68,7 @@ export const mockProjects: Project[] = [
           type: 'image' as const,
           position: { x: 400, y: 80 },
           data: {
-            label: 'Square Post',
+            label: '方形帖子',
             imageUrl: null,
             width: 1080,
             height: 1080,
@@ -81,7 +81,7 @@ export const mockProjects: Project[] = [
           type: 'video' as const,
           position: { x: 100, y: 320 },
           data: {
-            label: 'Promo Reel',
+            label: '宣传短视频',
             videoUrl: null,
             thumbnailUrl: null,
             duration: 15,
@@ -102,7 +102,7 @@ export const mockProjects: Project[] = [
   },
   {
     id: 'proj-003',
-    name: 'Brand Identity Design',
+    name: '品牌视觉设计',
     thumbnail: null,
     owner_id: '1',
     team_id: null,
@@ -116,7 +116,7 @@ export const mockProjects: Project[] = [
   },
   {
     id: 'proj-004',
-    name: 'Video Storyboard',
+    name: '视频分镜',
     thumbnail: null,
     owner_id: '1',
     team_id: null,
@@ -130,7 +130,7 @@ export const mockProjects: Project[] = [
   },
   {
     id: 'proj-005',
-    name: 'Texture Generation',
+    name: '纹理生成',
     thumbnail: null,
     owner_id: '1',
     team_id: 'team-001',
@@ -144,7 +144,7 @@ export const mockProjects: Project[] = [
   },
   {
     id: 'proj-006',
-    name: 'Character Concept Art',
+    name: '角色概念图',
     thumbnail: null,
     owner_id: '1',
     team_id: 'team-001',

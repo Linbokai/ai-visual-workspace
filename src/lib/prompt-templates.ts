@@ -44,50 +44,129 @@ export const CATEGORY_INFO: Record<PromptCategory, { label: string; labelCn: str
 // Prompt Building Blocks
 // ---------------------------------------------------------------------------
 
-export const PROMPT_SUBJECTS = [
-  'portrait of a person', 'landscape', 'cityscape', 'still life',
-  'animal', 'architecture', 'food', 'vehicle', 'fantasy creature',
-  'robot', 'flower', 'ocean scene', 'mountain scene', 'forest scene',
+export interface PromptTag {
+  label: string;  // Chinese display label
+  value: string;  // English prompt value
+}
+
+export const PROMPT_SUBJECTS: PromptTag[] = [
+  { label: '人像', value: 'portrait of a person' },
+  { label: '风景', value: 'landscape' },
+  { label: '城市景观', value: 'cityscape' },
+  { label: '静物', value: 'still life' },
+  { label: '动物', value: 'animal' },
+  { label: '建筑', value: 'architecture' },
+  { label: '美食', value: 'food' },
+  { label: '车辆', value: 'vehicle' },
+  { label: '幻想生物', value: 'fantasy creature' },
+  { label: '机器人', value: 'robot' },
+  { label: '花卉', value: 'flower' },
+  { label: '海洋场景', value: 'ocean scene' },
+  { label: '山景', value: 'mountain scene' },
+  { label: '森林场景', value: 'forest scene' },
 ];
 
-export const PROMPT_STYLES = [
-  'photorealistic', 'oil painting', 'watercolor', 'digital art',
-  'pencil sketch', 'ink drawing', 'pop art', 'minimalist',
-  'art nouveau', 'impressionist', 'surrealist', 'cyberpunk',
-  'steampunk', 'gothic', 'retro', 'vaporwave',
+export const PROMPT_STYLES: PromptTag[] = [
+  { label: '写实', value: 'photorealistic' },
+  { label: '油画', value: 'oil painting' },
+  { label: '水彩', value: 'watercolor' },
+  { label: '数字艺术', value: 'digital art' },
+  { label: '铅笔素描', value: 'pencil sketch' },
+  { label: '水墨画', value: 'ink drawing' },
+  { label: '波普艺术', value: 'pop art' },
+  { label: '极简主义', value: 'minimalist' },
+  { label: '新艺术', value: 'art nouveau' },
+  { label: '印象派', value: 'impressionist' },
+  { label: '超现实', value: 'surrealist' },
+  { label: '赛博朋克', value: 'cyberpunk' },
+  { label: '蒸汽朋克', value: 'steampunk' },
+  { label: '哥特风', value: 'gothic' },
+  { label: '复古', value: 'retro' },
+  { label: '蒸汽波', value: 'vaporwave' },
 ];
 
-export const PROMPT_LIGHTING = [
-  'natural light', 'golden hour', 'blue hour', 'studio lighting',
-  'dramatic lighting', 'backlit', 'rim lighting', 'neon lighting',
-  'candlelight', 'moonlight', 'overcast', 'harsh shadows',
-  'soft diffused', 'volumetric lighting', 'chiaroscuro',
+export const PROMPT_LIGHTING: PromptTag[] = [
+  { label: '自然光', value: 'natural light' },
+  { label: '黄金时刻', value: 'golden hour' },
+  { label: '蓝调时刻', value: 'blue hour' },
+  { label: '棚拍灯光', value: 'studio lighting' },
+  { label: '戏剧灯光', value: 'dramatic lighting' },
+  { label: '逆光', value: 'backlit' },
+  { label: '轮廓光', value: 'rim lighting' },
+  { label: '霓虹灯光', value: 'neon lighting' },
+  { label: '烛光', value: 'candlelight' },
+  { label: '月光', value: 'moonlight' },
+  { label: '阴天', value: 'overcast' },
+  { label: '强烈阴影', value: 'harsh shadows' },
+  { label: '柔和漫射', value: 'soft diffused' },
+  { label: '体积光', value: 'volumetric lighting' },
+  { label: '明暗法', value: 'chiaroscuro' },
 ];
 
-export const PROMPT_CAMERA_ANGLES = [
-  'eye level', 'low angle', 'high angle', 'bird\'s eye view',
-  'worm\'s eye view', 'dutch angle', 'over the shoulder',
-  'close-up', 'extreme close-up', 'wide shot', 'medium shot',
-  'aerial view', 'fisheye', 'macro', 'panoramic',
+export const PROMPT_CAMERA_ANGLES: PromptTag[] = [
+  { label: '平视', value: 'eye level' },
+  { label: '低角度', value: 'low angle' },
+  { label: '高角度', value: 'high angle' },
+  { label: '鸟瞰', value: "bird's eye view" },
+  { label: '仰视', value: "worm's eye view" },
+  { label: '荷兰角', value: 'dutch angle' },
+  { label: '过肩', value: 'over the shoulder' },
+  { label: '近景', value: 'close-up' },
+  { label: '极近景', value: 'extreme close-up' },
+  { label: '广角', value: 'wide shot' },
+  { label: '中景', value: 'medium shot' },
+  { label: '航拍', value: 'aerial view' },
+  { label: '鱼眼', value: 'fisheye' },
+  { label: '微距', value: 'macro' },
+  { label: '全景', value: 'panoramic' },
 ];
 
-export const PROMPT_COLOR_PALETTES = [
-  'warm tones', 'cool tones', 'monochrome', 'pastel colors',
-  'vibrant colors', 'muted colors', 'earth tones', 'neon colors',
-  'black and white', 'sepia', 'high contrast', 'complementary colors',
-  'analogous colors', 'triadic colors',
+export const PROMPT_COLOR_PALETTES: PromptTag[] = [
+  { label: '暖色调', value: 'warm tones' },
+  { label: '冷色调', value: 'cool tones' },
+  { label: '单色', value: 'monochrome' },
+  { label: '粉彩', value: 'pastel colors' },
+  { label: '鲜艳色彩', value: 'vibrant colors' },
+  { label: '柔和色彩', value: 'muted colors' },
+  { label: '大地色', value: 'earth tones' },
+  { label: '霓虹色', value: 'neon colors' },
+  { label: '黑白', value: 'black and white' },
+  { label: '复古棕', value: 'sepia' },
+  { label: '高对比', value: 'high contrast' },
+  { label: '互补色', value: 'complementary colors' },
+  { label: '类似色', value: 'analogous colors' },
+  { label: '三色组', value: 'triadic colors' },
 ];
 
-export const PROMPT_MOODS = [
-  'serene', 'dramatic', 'mysterious', 'joyful', 'melancholic',
-  'nostalgic', 'epic', 'cozy', 'eerie', 'romantic',
-  'powerful', 'peaceful', 'chaotic', 'dreamy', 'energetic',
+export const PROMPT_MOODS: PromptTag[] = [
+  { label: '宁静', value: 'serene' },
+  { label: '戏剧性', value: 'dramatic' },
+  { label: '神秘', value: 'mysterious' },
+  { label: '欢快', value: 'joyful' },
+  { label: '忧郁', value: 'melancholic' },
+  { label: '怀旧', value: 'nostalgic' },
+  { label: '史诗', value: 'epic' },
+  { label: '温馨', value: 'cozy' },
+  { label: '诡异', value: 'eerie' },
+  { label: '浪漫', value: 'romantic' },
+  { label: '力量感', value: 'powerful' },
+  { label: '平和', value: 'peaceful' },
+  { label: '混乱', value: 'chaotic' },
+  { label: '梦幻', value: 'dreamy' },
+  { label: '活力', value: 'energetic' },
 ];
 
-export const PROMPT_QUALITY_TAGS = [
-  'masterpiece', 'best quality', 'highly detailed', '8k',
-  'ultra-realistic', 'professional', 'award-winning',
-  'trending on artstation', 'sharp focus', 'intricate details',
+export const PROMPT_QUALITY_TAGS: PromptTag[] = [
+  { label: '杰作', value: 'masterpiece' },
+  { label: '最佳质量', value: 'best quality' },
+  { label: '高度详细', value: 'highly detailed' },
+  { label: '8K', value: '8k' },
+  { label: '超写实', value: 'ultra-realistic' },
+  { label: '专业级', value: 'professional' },
+  { label: '获奖作品', value: 'award-winning' },
+  { label: 'A站热门', value: 'trending on artstation' },
+  { label: '锐利对焦', value: 'sharp focus' },
+  { label: '精细细节', value: 'intricate details' },
 ];
 
 // ---------------------------------------------------------------------------

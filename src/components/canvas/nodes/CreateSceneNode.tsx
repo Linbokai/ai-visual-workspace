@@ -56,7 +56,7 @@ export function CreateSceneNode({ id, data, selected }: NodeProps) {
         {/* Environment */}
         <input
           type="text"
-          placeholder="Environment (e.g. urban, forest, space...)"
+          placeholder={t('properties.environment')}
           value={scene?.environment || ''}
           onChange={(e) =>
             updateNode(id, { scene: { ...(scene || { name: '', description: '', mood: '', imageUrl: null }), environment: e.target.value } })
@@ -72,15 +72,15 @@ export function CreateSceneNode({ id, data, selected }: NodeProps) {
           }
           className="w-full bg-[var(--muted)] text-[var(--foreground)] text-[10px] rounded px-2 py-1 border border-[var(--border)] focus:outline-none cursor-pointer"
         >
-          <option value="">Mood...</option>
+          <option value="">{t('properties.moodPlaceholder')}</option>
           {MOOD_OPTIONS.filter(Boolean).map((m) => (
-            <option key={m} value={m}>{m.charAt(0).toUpperCase() + m.slice(1)}</option>
+            <option key={m} value={m}>{t(`properties.${m}`)}</option>
           ))}
         </select>
 
         {/* Description */}
         <textarea
-          placeholder="Scene description..."
+          placeholder={t('properties.sceneDescPlaceholder')}
           value={scene?.description || ''}
           onChange={(e) =>
             updateNode(id, { scene: { ...(scene || { name: '', environment: '', mood: '', imageUrl: null }), description: e.target.value } })
@@ -95,13 +95,13 @@ export function CreateSceneNode({ id, data, selected }: NodeProps) {
         ) : (
           <div className="w-full h-12 rounded-lg border border-dashed border-[var(--border)] flex items-center justify-center gap-1.5 text-[var(--muted-foreground)]">
             <Upload className="h-3 w-3" />
-            <span className="text-[9px]">Reference image</span>
+            <span className="text-[9px]">{t('properties.referenceImage')}</span>
           </div>
         )}
 
         {/* Notes */}
         <textarea
-          placeholder="Notes..."
+          placeholder={t('properties.notesPlaceholder')}
           value={nodeData.notes || ''}
           onChange={(e) => updateNode(id, { notes: e.target.value })}
           rows={1}

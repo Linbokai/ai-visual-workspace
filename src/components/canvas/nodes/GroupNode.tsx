@@ -1,6 +1,7 @@
 import { type NodeProps } from '@xyflow/react';
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 
 interface GroupNodeDataType {
@@ -9,17 +10,18 @@ interface GroupNodeDataType {
 }
 
 const groupColors = [
-  { name: 'Gray', value: 'var(--node-group)', bg: 'var(--node-group)' },
-  { name: 'Blue', value: 'var(--node-image)', bg: 'var(--node-image)' },
-  { name: 'Purple', value: 'var(--node-video)', bg: 'var(--node-video)' },
-  { name: 'Amber', value: 'var(--node-text)', bg: 'var(--node-text)' },
-  { name: 'Green', value: 'var(--node-audio)', bg: 'var(--node-audio)' },
+  { nameKey: 'colorGray', value: 'var(--node-group)', bg: 'var(--node-group)' },
+  { nameKey: 'colorBlue', value: 'var(--node-image)', bg: 'var(--node-image)' },
+  { nameKey: 'colorPurple', value: 'var(--node-video)', bg: 'var(--node-video)' },
+  { nameKey: 'colorAmber', value: 'var(--node-text)', bg: 'var(--node-text)' },
+  { nameKey: 'colorGreen', value: 'var(--node-audio)', bg: 'var(--node-audio)' },
 ];
 
 export function GroupNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as GroupNodeDataType;
+  const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
-  const [editValue, setEditValue] = useState(nodeData.label || 'Group');
+  const [editValue, setEditValue] = useState(nodeData.label || t('nodes.group'));
   const inputRef = useRef<HTMLInputElement>(null);
   const updateNode = useCanvasStore((s) => s.updateNode);
   const groupColor = nodeData.color || 'var(--node-group)';
@@ -74,15 +76,15 @@ export function GroupNode({ id, data, selected }: NodeProps) {
               if (e.key === 'Escape') setEditing(false);
             }}
             className="h-5 px-1 rounded border border-[var(--border)] bg-[var(--input)] text-xs text-[var(--foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)] w-32"
-            aria-label="Group name"
+            aria-label={t('properties.groupName')}
           />
         ) : (
           <button
-            onDoubleClick={() => { setEditValue(nodeData.label || 'Group'); setEditing(true); }}
+            onDoubleClick={() => { setEditValue(nodeData.label || t('nodes.group')); setEditing(true); }}
             className="text-xs font-medium cursor-text bg-transparent border-none p-0"
             style={{ color: groupColor }}
           >
-            {nodeData.label || 'Group'}
+            {nodeData.label || t('nodes.group')}
           </button>
         )}
 
@@ -91,15 +93,15 @@ export function GroupNode({ id, data, selected }: NodeProps) {
           <div className="flex items-center gap-1">
             {groupColors.map((c) => (
               <button
-                key={c.name}
-                title={c.name}
+                key={c.nameKey}
+                title={t(`properties.${c.nameKey}`)}
                 onClick={() => updateNode(id, { color: c.value } as Record<string, unknown>)}
                 className="w-3 h-3 rounded-full cursor-pointer border-none hover:scale-125 transition-transform"
                 style={{
                   backgroundColor: c.bg,
                   boxShadow: groupColor === c.value ? `0 0 0 2px var(--card), 0 0 0 3px ${c.bg}` : 'none',
                 }}
-                aria-label={`Set group color to ${c.name}`}
+                aria-label={t('properties.setGroupColor', { color: t(`properties.${c.nameKey}`) })}
               />
             ))}
           </div>

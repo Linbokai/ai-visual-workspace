@@ -160,7 +160,7 @@ export function TemplatesPanel() {
                         categoryColors[template.category] ?? 'bg-white/10 text-[var(--muted-foreground)]'
                       )}
                     >
-                      {template.category}
+                      {templateCategories.find(c => c.id === template.category.toLowerCase())?.label ?? template.category}
                     </span>
                   </div>
 

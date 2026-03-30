@@ -59,6 +59,7 @@ import { CreateCharacterNode } from '@/components/canvas/nodes/CreateCharacterNo
 import { CreateSceneNode } from '@/components/canvas/nodes/CreateSceneNode';
 import { GenerateVideoNode } from '@/components/canvas/nodes/GenerateVideoNode';
 import { ProcessEdge } from '@/components/canvas/edges/ProcessEdge';
+import { useTranslation } from 'react-i18next';
 import { CanvasContextMenu } from '@/components/canvas/CanvasContextMenu';
 import { ShortcutsHelp } from '@/components/canvas/ShortcutsHelp';
 import { OnboardingOverlay } from '@/components/canvas/OnboardingOverlay';
@@ -138,6 +139,7 @@ export function CanvasPage() {
 }
 
 function CanvasPageInner() {
+  const { t } = useTranslation();
   const { projectId } = useParams<{ projectId: string }>();
   const { screenToFlowPosition } = useReactFlow();
   const nodes = useCanvasStore((s) => s.nodes);
@@ -172,7 +174,7 @@ function CanvasPageInner() {
     const saved = loadCanvasFromStorageSync(projectId);
     if (saved) {
       const project = projects.find((p) => p.id === projectId);
-      loadCanvas(projectId, project?.name || 'Untitled Project', saved.nodes || [], saved.edges || []);
+      loadCanvas(projectId, project?.name || t('projects.untitledProject'), saved.nodes || [], saved.edges || []);
       return;
     }
 
@@ -180,7 +182,7 @@ function CanvasPageInner() {
     if (project) {
       loadCanvas(projectId, project.name, project.canvas_data.nodes, project.canvas_data.edges);
     } else {
-      setProject(projectId, 'Untitled Project');
+      setProject(projectId, t('projects.untitledProject'));
     }
   }, [projectId, projects, setProject, loadCanvas]);
 

@@ -1,6 +1,7 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { HardDrive, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { NodeStatusBadge } from './NodeStatusBadge';
 import { NodePromptEditor } from './NodePromptEditor';
 import { useCanvasStore } from '@/stores/useCanvasStore';
@@ -19,6 +20,7 @@ export function LocalSaveNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as LocalSaveNodeDataType;
   const status = (nodeData as any).status || 'idle';
   const updateNode = useCanvasStore((s) => s.updateNode);
+  const { t } = useTranslation();
 
   return (
     <div
@@ -33,7 +35,7 @@ export function LocalSaveNode({ id, data, selected }: NodeProps) {
 
       <div className="p-3 space-y-2 nodrag">
         <div>
-          <p className="text-[9px] text-[var(--muted-foreground)] uppercase tracking-wider mb-1">Save Path</p>
+          <p className="text-[9px] text-[var(--muted-foreground)] uppercase tracking-wider mb-1">{t('localSave.savePath')}</p>
           <input
             type="text"
             className="w-full bg-[var(--muted)] text-[var(--foreground)] text-[10px] rounded px-2 py-1 border border-[var(--border)] focus:outline-none focus:ring-1 focus:ring-slate-500"
@@ -44,7 +46,7 @@ export function LocalSaveNode({ id, data, selected }: NodeProps) {
         </div>
         <div className="flex items-center gap-2">
           <div className="flex-1">
-            <p className="text-[9px] text-[var(--muted-foreground)] uppercase tracking-wider mb-1">Format</p>
+            <p className="text-[9px] text-[var(--muted-foreground)] uppercase tracking-wider mb-1">{t('localSave.format')}</p>
             <select
               className="w-full bg-[var(--muted)] text-[var(--foreground)] text-[10px] rounded px-1.5 py-0.5 border border-[var(--border)] focus:outline-none cursor-pointer"
               value={nodeData.format || 'png'}
@@ -56,7 +58,7 @@ export function LocalSaveNode({ id, data, selected }: NodeProps) {
             </select>
           </div>
           <div className="flex-1">
-            <p className="text-[9px] text-[var(--muted-foreground)] uppercase tracking-wider mb-1">Auto Save</p>
+            <p className="text-[9px] text-[var(--muted-foreground)] uppercase tracking-wider mb-1">{t('localSave.autoSave')}</p>
             <button
               onClick={() => updateNode(id, { autoSave: !nodeData.autoSave })}
               className={cn(
@@ -66,14 +68,14 @@ export function LocalSaveNode({ id, data, selected }: NodeProps) {
                   : 'bg-[var(--muted)] border-[var(--border)] text-[var(--muted-foreground)]'
               )}
             >
-              {nodeData.autoSave ? 'ON' : 'OFF'}
+              {nodeData.autoSave ? t('localSave.on') : t('localSave.off')}
             </button>
           </div>
         </div>
         {nodeData.lastSavedAt && (
           <div className="flex items-center gap-1">
             <Check className="h-3 w-3 text-emerald-400" />
-            <p className="text-[9px] text-[var(--muted-foreground)]">Last saved: {nodeData.lastSavedAt}</p>
+            <p className="text-[9px] text-[var(--muted-foreground)]">{t('localSave.lastSaved', { time: nodeData.lastSavedAt })}</p>
           </div>
         )}
       </div>

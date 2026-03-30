@@ -30,6 +30,7 @@ import {
   getTemplatesByCategory,
   type PromptTemplate,
   type PromptCategory,
+  type PromptTag,
 } from '@/lib/prompt-templates';
 
 type TabMode = 'builder' | 'templates' | 'translate' | 'history';
@@ -102,7 +103,7 @@ function translatePrompt(text: string, direction: 'cn2en' | 'en2cn'): string {
   return result;
 }
 
-const BUILDER_CATEGORIES_KEYS = [
+const BUILDER_CATEGORIES_KEYS: { key: string; labelKey: string; items: PromptTag[] }[] = [
   { key: 'subject', labelKey: 'promptEng.subject', items: PROMPT_SUBJECTS },
   { key: 'style', labelKey: 'promptEng.style', items: PROMPT_STYLES },
   { key: 'lighting', labelKey: 'promptEng.lighting', items: PROMPT_LIGHTING },
@@ -110,7 +111,7 @@ const BUILDER_CATEGORIES_KEYS = [
   { key: 'color', labelKey: 'promptEng.colorPalette', items: PROMPT_COLOR_PALETTES },
   { key: 'mood', labelKey: 'promptEng.mood', items: PROMPT_MOODS },
   { key: 'quality', labelKey: 'promptEng.quality', items: PROMPT_QUALITY_TAGS },
-] as const;
+];
 
 interface PromptEngineerProps {
   initialPrompt?: string;
@@ -340,16 +341,16 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                     <div className="p-2 flex flex-wrap gap-1.5">
                       {cat.items.map((item) => (
                         <button
-                          key={item}
-                          onClick={() => toggleTag(cat.key, item)}
+                          key={item.value}
+                          onClick={() => toggleTag(cat.key, item.value)}
                           className={cn(
                             'px-2 py-1 rounded-md text-[11px] transition-colors cursor-pointer border',
-                            selected.includes(item)
+                            selected.includes(item.value)
                               ? 'bg-[var(--primary)]/20 border-[var(--primary)] text-[var(--primary)]'
                               : 'bg-transparent border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--muted-foreground)]'
                           )}
                         >
-                          {item}
+                          {item.label}
                         </button>
                       ))}
                     </div>
@@ -427,7 +428,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                     )}
                     style={activeTemplateCategory === cat ? { backgroundColor: info.color } : undefined}
                   >
-                    {info.label}
+                    {info.labelCn}
                   </button>
                 );
               })}

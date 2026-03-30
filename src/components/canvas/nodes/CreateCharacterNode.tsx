@@ -55,7 +55,7 @@ export function CreateCharacterNode({ id, data, selected }: NodeProps) {
         {/* Identity & Gender/Age row */}
         <input
           type="text"
-          placeholder="Identity / Role"
+          placeholder={t('properties.identityRole')}
           value={character?.identity || ''}
           onChange={(e) =>
             updateNode(id, { character: { ...(character || { name: '', appearance: '', age: '', gender: '', imageUrl: null }), identity: e.target.value } })
@@ -65,7 +65,7 @@ export function CreateCharacterNode({ id, data, selected }: NodeProps) {
         <div className="flex gap-1.5">
           <input
             type="text"
-            placeholder="Age"
+            placeholder={t('properties.age')}
             value={character?.age || ''}
             onChange={(e) =>
               updateNode(id, { character: { ...(character || { name: '', identity: '', appearance: '', gender: '', imageUrl: null }), age: e.target.value } })
@@ -79,16 +79,16 @@ export function CreateCharacterNode({ id, data, selected }: NodeProps) {
             }
             className="w-1/2 bg-[var(--muted)] text-[var(--foreground)] text-[10px] rounded px-2 py-1 border border-[var(--border)] focus:outline-none cursor-pointer"
           >
-            <option value="">Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
+            <option value="">{t('properties.gender')}</option>
+            <option value="male">{t('properties.male')}</option>
+            <option value="female">{t('properties.female')}</option>
+            <option value="other">{t('properties.other')}</option>
           </select>
         </div>
 
         {/* Appearance */}
         <textarea
-          placeholder="Appearance description..."
+          placeholder={t('properties.appearanceDesc')}
           value={character?.appearance || ''}
           onChange={(e) =>
             updateNode(id, { character: { ...(character || { name: '', identity: '', age: '', gender: '', imageUrl: null }), appearance: e.target.value } })
@@ -103,13 +103,13 @@ export function CreateCharacterNode({ id, data, selected }: NodeProps) {
         ) : (
           <div className="w-full h-12 rounded-lg border border-dashed border-[var(--border)] flex items-center justify-center gap-1.5 text-[var(--muted-foreground)]">
             <Upload className="h-3 w-3" />
-            <span className="text-[9px]">Reference image</span>
+            <span className="text-[9px]">{t('properties.referenceImage')}</span>
           </div>
         )}
 
         {/* Notes */}
         <textarea
-          placeholder="Notes..."
+          placeholder={t('properties.notesPlaceholder')}
           value={nodeData.notes || ''}
           onChange={(e) => updateNode(id, { notes: e.target.value })}
           rows={1}

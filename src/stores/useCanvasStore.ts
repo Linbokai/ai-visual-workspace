@@ -4,6 +4,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import { temporal, type TemporalState } from 'zundo';
 import type { CanvasNode, CanvasEdge, NodeType, NodeData, NodeStatus } from '@/types';
 import { generateId } from '@/lib/utils';
+import i18n from '@/i18n';
 
 interface CanvasState {
   projectId: string | null;
@@ -47,61 +48,62 @@ interface CanvasState {
 }
 
 const createDefaultNodeData = (type: NodeType): NodeData => {
+  const t = (key: string) => i18n.t(key);
   switch (type) {
     case 'image':
-      return { label: 'New Image', imageUrl: null, width: 512, height: 512, format: 'png', prompt: '', model: 'midjourney' as const, resolutionPreset: '512x512' as const, samplingSteps: 20, cfgScale: 7, seed: -1, progress: 0, showComparison: false };
+      return { label: t('nodeDefaults.newImage'), imageUrl: null, width: 512, height: 512, format: 'png', prompt: '', model: 'midjourney' as const, resolutionPreset: '512x512' as const, samplingSteps: 20, cfgScale: 7, seed: -1, progress: 0, showComparison: false };
     case 'image-editor':
-      return { label: 'Image Editor', imageUrl: null, width: 512, height: 512, format: 'png', prompt: '', brightness: 100, contrast: 100, saturation: 100, blur: 0, activeFilter: 'none' };
+      return { label: t('nodeDefaults.imageEditor'), imageUrl: null, width: 512, height: 512, format: 'png', prompt: '', brightness: 100, contrast: 100, saturation: 100, blur: 0, activeFilter: 'none' };
     case 'doodle-image':
-      return { label: 'Doodle to Image', imageUrl: null, doodleDataUrl: null, width: 512, height: 512, format: 'png', prompt: '', brushSize: 4, brushColor: '#ffffff' };
+      return { label: t('nodeDefaults.doodleToImage'), imageUrl: null, doodleDataUrl: null, width: 512, height: 512, format: 'png', prompt: '', brushSize: 4, brushColor: '#ffffff' };
     case 'video':
-      return { label: 'New Video', videoUrl: null, thumbnailUrl: null, duration: 5, prompt: '', model: 'sora' as const, fps: 24, resolution: '1080p', cameraMotion: 'none' as const, progress: 0 };
+      return { label: t('nodeDefaults.newVideo'), videoUrl: null, thumbnailUrl: null, duration: 5, prompt: '', model: 'sora' as const, fps: 24, resolution: '1080p', cameraMotion: 'none' as const, progress: 0 };
     case 'doodle-video':
-      return { label: 'Doodle to Video', videoUrl: null, thumbnailUrl: null, duration: 0, prompt: '' };
+      return { label: t('nodeDefaults.doodleToImage'), videoUrl: null, thumbnailUrl: null, duration: 0, prompt: '' };
     case 'text':
-      return { label: 'New Text', content: '', prompt: '' };
+      return { label: t('nodeDefaults.newText'), content: '', prompt: '' };
     case 'audio':
-      return { label: 'New Audio', audioUrl: null, duration: 0, prompt: '' };
+      return { label: t('nodeDefaults.newAudio'), audioUrl: null, duration: 0, prompt: '' };
     case 'compare':
-      return { label: 'Compare', imageUrlA: null, imageUrlB: null, labelA: 'Before', labelB: 'After', splitPosition: 50, prompt: '' };
+      return { label: t('nodeDefaults.compare'), imageUrlA: null, imageUrlB: null, labelA: t('properties.before'), labelB: t('properties.after'), splitPosition: 50, prompt: '' };
     case 'novel-input':
-      return { label: 'Novel Input', content: '', prompt: '', wordCount: 0 };
+      return { label: t('nodeDefaults.novelInput'), content: '', prompt: '', wordCount: 0 };
     case 'video-analyze':
-      return { label: 'Video Analyze', videoUrl: null, scenes: [], keyframes: [], analysisStatus: 'idle', prompt: '' };
+      return { label: t('nodeDefaults.videoAnalyze'), videoUrl: null, scenes: [], keyframes: [], analysisStatus: 'idle', prompt: '' };
     case 'extract-characters-scenes':
-      return { label: 'Extract Characters & Scenes', sourceText: '', characters: [], scenes: [], prompt: '' };
+      return { label: t('nodeDefaults.extractCharactersScenes'), sourceText: '', characters: [], scenes: [], prompt: '' };
     case 'character-description':
-      return { label: 'Character Description', character: null, description: '', prompt: '' };
+      return { label: t('nodeDefaults.characterDescription'), character: null, description: '', prompt: '' };
     case 'scene-description':
-      return { label: 'Scene Description', scene: null, description: '', prompt: '' };
+      return { label: t('nodeDefaults.sceneDescription'), scene: null, description: '', prompt: '' };
     case 'gen-image':
-      return { label: 'AI Image', imageUrl: null, width: 1024, height: 1024, format: 'png', prompt: '', model: 'jimeng-4.5' as const, progress: 0 };
+      return { label: t('nodeDefaults.aiImage'), imageUrl: null, width: 1024, height: 1024, format: 'png', prompt: '', model: 'jimeng-4.5' as const, progress: 0 };
     case 'gen-video':
-      return { label: 'AI Video', videoUrl: null, thumbnailUrl: null, duration: 5, prompt: '', model: 'jimeng-video-3.5' as const, progress: 0 };
+      return { label: t('nodeDefaults.aiVideo'), videoUrl: null, thumbnailUrl: null, duration: 5, prompt: '', model: 'jimeng-video-3.5' as const, progress: 0 };
     case 'generate-character-image':
-      return { label: 'Character Image', character: null, imageUrl: null, prompt: '', model: 'midjourney' as const, progress: 0 };
+      return { label: t('nodeDefaults.characterImage'), character: null, imageUrl: null, prompt: '', model: 'midjourney' as const, progress: 0 };
     case 'generate-character-video':
-      return { label: 'Character Video', character: null, videoUrl: null, prompt: '', model: 'sora' as const, duration: 5, progress: 0 };
+      return { label: t('nodeDefaults.characterVideo'), character: null, videoUrl: null, prompt: '', model: 'sora' as const, duration: 5, progress: 0 };
     case 'generate-scene-image':
-      return { label: 'Scene Image', scene: null, imageUrl: null, prompt: '', model: 'midjourney' as const, progress: 0 };
+      return { label: t('nodeDefaults.sceneImage'), scene: null, imageUrl: null, prompt: '', model: 'midjourney' as const, progress: 0 };
     case 'generate-scene-video':
-      return { label: 'Scene Video', scene: null, videoUrl: null, prompt: '', model: 'sora' as const, duration: 5, progress: 0 };
+      return { label: t('nodeDefaults.sceneVideo'), scene: null, videoUrl: null, prompt: '', model: 'sora' as const, duration: 5, progress: 0 };
     case 'create-character':
-      return { label: 'Create Character', character: null, referenceImages: [], notes: '', prompt: '' };
+      return { label: t('nodeDefaults.createCharacter'), character: null, referenceImages: [], notes: '', prompt: '' };
     case 'create-scene':
-      return { label: 'Create Scene', scene: null, referenceImages: [], notes: '', prompt: '' };
+      return { label: t('nodeDefaults.createScene'), scene: null, referenceImages: [], notes: '', prompt: '' };
     case 'storyboard-node':
-      return { label: 'Storyboard', shots: [], prompt: '' };
+      return { label: t('nodeDefaults.storyboard'), shots: [], prompt: '' };
     case 'preview':
-      return { label: 'Preview', mediaUrl: null, mediaType: 'image' as const, prompt: '' };
+      return { label: t('nodeDefaults.preview'), mediaUrl: null, mediaType: 'image' as const, prompt: '' };
     case 'local-save':
-      return { label: 'Local Save', savePath: '', format: 'png', autoSave: false, lastSavedAt: null, prompt: '' };
+      return { label: t('nodeDefaults.localSave'), savePath: '', format: 'png', autoSave: false, lastSavedAt: null, prompt: '' };
     case 'mask-editor':
-      return { label: 'Mask Editor', imageUrl: null, maskDataUrl: null, brushSize: 20, prompt: '', width: 512, height: 512 };
+      return { label: t('nodeDefaults.maskEditor'), imageUrl: null, maskDataUrl: null, brushSize: 20, prompt: '', width: 512, height: 512 };
     case 'group':
-      return { label: 'Group', content: '', prompt: '' };
+      return { label: t('nodeDefaults.group'), content: '', prompt: '' };
     default:
-      return { label: 'New Node', content: '', prompt: '' };
+      return { label: t('nodeDefaults.newNode'), content: '', prompt: '' };
   }
 };
 

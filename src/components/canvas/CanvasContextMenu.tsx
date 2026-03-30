@@ -168,7 +168,7 @@ export function CanvasContextMenu({ x, y, canvasPosition, onClose }: CanvasConte
               <MenuButton key={type} icon={Icon} label={t(labelKey)} onClick={() => handleAdd(type)} />
             ))
           ) : (
-            <p className="px-3 py-4 text-[10px] text-center text-[var(--muted-foreground)]">No results</p>
+            <p className="px-3 py-4 text-[10px] text-center text-[var(--muted-foreground)]">{t('contextMenu.noResults')}</p>
           )
         ) : (
           /* Grouped menu with collapsible sections */

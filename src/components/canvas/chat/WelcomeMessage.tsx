@@ -9,10 +9,10 @@ export function WelcomeMessage({ onQuickAction }: WelcomeMessageProps) {
   const { t } = useTranslation();
 
   const quickActions = [
-    { icon: Image, labelKey: 'welcome.generateSunset', prompt: 'Generate image of a dramatic sunset over mountain landscape with golden hour lighting' },
-    { icon: Video, labelKey: 'welcome.createProductVideo', prompt: 'Create a 5-second video showing a product rotating on a clean white background' },
-    { icon: Type, labelKey: 'welcome.writeMarketingCopy', prompt: 'Write compelling marketing copy for a modern tech product launch' },
-    { icon: Music, labelKey: 'welcome.generateMusic', prompt: 'Generate audio ambient background music for a product showcase video' },
+    { icon: Image, labelKey: 'welcome.generateSunset', prompt: '生成一张戏剧性的日落山景图片，黄金时刻光线' },
+    { icon: Video, labelKey: 'welcome.createProductVideo', prompt: '创建一个5秒的产品旋转展示视频，干净的白色背景' },
+    { icon: Type, labelKey: 'welcome.writeMarketingCopy', prompt: '为现代科技产品发布撰写引人入胜的营销文案' },
+    { icon: Music, labelKey: 'welcome.generateMusic', prompt: '生成一段产品展示视频用的氛围背景音乐' },
   ];
 
   return (

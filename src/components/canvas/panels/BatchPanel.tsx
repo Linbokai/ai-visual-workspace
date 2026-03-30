@@ -6,12 +6,12 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const statusConfig: Record<BatchTaskStatus, { icon: React.ComponentType<{ className?: string }>; color: string; label: string }> = {
-  pending: { icon: Clock, color: 'text-[var(--muted-foreground)]', label: 'Pending' },
-  running: { icon: Loader2, color: 'text-blue-400', label: 'Running' },
-  completed: { icon: CheckCircle2, color: 'text-green-400', label: 'Done' },
-  failed: { icon: XCircle, color: 'text-red-400', label: 'Failed' },
-  aborted: { icon: AlertTriangle, color: 'text-yellow-400', label: 'Aborted' },
+const statusConfig: Record<BatchTaskStatus, { icon: React.ComponentType<{ className?: string }>; color: string; labelKey: string }> = {
+  pending: { icon: Clock, color: 'text-[var(--muted-foreground)]', labelKey: 'batch.pending' },
+  running: { icon: Loader2, color: 'text-blue-400', labelKey: 'batch.running' },
+  completed: { icon: CheckCircle2, color: 'text-green-400', labelKey: 'batch.done' },
+  failed: { icon: XCircle, color: 'text-red-400', labelKey: 'batch.failed' },
+  aborted: { icon: AlertTriangle, color: 'text-yellow-400', labelKey: 'batch.aborted' },
 };
 
 export function BatchPanel() {
@@ -38,8 +38,8 @@ export function BatchPanel() {
           {t('sidebar.batch', 'Batch Queue')}
         </h3>
         <p className="text-[10px] text-[var(--muted-foreground)] mt-0.5">
-          {tasks.length} {t('common.items', { count: tasks.length })} &middot;
-          {completed} done &middot; {running} running
+          {t('common.items', { count: tasks.length })} &middot;
+          {t('batch.doneCount', { count: completed })} &middot; {t('batch.runningCount', { count: running })}
         </p>
       </div>
 
@@ -47,20 +47,20 @@ export function BatchPanel() {
       <div className="px-4 py-2 border-b border-[var(--border)] space-y-2">
         {/* Mode toggle */}
         <div className="flex items-center justify-between">
-          <span className="text-[10px] text-[var(--muted-foreground)]">Mode</span>
+          <span className="text-[10px] text-[var(--muted-foreground)]">{t('batch.mode')}</span>
           <button
             onClick={() => setMode(mode === 'parallel' ? 'sequential' : 'parallel')}
             className="flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded bg-[var(--muted)] border border-[var(--border)] cursor-pointer text-[var(--foreground)]"
           >
             {mode === 'parallel' ? <ToggleRight className="h-3 w-3 text-blue-400" /> : <ToggleLeft className="h-3 w-3" />}
-            {mode === 'parallel' ? 'Parallel' : 'Sequential'}
+            {mode === 'parallel' ? t('batch.parallel') : t('batch.sequential')}
           </button>
         </div>
 
         {/* Concurrency (only for parallel) */}
         {mode === 'parallel' && (
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-[var(--muted-foreground)]">Concurrency</span>
+            <span className="text-[10px] text-[var(--muted-foreground)]">{t('batch.concurrency')}</span>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setConcurrency(concurrency - 1)}
@@ -93,7 +93,7 @@ export function BatchPanel() {
               )}
             >
               <Play className="h-3 w-3" />
-              Start ({pending})
+              {t('batch.start', { count: pending })}
             </button>
           ) : (
             <button
@@ -101,7 +101,7 @@ export function BatchPanel() {
               className="flex-1 flex items-center justify-center gap-1 text-[10px] py-1.5 rounded-lg border bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20 cursor-pointer transition-colors"
             >
               <Square className="h-3 w-3" />
-              Abort
+              {t('batch.abort')}
             </button>
           )}
           <button
@@ -109,7 +109,7 @@ export function BatchPanel() {
             className="flex items-center justify-center gap-1 text-[10px] py-1.5 px-2 rounded-lg border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--hover-overlay)] cursor-pointer bg-transparent transition-colors"
           >
             <Trash2 className="h-3 w-3" />
-            Clear
+            {t('batch.clear')}
           </button>
         </div>
       </div>
@@ -119,9 +119,9 @@ export function BatchPanel() {
         {tasks.length === 0 ? (
           <div className="px-4 py-12 text-center">
             <Clock className="h-8 w-8 text-[var(--muted-foreground)] mx-auto mb-2 opacity-30" />
-            <p className="text-xs text-[var(--muted-foreground)]">No batch tasks</p>
+            <p className="text-xs text-[var(--muted-foreground)]">{t('batch.noTasks')}</p>
             <p className="text-[10px] text-[var(--muted-foreground)] mt-0.5">
-              Select generation nodes and add to batch
+              {t('batch.noTasksDesc')}
             </p>
           </div>
         ) : (

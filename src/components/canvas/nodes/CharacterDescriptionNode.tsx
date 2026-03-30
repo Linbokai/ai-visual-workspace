@@ -1,6 +1,7 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { NodeStatusBadge } from './NodeStatusBadge';
 import { NodePromptEditor } from './NodePromptEditor';
 import { useCanvasStore } from '@/stores/useCanvasStore';
@@ -17,6 +18,7 @@ export function CharacterDescriptionNode({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as CharacterDescriptionNodeDataType;
   const status = (nodeData as any).status || 'idle';
   const updateNode = useCanvasStore((s) => s.updateNode);
+  const { t } = useTranslation();
   const character = nodeData.character;
 
   return (
@@ -37,15 +39,15 @@ export function CharacterDescriptionNode({ id, data, selected }: NodeProps) {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-1 text-[9px]">
-            <div><span className="text-[var(--muted-foreground)]">Age: </span><span className="text-[var(--foreground)]">{character.age}</span></div>
-            <div><span className="text-[var(--muted-foreground)]">Gender: </span><span className="text-[var(--foreground)]">{character.gender}</span></div>
+            <div><span className="text-[var(--muted-foreground)]">{t('properties.ageLabel')}</span><span className="text-[var(--foreground)]">{character.age}</span></div>
+            <div><span className="text-[var(--muted-foreground)]">{t('properties.genderLabel')}</span><span className="text-[var(--foreground)]">{character.gender}</span></div>
           </div>
           <p className="text-[9px] text-[var(--muted-foreground)] line-clamp-2">{character.appearance}</p>
         </div>
       ) : (
         <div className="px-3 py-6 flex flex-col items-center gap-1">
           <User className="h-6 w-6 text-[var(--muted-foreground)]" />
-          <p className="text-[10px] text-[var(--muted-foreground)]">Connect character data</p>
+          <p className="text-[10px] text-[var(--muted-foreground)]">{t('properties.connectCharacterData')}</p>
         </div>
       )}
       <div className="px-3 py-2 border-t border-[var(--border)]">

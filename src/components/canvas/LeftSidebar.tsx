@@ -46,7 +46,7 @@ export function LeftSidebar() {
     <nav
       className="w-16 h-full flex flex-col items-center py-3 gap-1 border-r border-[var(--border)] bg-[var(--sidebar)]"
       role="toolbar"
-      aria-label="Canvas tools"
+      aria-label={t('canvas.canvasTools')}
     >
       {sidebarItems.map(({ id, icon: Icon, labelKey, dividerBefore }) => (
         <span key={id} className="contents">

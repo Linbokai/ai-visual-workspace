@@ -36,7 +36,7 @@ export function LoadingFallback() {
     <div className="h-screen w-screen flex items-center justify-center bg-[var(--background)]">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
-        <span className="text-sm text-[var(--muted-foreground)]">Loading...</span>
+        <span className="text-sm text-[var(--muted-foreground)]">加载中...</span>
       </div>
     </div>
   );

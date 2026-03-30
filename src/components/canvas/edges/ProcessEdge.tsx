@@ -6,14 +6,15 @@ import {
   type EdgeProps,
 } from '@xyflow/react';
 import { Plus, ImageIcon, VideoIcon, TypeIcon, Music } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import type { NodeType } from '@/types';
 
-const nodeTypeOptions: { type: NodeType; label: string; icon: FC<{ className?: string }> }[] = [
-  { type: 'image', label: 'Image', icon: ImageIcon },
-  { type: 'video', label: 'Video', icon: VideoIcon },
-  { type: 'text', label: 'Text', icon: TypeIcon },
-  { type: 'audio', label: 'Audio', icon: Music },
+const nodeTypeOptions: { type: NodeType; labelKey: string; icon: FC<{ className?: string }> }[] = [
+  { type: 'image', labelKey: 'nodes.image', icon: ImageIcon },
+  { type: 'video', labelKey: 'nodes.video', icon: VideoIcon },
+  { type: 'text', labelKey: 'nodes.text', icon: TypeIcon },
+  { type: 'audio', labelKey: 'nodes.audio', icon: Music },
 ];
 
 // Color based on source node type
@@ -37,6 +38,7 @@ export const ProcessEdge: FC<EdgeProps> = ({
   markerEnd,
   data,
 }) => {
+  const { t } = useTranslation();
   const [isHovered, setIsHovered] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -142,7 +144,7 @@ export const ProcessEdge: FC<EdgeProps> = ({
               ${isHovered || pickerOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}
             `}
             style={{ transition: 'opacity 0.2s, transform 0.2s, color 0.2s, border-color 0.2s' }}
-            aria-label="Insert node on this edge"
+            aria-label={t('canvas.insertNodeOnEdge')}
           >
             <Plus className="h-3.5 w-3.5" />
           </button>
@@ -154,7 +156,7 @@ export const ProcessEdge: FC<EdgeProps> = ({
               className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50"
             >
               <div className="flex flex-col gap-0.5 py-1 px-1 rounded-lg bg-[var(--card)] border border-[var(--border)] shadow-xl min-w-[120px]">
-                {nodeTypeOptions.map(({ type, label, icon: Icon }) => (
+                {nodeTypeOptions.map(({ type, labelKey, icon: Icon }) => (
                   <button
                     key={type}
                     onClick={(e) => { e.stopPropagation(); handleSelectType(type); }}
@@ -162,7 +164,7 @@ export const ProcessEdge: FC<EdgeProps> = ({
                     role="menuitem"
                   >
                     <span style={{ color: edgeColorMap[type] }}><Icon className="h-3.5 w-3.5" /></span>
-                    <span>{label}</span>
+                    <span>{t(labelKey)}</span>
                   </button>
                 ))}
               </div>
