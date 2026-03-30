@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   BookOpen,
   Users,
@@ -24,11 +25,13 @@ import {
 type ViewMode = 'input' | 'scenes' | 'characters' | 'timeline';
 type AnalysisMode = 'characters' | 'scenes' | 'visuals' | 'camera';
 
-const ANALYSIS_MODES: Array<{ mode: AnalysisMode; label: string; icon: React.ComponentType<{ className?: string }> }> = [
-  { mode: 'characters', label: 'Characters', icon: Users },
-  { mode: 'scenes', label: 'Scenes', icon: Film },
-  { mode: 'visuals', label: 'Visual Prompts', icon: Eye },
-  { mode: 'camera', label: 'Camera Shots', icon: Camera },
+type AnalysisModeEntry = { mode: AnalysisMode; labelKey: string; icon: React.ComponentType<{ className?: string }> };
+
+const ANALYSIS_MODES: AnalysisModeEntry[] = [
+  { mode: 'characters', labelKey: 'storyboard.characters', icon: Users },
+  { mode: 'scenes', labelKey: 'storyboard.scenes', icon: Film },
+  { mode: 'visuals', labelKey: 'storyboard.visualPrompts', icon: Eye },
+  { mode: 'camera', labelKey: 'storyboard.cameraShots', icon: Camera },
 ];
 
 const SAMPLE_TEXT_EN = `Chapter 1: The Awakening
@@ -64,6 +67,7 @@ const SAMPLE_TEXT_CN = `第一章：觉醒
 叶琳举起法杖，翡翠色的杖尖燃烧着绿色的火焰。"待在我身后！"她命令道。空气中噼啪作响，充满了魔法能量，战斗开始了。`;
 
 export function StoryboardPanel() {
+  const { t } = useTranslation();
   const addNode = useCanvasStore((s) => s.addNode);
   const addEdge = useCanvasStore((s) => s.addEdge);
 
@@ -194,10 +198,10 @@ export function StoryboardPanel() {
       {/* View Mode Tabs */}
       <div className="flex gap-1 p-1 rounded-lg bg-[var(--muted)]">
         {([
-          { mode: 'input' as ViewMode, label: 'Input', icon: BookOpen },
-          { mode: 'scenes' as ViewMode, label: 'Scenes', icon: Film },
-          { mode: 'characters' as ViewMode, label: 'Cast', icon: Users },
-          { mode: 'timeline' as ViewMode, label: 'Timeline', icon: Camera },
+          { mode: 'input' as ViewMode, label: t('storyboard.input'), icon: BookOpen },
+          { mode: 'scenes' as ViewMode, label: t('storyboard.scenes'), icon: Film },
+          { mode: 'characters' as ViewMode, label: t('storyboard.cast'), icon: Users },
+          { mode: 'timeline' as ViewMode, label: t('storyboard.timeline'), icon: Camera },
         ]).map(({ mode, label, icon: Icon }) => (
           <button
             key={mode}
@@ -221,20 +225,20 @@ export function StoryboardPanel() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]">
-              Story Text
+              {t('storyboard.storyText')}
             </h3>
             <div className="flex gap-1">
               <button
                 onClick={() => handleLoadSample('en')}
                 className="px-2 py-1 rounded text-[10px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] bg-[var(--muted)] hover:bg-white/10 cursor-pointer border-none"
               >
-                EN Sample
+                {t('storyboard.enSample')}
               </button>
               <button
                 onClick={() => handleLoadSample('zh')}
                 className="px-2 py-1 rounded text-[10px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] bg-[var(--muted)] hover:bg-white/10 cursor-pointer border-none"
               >
-                CN Sample
+                {t('storyboard.cnSample')}
               </button>
             </div>
           </div>
@@ -242,12 +246,12 @@ export function StoryboardPanel() {
           <textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Paste your novel chapter, screenplay, or storyboard text here...&#10;&#10;粘贴您的小说章节、剧本或故事板文本..."
+            placeholder={t('storyboard.pasteText')}
             className="w-full h-[200px] px-3 py-2 text-sm rounded-lg bg-[var(--muted)] text-[var(--foreground)] border border-[var(--border)] focus:outline-none focus:border-[var(--primary)] placeholder:text-[var(--muted-foreground)] resize-none"
           />
 
           <div className="text-xs text-[var(--muted-foreground)] text-right">
-            {inputText.length} characters
+            {t('common.characters', { count: inputText.length })}
           </div>
 
           <button
@@ -256,17 +260,17 @@ export function StoryboardPanel() {
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-30 cursor-pointer border-none"
           >
             <Sparkles className="h-4 w-4" />
-            {isAnalyzing ? 'Analyzing...' : 'Analyze Story'}
+            {isAnalyzing ? t('storyboard.analyzing') : t('storyboard.analyzeStory')}
           </button>
 
           {/* AI Analysis Modes */}
           {inputText.trim() && (
             <div className="space-y-2">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
-                AI Analysis
+                {t('storyboard.aiAnalysis')}
               </h3>
               <div className="grid grid-cols-2 gap-2">
-                {ANALYSIS_MODES.map(({ mode, label, icon: Icon }) => (
+                {ANALYSIS_MODES.map(({ mode, labelKey, icon: Icon }) => (
                   <button
                     key={mode}
                     onClick={() => handleAIAnalysis(mode)}
@@ -278,14 +282,14 @@ export function StoryboardPanel() {
                     )}
                   >
                     <Icon className="h-3.5 w-3.5" />
-                    {label}
+                    {t(labelKey)}
                   </button>
                 ))}
               </div>
 
               {aiPromptOutput && (
                 <div className="p-3 rounded-lg bg-[var(--muted)] border border-[var(--border)]">
-                  <p className="text-[10px] text-[var(--muted-foreground)] mb-1.5">AI Prompt (copy to AI chat):</p>
+                  <p className="text-[10px] text-[var(--muted-foreground)] mb-1.5">{t('storyboard.aiPromptCopy')}</p>
                   <p className="text-xs text-[var(--foreground)] whitespace-pre-wrap line-clamp-6">
                     {aiPromptOutput}
                   </p>
@@ -293,7 +297,7 @@ export function StoryboardPanel() {
                     onClick={() => navigator.clipboard.writeText(aiPromptOutput)}
                     className="mt-2 px-2 py-1 rounded text-[10px] text-[var(--primary)] hover:bg-[var(--primary)]/10 cursor-pointer bg-transparent border border-[var(--primary)]/30"
                   >
-                    Copy Prompt
+                    {t('storyboard.copyPrompt')}
                   </button>
                 </div>
               )}
@@ -307,14 +311,14 @@ export function StoryboardPanel() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]">
-              {storyData.totalScenes} Scenes Detected
+              {t('storyboard.scenesDetected', { count: storyData.totalScenes })}
             </h3>
             <button
               onClick={handleGenerateStoryboard}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--primary)] text-white text-xs font-medium hover:opacity-90 transition-opacity cursor-pointer border-none"
             >
               <Layers className="h-3.5 w-3.5" />
-              Generate All
+              {t('storyboard.generateAll')}
             </button>
           </div>
 
@@ -362,14 +366,14 @@ export function StoryboardPanel() {
                     <div className="p-3 space-y-3">
                       {/* Setting */}
                       <div className="space-y-1">
-                        <p className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Setting</p>
+                        <p className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">{t('storyboard.setting')}</p>
                         <p className="text-xs text-[var(--foreground)]">{scene.setting}</p>
                       </div>
 
                       {/* Characters */}
                       {scene.characters.length > 0 && (
                         <div className="space-y-1">
-                          <p className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Characters</p>
+                          <p className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">{t('storyboard.characters')}</p>
                           <div className="flex flex-wrap gap-1">
                             {scene.characters.map((char) => (
                               <span key={char} className="px-2 py-0.5 rounded-full bg-[var(--primary)]/10 text-[10px] text-[var(--primary)]">
@@ -383,7 +387,7 @@ export function StoryboardPanel() {
                       {/* Dialogue */}
                       {scene.dialogue.length > 0 && (
                         <div className="space-y-1">
-                          <p className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Dialogue</p>
+                          <p className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">{t('storyboard.dialogue')}</p>
                           <div className="space-y-1">
                             {scene.dialogue.slice(0, 3).map((d, i) => (
                               <p key={i} className="text-xs text-[var(--foreground)] italic pl-2 border-l-2 border-[var(--primary)]/30">
@@ -396,13 +400,13 @@ export function StoryboardPanel() {
 
                       {/* Camera Shot */}
                       <div className="space-y-1">
-                        <p className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Camera</p>
+                        <p className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">{t('storyboard.cameraLabel')}</p>
                         <p className="text-xs text-[var(--foreground)]">{scene.cameraShot}</p>
                       </div>
 
                       {/* Image Prompt */}
                       <div className="space-y-1">
-                        <p className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Image Prompt</p>
+                        <p className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">{t('storyboard.imagePrompt')}</p>
                         <p className="text-xs text-[var(--foreground)] p-2 rounded bg-[var(--muted)] border border-[var(--border)]">
                           {scene.imagePrompt}
                         </p>
@@ -415,14 +419,14 @@ export function StoryboardPanel() {
                           className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--primary)] text-white text-xs font-medium hover:opacity-90 cursor-pointer border-none"
                         >
                           <Plus className="h-3.5 w-3.5" />
-                          Add to Canvas
+                          {t('storyboard.addToCanvas')}
                         </button>
                         <button
                           onClick={() => navigator.clipboard.writeText(scene.imagePrompt)}
                           className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-transparent text-[var(--muted-foreground)] text-xs hover:text-[var(--foreground)] hover:bg-white/5 cursor-pointer border border-[var(--border)]"
                         >
                           <Palette className="h-3.5 w-3.5" />
-                          Copy Prompt
+                          {t('storyboard.copyPrompt')}
                         </button>
                       </div>
                     </div>
@@ -438,12 +442,12 @@ export function StoryboardPanel() {
       {viewMode === 'characters' && storyData && (
         <div className="space-y-3">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]">
-            {storyData.characters.length} Characters Found
+            {t('storyboard.charactersFound', { count: storyData.characters.length })}
           </h3>
 
           {storyData.characters.length === 0 ? (
             <p className="text-xs text-[var(--muted-foreground)] p-4 text-center">
-              No recurring characters detected. Try with a longer text.
+              {t('storyboard.noCharacters')}
             </p>
           ) : (
             <div className="space-y-2">
@@ -469,7 +473,7 @@ export function StoryboardPanel() {
                         key={sceneIdx}
                         className="px-1.5 py-0.5 rounded bg-[var(--muted)] text-[9px] text-[var(--muted-foreground)]"
                       >
-                        Scene {sceneIdx + 1}
+                        {t('storyboard.scene', { index: sceneIdx + 1 })}
                       </span>
                     ))}
                   </div>
@@ -485,14 +489,14 @@ export function StoryboardPanel() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]">
-              Story Timeline
+              {t('storyboard.storyTimeline')}
             </h3>
             <button
               onClick={handleGenerateStoryboard}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--primary)] text-white text-xs font-medium hover:opacity-90 transition-opacity cursor-pointer border-none"
             >
               <Layers className="h-3.5 w-3.5" />
-              Generate All
+              {t('storyboard.generateAll')}
             </button>
           </div>
 
@@ -533,7 +537,7 @@ export function StoryboardPanel() {
                     <button
                       onClick={() => handleCreateSceneNode(scene)}
                       className="ml-auto p-1 rounded text-[var(--muted-foreground)] hover:text-[var(--primary)] cursor-pointer bg-transparent border-none"
-                      title="Add to canvas"
+                      title={t('canvas.addToCanvas')}
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>

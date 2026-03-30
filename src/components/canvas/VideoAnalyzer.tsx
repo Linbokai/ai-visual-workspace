@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Video,
   Upload,
@@ -25,6 +26,7 @@ import {
 } from '@/lib/video-analyzer';
 
 export function VideoAnalyzer() {
+  const { t } = useTranslation();
   const addNode = useCanvasStore((s) => s.addNode);
   const addEdge = useCanvasStore((s) => s.addEdge);
 
@@ -47,7 +49,7 @@ export function VideoAnalyzer() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('video/')) {
-      setError('Please select a video file');
+      setError(t('videoAnalyzer.selectVideoFile'));
       return;
     }
     setError(null);
@@ -56,7 +58,7 @@ export function VideoAnalyzer() {
     setVideoSrc(url);
     setAnalysisResult(null);
     setSelectedKeyframes(new Set());
-  }, []);
+  }, [t]);
 
   // Handle URL input
   const handleUrlSubmit = useCallback(() => {
@@ -85,11 +87,11 @@ export function VideoAnalyzer() {
       // Select all keyframes by default
       setSelectedKeyframes(new Set(result.keyframes.map((_, i) => i)));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Analysis failed');
+      setError(err instanceof Error ? err.message : t('videoAnalyzer.analysisFailed'));
     } finally {
       setIsAnalyzing(false);
     }
-  }, [videoSrc, frameInterval, sceneThreshold]);
+  }, [videoSrc, frameInterval, sceneThreshold, t]);
 
   // Create a single image node from a keyframe
   const handleCreateNode = useCallback((frame: ExtractedFrame) => {
@@ -166,7 +168,7 @@ export function VideoAnalyzer() {
       {/* Video Input */}
       <div className="space-y-3">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]">
-          Video Source
+          {t('videoAnalyzer.videoSource')}
         </h3>
 
         {/* File Upload */}
@@ -178,8 +180,8 @@ export function VideoAnalyzer() {
             <Upload className="h-5 w-5 text-[var(--primary)]" />
           </div>
           <div>
-            <p className="text-sm font-medium text-[var(--foreground)]">Upload Video</p>
-            <p className="text-xs text-[var(--muted-foreground)]">MP4, WebM, MOV supported</p>
+            <p className="text-sm font-medium text-[var(--foreground)]">{t('videoAnalyzer.uploadVideo')}</p>
+            <p className="text-xs text-[var(--muted-foreground)]">{t('videoAnalyzer.supportedFormats')}</p>
           </div>
         </button>
         <input
@@ -196,7 +198,7 @@ export function VideoAnalyzer() {
             type="text"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
-            placeholder="Paste video URL..."
+            placeholder={t('videoAnalyzer.pasteVideoUrl')}
             className="flex-1 px-3 py-2 text-sm rounded-lg bg-[var(--muted)] text-[var(--foreground)] border border-[var(--border)] focus:outline-none focus:border-[var(--primary)] placeholder:text-[var(--muted-foreground)]"
             onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
           />
@@ -205,7 +207,7 @@ export function VideoAnalyzer() {
             disabled={!urlInput.trim()}
             className="px-3 py-2 rounded-lg bg-[var(--primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-30 cursor-pointer border-none"
           >
-            Load
+            {t('videoAnalyzer.load')}
           </button>
         </div>
       </div>
@@ -246,7 +248,7 @@ export function VideoAnalyzer() {
             className="flex items-center gap-2 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer bg-transparent border-none"
           >
             <Settings2 className="h-3.5 w-3.5" />
-            <span>Analysis Settings</span>
+            <span>{t('videoAnalyzer.analysisSettings')}</span>
             {showSettings ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
           </button>
 
@@ -254,7 +256,7 @@ export function VideoAnalyzer() {
             <div className="space-y-3 p-3 rounded-lg bg-[var(--muted)] border border-[var(--border)]">
               <div className="space-y-1.5">
                 <label className="text-xs text-[var(--muted-foreground)]">
-                  Frame Interval: {frameInterval}s
+                  {t('videoAnalyzer.frameInterval', { value: frameInterval })}
                 </label>
                 <input
                   type="range"
@@ -268,7 +270,7 @@ export function VideoAnalyzer() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs text-[var(--muted-foreground)]">
-                  Scene Sensitivity: {Math.round(sceneThreshold * 100)}%
+                  {t('videoAnalyzer.sceneSensitivity', { value: Math.round(sceneThreshold * 100) })}
                 </label>
                 <input
                   type="range"
@@ -288,7 +290,7 @@ export function VideoAnalyzer() {
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer border-none"
           >
             <Play className="h-4 w-4" />
-            Analyze Video
+            {t('videoAnalyzer.analyzeVideo')}
           </button>
         </div>
       )}
@@ -323,15 +325,15 @@ export function VideoAnalyzer() {
           <div className="grid grid-cols-3 gap-2">
             <div className="p-2 rounded-lg bg-[var(--muted)] text-center">
               <p className="text-lg font-semibold text-[var(--foreground)]">{analysisResult.scenes.length}</p>
-              <p className="text-[10px] text-[var(--muted-foreground)]">Scenes</p>
+              <p className="text-[10px] text-[var(--muted-foreground)]">{t('videoAnalyzer.scenesLabel')}</p>
             </div>
             <div className="p-2 rounded-lg bg-[var(--muted)] text-center">
               <p className="text-lg font-semibold text-[var(--foreground)]">{analysisResult.keyframes.length}</p>
-              <p className="text-[10px] text-[var(--muted-foreground)]">Keyframes</p>
+              <p className="text-[10px] text-[var(--muted-foreground)]">{t('videoAnalyzer.keyframesLabel')}</p>
             </div>
             <div className="p-2 rounded-lg bg-[var(--muted)] text-center">
               <p className="text-lg font-semibold text-[var(--foreground)]">{formatTimestamp(analysisResult.duration)}</p>
-              <p className="text-[10px] text-[var(--muted-foreground)]">Duration</p>
+              <p className="text-[10px] text-[var(--muted-foreground)]">{t('videoAnalyzer.durationLabel')}</p>
             </div>
           </div>
 
@@ -343,21 +345,21 @@ export function VideoAnalyzer() {
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[var(--primary)] text-white text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-30 cursor-pointer border-none"
             >
               <Layers className="h-3.5 w-3.5" />
-              Add {selectedKeyframes.size} to Canvas
+              {t('videoAnalyzer.addNToCanvas', { count: selectedKeyframes.size })}
             </button>
             <button
               onClick={handleExportAll}
               className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[var(--muted)] text-[var(--foreground)] text-xs font-medium hover:bg-white/10 transition-colors cursor-pointer border border-[var(--border)]"
             >
               <Download className="h-3.5 w-3.5" />
-              Export
+              {t('common.export')}
             </button>
           </div>
 
           {/* Keyframe Timeline */}
           <div className="space-y-2">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]">
-              Keyframes
+              {t('videoAnalyzer.keyframes')}
             </h3>
             <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
               {analysisResult.keyframes.map((frame, i) => {
@@ -391,7 +393,7 @@ export function VideoAnalyzer() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <p className="text-xs font-medium text-[var(--foreground)]">
-                            Scene {i + 1}
+                            {t('storyboard.scene', { index: i + 1 })}
                           </p>
                           <div className="flex items-center gap-1">
                             <button
@@ -399,7 +401,7 @@ export function VideoAnalyzer() {
                                 e.stopPropagation();
                                 handleCreateNode(frame);
                               }}
-                              title="Add to canvas"
+                              title={t('canvas.addToCanvas')}
                               className="p-1 rounded text-[var(--muted-foreground)] hover:text-[var(--primary)] cursor-pointer bg-transparent border-none"
                             >
                               <Plus className="h-3.5 w-3.5" />
@@ -409,7 +411,7 @@ export function VideoAnalyzer() {
                                 e.stopPropagation();
                                 downloadDataUrl(frame.dataUrl, `keyframe_${i + 1}.jpg`);
                               }}
-                              title="Download"
+                              title={t('common.download')}
                               className="p-1 rounded text-[var(--muted-foreground)] hover:text-[var(--primary)] cursor-pointer bg-transparent border-none"
                             >
                               <Download className="h-3.5 w-3.5" />

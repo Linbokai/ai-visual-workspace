@@ -44,6 +44,16 @@ import { GroupNode } from '@/components/canvas/nodes/GroupNode';
 import { ImageEditorNode } from '@/components/canvas/nodes/ImageEditorNode';
 import { DoodleNode } from '@/components/canvas/nodes/DoodleNode';
 import { CompareNode } from '@/components/canvas/nodes/CompareNode';
+import { NovelInputNode } from '@/components/canvas/nodes/NovelInputNode';
+import { VideoAnalyzeNode } from '@/components/canvas/nodes/VideoAnalyzeNode';
+import { ExtractNode } from '@/components/canvas/nodes/ExtractNode';
+import { CharacterDescriptionNode } from '@/components/canvas/nodes/CharacterDescriptionNode';
+import { SceneDescriptionNode } from '@/components/canvas/nodes/SceneDescriptionNode';
+import { GenerateImageNode } from '@/components/canvas/nodes/GenerateImageNode';
+import { StoryboardNode } from '@/components/canvas/nodes/StoryboardNode';
+import { PreviewNode } from '@/components/canvas/nodes/PreviewNode';
+import { LocalSaveNode } from '@/components/canvas/nodes/LocalSaveNode';
+import { MaskEditorNode } from '@/components/canvas/nodes/MaskEditorNode';
 import { ProcessEdge } from '@/components/canvas/edges/ProcessEdge';
 import { CanvasContextMenu } from '@/components/canvas/CanvasContextMenu';
 import { ShortcutsHelp } from '@/components/canvas/ShortcutsHelp';
@@ -69,6 +79,16 @@ const MemoizedGroupNode = memo(GroupNode, areNodePropsEqual);
 const MemoizedImageEditorNode = memo(ImageEditorNode, areNodePropsEqual);
 const MemoizedDoodleNode = memo(DoodleNode, areNodePropsEqual);
 const MemoizedCompareNode = memo(CompareNode, areNodePropsEqual);
+const MemoizedNovelInputNode = memo(NovelInputNode, areNodePropsEqual);
+const MemoizedVideoAnalyzeNode = memo(VideoAnalyzeNode, areNodePropsEqual);
+const MemoizedExtractNode = memo(ExtractNode, areNodePropsEqual);
+const MemoizedCharacterDescriptionNode = memo(CharacterDescriptionNode, areNodePropsEqual);
+const MemoizedSceneDescriptionNode = memo(SceneDescriptionNode, areNodePropsEqual);
+const MemoizedGenerateImageNode = memo(GenerateImageNode, areNodePropsEqual);
+const MemoizedStoryboardNode = memo(StoryboardNode, areNodePropsEqual);
+const MemoizedPreviewNode = memo(PreviewNode, areNodePropsEqual);
+const MemoizedLocalSaveNode = memo(LocalSaveNode, areNodePropsEqual);
+const MemoizedMaskEditorNode = memo(MaskEditorNode, areNodePropsEqual);
 
 const nodeTypes = {
   image: MemoizedImageNode,
@@ -79,6 +99,23 @@ const nodeTypes = {
   'image-editor': MemoizedImageEditorNode,
   'doodle-image': MemoizedDoodleNode,
   compare: MemoizedCompareNode,
+  'novel-input': MemoizedNovelInputNode,
+  'video-analyze': MemoizedVideoAnalyzeNode,
+  'extract-characters-scenes': MemoizedExtractNode,
+  'character-description': MemoizedCharacterDescriptionNode,
+  'scene-description': MemoizedSceneDescriptionNode,
+  'gen-image': MemoizedGenerateImageNode,
+  'gen-video': MemoizedGenerateImageNode, // reuse same component
+  'generate-character-image': MemoizedGenerateImageNode,
+  'generate-character-video': MemoizedGenerateImageNode,
+  'generate-scene-image': MemoizedGenerateImageNode,
+  'generate-scene-video': MemoizedGenerateImageNode,
+  'create-character': MemoizedCharacterDescriptionNode, // reuse
+  'create-scene': MemoizedSceneDescriptionNode, // reuse
+  'storyboard-node': MemoizedStoryboardNode,
+  'preview': MemoizedPreviewNode,
+  'local-save': MemoizedLocalSaveNode,
+  'mask-editor': MemoizedMaskEditorNode,
 };
 
 const edgeTypes = {

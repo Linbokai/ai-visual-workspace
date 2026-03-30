@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Image,
   Video,
@@ -93,13 +94,6 @@ const mockAssets: Asset[] = [
   },
 ];
 
-const filterTabs: { id: AssetType; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { id: 'all', label: 'All', icon: FolderOpen },
-  { id: 'image', label: 'Images', icon: Image },
-  { id: 'video', label: 'Videos', icon: Video },
-  { id: 'audio', label: 'Audio', icon: Music },
-];
-
 const typeToNodeType: Record<string, NodeType> = {
   image: 'image',
   video: 'video',
@@ -119,6 +113,7 @@ const typeColors: Record<string, string> = {
 };
 
 export function AssetsPanel() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<AssetType>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -126,6 +121,13 @@ export function AssetsPanel() {
 
   const addNode = useCanvasStore((s) => s.addNode);
   const closePanel = usePanelStore((s) => s.closeLeftPanel);
+
+  const filterTabs: { id: AssetType; label: string; icon: React.ComponentType<{ className?: string }> }[] = useMemo(() => [
+    { id: 'all', label: t('assets.all'), icon: FolderOpen },
+    { id: 'image', label: t('assets.images'), icon: Image },
+    { id: 'video', label: t('assets.videos'), icon: Video },
+    { id: 'audio', label: t('assets.audio'), icon: Music },
+  ], [t]);
 
   const filteredAssets = useMemo(() => {
     return mockAssets.filter((asset) => {
@@ -159,14 +161,14 @@ export function AssetsPanel() {
       <div className="flex flex-col items-center justify-center h-48 text-center">
         <FolderOpen className="h-8 w-8 text-[var(--muted-foreground)] mb-2" />
         <p className="text-sm text-[var(--muted-foreground)]">
-          No assets yet
+          {t('assets.noAssets')}
         </p>
         <p className="text-xs text-[var(--muted-foreground)] mt-1">
-          Upload files or generate content to build your asset library
+          {t('assets.noAssetsDesc')}
         </p>
         <button className="mt-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] text-xs hover:opacity-90 transition-opacity cursor-pointer border-none">
           <Upload className="h-3.5 w-3.5" />
-          Upload Files
+          {t('assets.uploadFiles')}
         </button>
       </div>
     );
@@ -179,7 +181,7 @@ export function AssetsPanel() {
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--muted-foreground)]" />
         <input
           type="text"
-          placeholder="Search assets..."
+          placeholder={t('assets.searchAssets')}
           className="w-full pl-8 pr-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -227,7 +229,7 @@ export function AssetsPanel() {
       {/* Upload button */}
       <button className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border-2 border-dashed border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--primary)]/50 hover:text-[var(--primary)] transition-colors cursor-pointer bg-transparent text-xs">
         <Upload className="h-3.5 w-3.5" />
-        Upload Files
+        {t('assets.uploadFiles')}
       </button>
 
       {/* Asset grid/list */}
@@ -268,7 +270,7 @@ export function AssetsPanel() {
                     handleAddToCanvas(asset);
                   }}
                   className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer border-none"
-                  title="Add to canvas"
+                  title={t('assets.addToCanvas')}
                 >
                   <Plus className="h-3 w-3" />
                 </button>
@@ -312,7 +314,7 @@ export function AssetsPanel() {
                     handleAddToCanvas(asset);
                   }}
                   className="p-1 rounded text-[var(--muted-foreground)] hover:text-[var(--primary)] opacity-0 group-hover:opacity-100 transition-all cursor-pointer bg-transparent border-none"
-                  title="Add to canvas"
+                  title={t('assets.addToCanvas')}
                 >
                   <Plus className="h-3.5 w-3.5" />
                 </button>
@@ -327,30 +329,30 @@ export function AssetsPanel() {
         <div className="mt-3 p-3 rounded-xl border border-[var(--border)] bg-[var(--card)]">
           <div className="flex items-center gap-1.5 mb-2">
             <Info className="h-3.5 w-3.5 text-[var(--primary)]" />
-            <h4 className="text-xs font-medium text-[var(--foreground)]">Asset Details</h4>
+            <h4 className="text-xs font-medium text-[var(--foreground)]">{t('assets.assetDetails')}</h4>
           </div>
           <div className="space-y-1.5 text-[11px]">
             <div className="flex justify-between">
-              <span className="text-[var(--muted-foreground)]">Name</span>
+              <span className="text-[var(--muted-foreground)]">{t('assets.name')}</span>
               <span className="text-[var(--foreground)] truncate ml-2">{selected.name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[var(--muted-foreground)]">Type</span>
+              <span className="text-[var(--muted-foreground)]">{t('assets.type')}</span>
               <span className="text-[var(--foreground)] capitalize">{selected.type}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[var(--muted-foreground)]">Size</span>
+              <span className="text-[var(--muted-foreground)]">{t('assets.size')}</span>
               <span className="text-[var(--foreground)]">{selected.size}</span>
             </div>
             {selected.dimensions && (
               <div className="flex justify-between">
-                <span className="text-[var(--muted-foreground)]">Dimensions</span>
+                <span className="text-[var(--muted-foreground)]">{t('assets.dimensions')}</span>
                 <span className="text-[var(--foreground)]">{selected.dimensions}</span>
               </div>
             )}
             {selected.duration && (
               <div className="flex justify-between">
-                <span className="text-[var(--muted-foreground)]">Duration</span>
+                <span className="text-[var(--muted-foreground)]">{t('assets.duration')}</span>
                 <span className="text-[var(--foreground)]">{selected.duration}</span>
               </div>
             )}
@@ -360,7 +362,7 @@ export function AssetsPanel() {
             className="w-full mt-2 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] text-xs hover:opacity-90 transition-opacity cursor-pointer border-none"
           >
             <Plus className="h-3 w-3" />
-            Add to Canvas
+            {t('assets.addToCanvas')}
           </button>
         </div>
       )}
@@ -369,7 +371,7 @@ export function AssetsPanel() {
       {filteredAssets.length === 0 && (
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <Search className="h-6 w-6 text-[var(--muted-foreground)] mb-2" />
-          <p className="text-xs text-[var(--muted-foreground)]">No matching assets found</p>
+          <p className="text-xs text-[var(--muted-foreground)]">{t('assets.noMatchingAssets')}</p>
         </div>
       )}
     </div>

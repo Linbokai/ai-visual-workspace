@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Wand2,
   Languages,
@@ -101,14 +102,14 @@ function translatePrompt(text: string, direction: 'cn2en' | 'en2cn'): string {
   return result;
 }
 
-const BUILDER_CATEGORIES = [
-  { key: 'subject', label: 'Subject', items: PROMPT_SUBJECTS },
-  { key: 'style', label: 'Style', items: PROMPT_STYLES },
-  { key: 'lighting', label: 'Lighting', items: PROMPT_LIGHTING },
-  { key: 'camera', label: 'Camera', items: PROMPT_CAMERA_ANGLES },
-  { key: 'color', label: 'Color Palette', items: PROMPT_COLOR_PALETTES },
-  { key: 'mood', label: 'Mood', items: PROMPT_MOODS },
-  { key: 'quality', label: 'Quality', items: PROMPT_QUALITY_TAGS },
+const BUILDER_CATEGORIES_KEYS = [
+  { key: 'subject', labelKey: 'promptEng.subject', items: PROMPT_SUBJECTS },
+  { key: 'style', labelKey: 'promptEng.style', items: PROMPT_STYLES },
+  { key: 'lighting', labelKey: 'promptEng.lighting', items: PROMPT_LIGHTING },
+  { key: 'camera', labelKey: 'promptEng.camera', items: PROMPT_CAMERA_ANGLES },
+  { key: 'color', labelKey: 'promptEng.colorPalette', items: PROMPT_COLOR_PALETTES },
+  { key: 'mood', labelKey: 'promptEng.mood', items: PROMPT_MOODS },
+  { key: 'quality', labelKey: 'promptEng.quality', items: PROMPT_QUALITY_TAGS },
 ] as const;
 
 interface PromptEngineerProps {
@@ -119,6 +120,7 @@ interface PromptEngineerProps {
 }
 
 export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, floating = false }: PromptEngineerProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabMode>('builder');
   const [selectedTags, setSelectedTags] = useState<Record<string, string[]>>({});
   const [customSubject, setCustomSubject] = useState(initialPrompt);
@@ -142,18 +144,27 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
   });
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Translated builder categories
+  const builderCategories = useMemo(() =>
+    BUILDER_CATEGORIES_KEYS.map((cat) => ({
+      key: cat.key,
+      label: t(cat.labelKey),
+      items: cat.items,
+    })),
+  [t]);
+
   // Build prompt from selected tags
   const builtPrompt = useMemo(() => {
     const parts: string[] = [];
     if (customSubject.trim()) parts.push(customSubject.trim());
 
-    for (const cat of BUILDER_CATEGORIES) {
+    for (const cat of builderCategories) {
       const tags = selectedTags[cat.key] || [];
       if (tags.length > 0) parts.push(tags.join(', '));
     }
 
     return parts.join(', ');
-  }, [selectedTags, customSubject]);
+  }, [selectedTags, customSubject, builderCategories]);
 
   // Toggle tag
   const toggleTag = useCallback((category: string, tag: string) => {
@@ -251,7 +262,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
         <div className="flex items-center justify-between px-4 h-11 border-b border-[var(--border)] flex-shrink-0">
           <div className="flex items-center gap-2">
             <Wand2 className="h-4 w-4 text-[var(--primary)]" />
-            <h2 className="text-sm font-medium text-[var(--foreground)]">Prompt Engineer</h2>
+            <h2 className="text-sm font-medium text-[var(--foreground)]">{t('promptEng.title')}</h2>
           </div>
           {onClose && (
             <button
@@ -268,10 +279,10 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
         {/* Tabs */}
         <div className="flex gap-1 p-1 rounded-lg bg-[var(--muted)]">
           {([
-            { mode: 'builder' as TabMode, label: 'Builder' },
-            { mode: 'templates' as TabMode, label: 'Templates' },
-            { mode: 'translate' as TabMode, label: 'Translate' },
-            { mode: 'history' as TabMode, label: 'History' },
+            { mode: 'builder' as TabMode, label: t('promptEng.builder') },
+            { mode: 'templates' as TabMode, label: t('promptEng.templates') },
+            { mode: 'translate' as TabMode, label: t('promptEng.translate') },
+            { mode: 'history' as TabMode, label: t('promptEng.history') },
           ]).map(({ mode, label }) => (
             <button
               key={mode}
@@ -293,18 +304,18 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
           <div className="space-y-3">
             {/* Subject Input */}
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-[var(--foreground)]">Subject / Description</label>
+              <label className="text-xs font-medium text-[var(--foreground)]">{t('promptEng.subjectDesc')}</label>
               <input
                 type="text"
                 value={customSubject}
                 onChange={(e) => setCustomSubject(e.target.value)}
-                placeholder="Describe your main subject..."
+                placeholder={t('promptEng.describeSubject')}
                 className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--muted)] text-[var(--foreground)] border border-[var(--border)] focus:outline-none focus:border-[var(--primary)] placeholder:text-[var(--muted-foreground)]"
               />
             </div>
 
             {/* Tag Categories */}
-            {BUILDER_CATEGORIES.map((cat) => {
+            {builderCategories.map((cat) => {
               const isExpanded = expandedCategories.has(cat.key);
               const selected = selectedTags[cat.key] || [];
 
@@ -350,7 +361,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
             {/* Built Prompt Preview */}
             {builtPrompt && (
               <div className="space-y-2">
-                <h3 className="text-xs font-semibold text-[var(--primary)]">Generated Prompt</h3>
+                <h3 className="text-xs font-semibold text-[var(--primary)]">{t('promptEng.generatedPrompt')}</h3>
                 <div className="p-3 rounded-lg bg-[var(--muted)] border border-[var(--border)]">
                   <p className="text-xs text-[var(--foreground)] whitespace-pre-wrap">{builtPrompt}</p>
                 </div>
@@ -360,7 +371,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                     className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--muted)] text-[var(--foreground)] text-xs hover:bg-white/10 cursor-pointer border border-[var(--border)]"
                   >
                     <Copy className="h-3.5 w-3.5" />
-                    Copy
+                    {t('common.copy')}
                   </button>
                   {onApplyPrompt && (
                     <button
@@ -368,13 +379,13 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                       className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--primary)] text-white text-xs font-medium hover:opacity-90 cursor-pointer border-none"
                     >
                       <Wand2 className="h-3.5 w-3.5" />
-                      Apply
+                      {t('common.apply')}
                     </button>
                   )}
                   <button
                     onClick={() => handleSavePrompt(builtPrompt)}
                     className="flex items-center justify-center px-2 py-1.5 rounded-lg bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-white/10 cursor-pointer border border-[var(--border)]"
-                    title="Save to history"
+                    title={t('promptEng.saveToHistory')}
                   >
                     <Bookmark className="h-3.5 w-3.5" />
                   </button>
@@ -387,7 +398,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                   className="flex items-center gap-1.5 text-[10px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer bg-transparent border-none"
                 >
                   <RotateCcw className="h-3 w-3" />
-                  Reset all
+                  {t('promptEng.resetAll')}
                 </button>
               </div>
             )}
@@ -457,7 +468,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                   className="flex items-center gap-1 text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer bg-transparent border-none"
                 >
                   <ChevronDown className="h-3 w-3 rotate-90" />
-                  Back to templates
+                  {t('promptEng.backToTemplates')}
                 </button>
 
                 <div>
@@ -494,7 +505,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
 
                 {/* Preview */}
                 <div className="p-3 rounded-lg bg-[var(--muted)] border border-[var(--border)]">
-                  <p className="text-[10px] text-[var(--muted-foreground)] mb-1">Preview:</p>
+                  <p className="text-[10px] text-[var(--muted-foreground)] mb-1">{t('common.preview')}:</p>
                   <p className="text-xs text-[var(--foreground)]">{templatePrompt}</p>
                 </div>
 
@@ -505,7 +516,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                     className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--muted)] text-[var(--foreground)] text-xs hover:bg-white/10 cursor-pointer border border-[var(--border)]"
                   >
                     <Copy className="h-3.5 w-3.5" />
-                    Copy
+                    {t('common.copy')}
                   </button>
                   {onApplyPrompt && (
                     <button
@@ -513,7 +524,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                       className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--primary)] text-white text-xs font-medium hover:opacity-90 cursor-pointer border-none"
                     >
                       <Wand2 className="h-3.5 w-3.5" />
-                      Apply
+                      {t('common.apply')}
                     </button>
                   )}
                 </div>
@@ -527,7 +538,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--primary)]">
-                Prompt Translation
+                {t('promptEng.promptTranslation')}
               </h3>
               <button
                 onClick={() => setTranslateDirection(translateDirection === 'cn2en' ? 'en2cn' : 'cn2en')}
@@ -543,8 +554,8 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                 value={translateInput}
                 onChange={(e) => setTranslateInput(e.target.value)}
                 placeholder={translateDirection === 'cn2en'
-                  ? '输入中文提示词...'
-                  : 'Enter English prompt...'
+                  ? t('promptEng.cnToEn')
+                  : t('promptEng.enToCn')
                 }
                 className="w-full h-[100px] px-3 py-2 text-sm rounded-lg bg-[var(--muted)] text-[var(--foreground)] border border-[var(--border)] focus:outline-none focus:border-[var(--primary)] placeholder:text-[var(--muted-foreground)] resize-none"
               />
@@ -555,7 +566,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                 className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-[var(--primary)] text-white text-sm font-medium hover:opacity-90 disabled:opacity-30 cursor-pointer border-none"
               >
                 <Languages className="h-4 w-4" />
-                Translate
+                {t('promptEng.translateBtn')}
               </button>
 
               {translateOutput && (
@@ -569,7 +580,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                       className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--muted)] text-[var(--foreground)] text-xs hover:bg-white/10 cursor-pointer border border-[var(--border)]"
                     >
                       <Copy className="h-3.5 w-3.5" />
-                      Copy
+                      {t('common.copy')}
                     </button>
                     {onApplyPrompt && (
                       <button
@@ -577,7 +588,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                         className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--primary)] text-white text-xs font-medium hover:opacity-90 cursor-pointer border-none"
                       >
                         <Wand2 className="h-3.5 w-3.5" />
-                        Apply
+                        {t('common.apply')}
                       </button>
                     )}
                   </div>
@@ -586,7 +597,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
 
               {/* Common prompt terms reference */}
               <div className="space-y-1.5">
-                <p className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Quick Reference</p>
+                <p className="text-[10px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">{t('promptEng.quickReference')}</p>
                 <div className="grid grid-cols-2 gap-1 max-h-[200px] overflow-y-auto">
                   {TRANSLATION_MAP.slice(0, 20).map(([cn, en]) => (
                     <button
@@ -617,14 +628,14 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search saved prompts..."
+                placeholder={t('promptEng.searchSavedPrompts')}
                 className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-[var(--muted)] text-[var(--foreground)] border border-[var(--border)] focus:outline-none focus:border-[var(--primary)] placeholder:text-[var(--muted-foreground)]"
               />
             </div>
 
             {filteredHistory.length === 0 ? (
               <p className="text-xs text-[var(--muted-foreground)] text-center py-6">
-                No saved prompts yet. Build or copy a prompt to save it here.
+                {t('promptEng.noSavedPrompts')}
               </p>
             ) : (
               <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
@@ -642,7 +653,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                         <button
                           onClick={() => toggleFavorite(item.id)}
                           className="p-1 rounded text-[var(--muted-foreground)] hover:text-yellow-400 cursor-pointer bg-transparent border-none"
-                          title="Toggle favorite"
+                          title={t('promptEng.toggleFavorite')}
                         >
                           {item.isFavorite
                             ? <BookmarkCheck className="h-3.5 w-3.5 text-yellow-400" />
@@ -652,7 +663,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                         <button
                           onClick={() => handleCopy(item.prompt)}
                           className="p-1 rounded text-[var(--muted-foreground)] hover:text-[var(--foreground)] cursor-pointer bg-transparent border-none"
-                          title="Copy"
+                          title={t('common.copy')}
                         >
                           <Copy className="h-3.5 w-3.5" />
                         </button>
@@ -660,7 +671,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                           <button
                             onClick={() => handleApply(item.prompt)}
                             className="p-1 rounded text-[var(--muted-foreground)] hover:text-[var(--primary)] cursor-pointer bg-transparent border-none"
-                            title="Apply"
+                            title={t('common.apply')}
                           >
                             <Plus className="h-3.5 w-3.5" />
                           </button>
@@ -668,7 +679,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
                         <button
                           onClick={() => deletePrompt(item.id)}
                           className="p-1 rounded text-[var(--muted-foreground)] hover:text-red-400 cursor-pointer bg-transparent border-none"
-                          title="Delete"
+                          title={t('common.delete')}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>

@@ -101,6 +101,41 @@
   --topbar-border: rgba(0, 0, 0, 0.1);
 }
 
+[data-theme="solarized"] {
+  --background: #002b36;
+  --foreground: #839496;
+  --card: #073642;
+  --card-foreground: #93a1a1;
+  --popover: #073642;
+  --popover-foreground: #93a1a1;
+  --primary: #b58900;
+  --primary-foreground: #fdf6e3;
+  --secondary: #586e75;
+  --secondary-foreground: #eee8d5;
+  --muted: #073642;
+  --muted-foreground: #657b83;
+  --border: #586e75;
+  --input: rgba(88, 110, 117, 0.3);
+  --ring: rgba(181, 137, 0, 0.2);
+  --success: #859900;
+  --warning: #cb4b16;
+  --error: #dc322f;
+  --info: #268bd2;
+  --sidebar: #002b36;
+  --chat-background: #002b36;
+  --node-image: #268bd2;
+  --node-video: #2aa198;
+  --node-text: #b58900;
+  --node-audio: #d33682;
+  --node-group: #586e75;
+  --hover-overlay: rgba(181, 137, 0, 0.1);
+  --active-overlay: rgba(181, 137, 0, 0.15);
+  --canvas-dot: #586e75;
+  --minimap-mask: rgba(0, 43, 54, 0.8);
+  --topbar-bg: rgba(0, 43, 54, 0.9);
+  --topbar-border: #073642;
+}
+
 * {
   border-color: var(--border);
 }
@@ -254,6 +289,10 @@ body {
 
 [data-theme="light"] .project-card-hover:hover {
   box-shadow: 0 8px 30px -8px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="solarized"] .project-card-hover:hover {
+  box-shadow: 0 8px 30px -8px rgba(181, 137, 0, 0.2);
 }
 
 /* ============================================================

@@ -28,7 +28,8 @@ export type PromptCategory =
   | 'illustration'
   | '3d'
   | 'anime'
-  | 'abstract';
+  | 'abstract'
+  | 'composite';
 
 export const CATEGORY_INFO: Record<PromptCategory, { label: string; labelCn: string; color: string }> = {
   photography: { label: 'Photography', labelCn: '摄影', color: '#4ade80' },
@@ -36,6 +37,7 @@ export const CATEGORY_INFO: Record<PromptCategory, { label: string; labelCn: str
   '3d': { label: '3D Render', labelCn: '3D渲染', color: '#c084fc' },
   anime: { label: 'Anime', labelCn: '动漫', color: '#fb923c' },
   abstract: { label: 'Abstract', labelCn: '抽象', color: '#f472b6' },
+  composite: { label: 'Composite', labelCn: '合成排版', color: '#facc15' },
 };
 
 // ---------------------------------------------------------------------------
@@ -287,6 +289,82 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
       { name: 'palette', label: 'Colors', type: 'select', options: ['warm naturals', 'cool blues', 'vibrant mix', 'black and gold', 'pastel soft'], default: 'warm naturals' },
     ],
     tags: ['pattern', 'textile', 'design'],
+  },
+
+  // Composite / Layout Templates
+  {
+    id: 'storyboard',
+    name: 'Storyboard',
+    nameCn: '分镜故事板',
+    description: 'Hollywood-style 3x3 storyboard grid with sequential shots',
+    category: 'composite',
+    basePrompt: 'Create a professional 3x3 storyboard grid showing sequential shots of {scene}. Each panel should have different camera angles: wide establishing shot, medium shot, close-up, over-the-shoulder, low angle, high angle, POV, tracking shot, final dramatic shot. {mood} mood progression, {style}, film grain, cinematic color grading',
+    parameters: [
+      { name: 'scene', label: 'Scene', type: 'text', default: 'a detective entering a dimly lit room' },
+      { name: 'mood', label: 'Mood', type: 'select', options: ['tense', 'romantic', 'action-packed', 'mysterious', 'melancholic', 'triumphant'], default: 'tense' },
+      { name: 'style', label: 'Style', type: 'select', options: ['noir film', 'modern blockbuster', 'indie drama', 'horror', 'sci-fi epic', 'animated feature'], default: 'modern blockbuster' },
+    ],
+    tags: ['storyboard', 'film', 'cinematic', 'grid'],
+    preview: '🎬',
+  },
+  {
+    id: 'grid-character-dynamics',
+    name: 'Character Grid',
+    nameCn: '九宫格角色动态',
+    description: 'Character dynamic variations displayed in a 3x3 grid layout',
+    category: 'composite',
+    basePrompt: 'Character reference sheet for {character}, multiple poses and expressions in a 3x3 grid layout. Full body front view, side view, back view, facial expressions (happy, sad, angry, surprised), action pose, sitting pose. {style}, white background, professional character design, detailed annotations',
+    parameters: [
+      { name: 'character', label: 'Character', type: 'text', default: 'a fantasy elf ranger' },
+      { name: 'style', label: 'Art Style', type: 'select', options: ['consistent anime style', 'semi-realistic digital art', 'cartoon illustration', 'concept art style', 'pixel art style'], default: 'semi-realistic digital art' },
+    ],
+    tags: ['grid', 'character', 'reference', 'poses'],
+    preview: '🔲',
+  },
+  {
+    id: 'upscale-enhance',
+    name: 'Upscale Enhancement',
+    nameCn: '超分辨率增强',
+    description: 'High-resolution enhancement prompt for maximum detail and quality',
+    category: 'composite',
+    basePrompt: '{subject}, ultra high resolution, masterpiece quality, 8K UHD, extremely detailed, sharp focus, {style}, photorealistic, intricate details, maximum quality, best quality, absurdres, highres, {enhancement}',
+    parameters: [
+      { name: 'subject', label: 'Subject', type: 'text', default: 'the original image' },
+      { name: 'style', label: 'Enhancement Style', type: 'select', options: ['professional photography', 'digital art render', 'film scan quality', 'studio master print', 'RAW photo processing'], default: 'professional photography' },
+      { name: 'enhancement', label: 'Extra Detail', type: 'select', options: ['fine skin texture, pore detail', 'fabric weave detail, material texture', 'architectural detail, clean edges', 'foliage detail, natural textures', 'metallic reflections, surface detail'], default: 'fine skin texture, pore detail' },
+    ],
+    tags: ['upscale', 'enhance', 'quality', 'highres'],
+    preview: '🔍',
+  },
+  {
+    id: 'character-sheet',
+    name: 'Character Sheet',
+    nameCn: '角色设定图',
+    description: 'Detailed character reference sheet with full annotations',
+    category: 'composite',
+    basePrompt: 'Detailed character reference sheet for {character}, professional character design document. Front view, three-quarter view, side profile, back view. Outfit details with callout annotations, color palette swatch, {extras}. {style}, clean white background, labeled reference sheet, production quality',
+    parameters: [
+      { name: 'character', label: 'Character', type: 'text', default: 'a steampunk inventor with goggles and mechanical arm' },
+      { name: 'style', label: 'Art Style', type: 'select', options: ['game concept art', 'anime production art', 'western animation style', 'realistic illustration', 'comic book style'], default: 'game concept art' },
+      { name: 'extras', label: 'Extra Elements', type: 'select', options: ['weapon/prop designs', 'facial expression lineup', 'accessories and gear detail', 'transformation stages', 'height comparison chart'], default: 'weapon/prop designs' },
+    ],
+    tags: ['character', 'sheet', 'reference', 'design'],
+    preview: '📋',
+  },
+  {
+    id: 'mood-board',
+    name: 'Mood Board',
+    nameCn: '情绪板',
+    description: 'Cinematic 8-panel mood board for narrative composition',
+    category: 'composite',
+    basePrompt: 'Cinematic mood board, 8 panels showing {theme}. Include: establishing wide shot, character portrait, detail close-up, environmental texture, color palette swatch, typography sample, atmospheric scene, final composite. {style}, film photography aesthetic, {palette}',
+    parameters: [
+      { name: 'theme', label: 'Theme', type: 'text', default: 'a cozy autumn coffee shop story' },
+      { name: 'style', label: 'Style', type: 'select', options: ['professional layout', 'collage style', 'editorial magazine', 'Pinterest aesthetic', 'film director lookbook'], default: 'professional layout' },
+      { name: 'palette', label: 'Color Mood', type: 'select', options: ['warm golden tones', 'cool blue-grey tones', 'vibrant saturated', 'desaturated vintage', 'high contrast noir'], default: 'warm golden tones' },
+    ],
+    tags: ['mood board', 'narrative', 'composition', 'layout'],
+    preview: '🎨',
   },
 ];
 

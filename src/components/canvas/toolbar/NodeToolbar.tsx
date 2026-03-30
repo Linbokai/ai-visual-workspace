@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   Crop,
   SlidersHorizontal,
@@ -21,6 +22,7 @@ interface ToolbarAction {
 }
 
 export function NodeToolbar() {
+  const { t } = useTranslation();
   const selectedNodeIds = useCanvasStore((s) => s.selectedNodeIds);
   const nodes = useCanvasStore((s) => s.nodes);
   const removeNode = useCanvasStore((s) => s.removeNode);
@@ -49,18 +51,18 @@ export function NodeToolbar() {
 
   if (isMediaNode) {
     actions.push(
-      { icon: Crop, label: 'Crop', onClick: () => console.log('crop') },
-      { icon: SlidersHorizontal, label: 'Adjust', onClick: () => console.log('adjust') },
-      { icon: Eraser, label: 'Erase', onClick: () => console.log('erase') },
-      { icon: Palette, label: 'Style Transfer', onClick: () => console.log('style') },
-      { icon: Wand2, label: 'Enhance', onClick: () => console.log('enhance') },
+      { icon: Crop, label: t('toolbar.crop'), onClick: () => console.log('crop') },
+      { icon: SlidersHorizontal, label: t('toolbar.adjust'), onClick: () => console.log('adjust') },
+      { icon: Eraser, label: t('toolbar.erase'), onClick: () => console.log('erase') },
+      { icon: Palette, label: t('toolbar.styleTransfer'), onClick: () => console.log('style') },
+      { icon: Wand2, label: t('toolbar.enhance'), onClick: () => console.log('enhance') },
     );
   }
 
   actions.push(
-    { icon: CheckCircle2, label: 'Mark Done', onClick: () => console.log('done') },
-    { icon: Download, label: 'Download', onClick: handleDownload },
-    { icon: Maximize, label: 'Fullscreen', onClick: () => console.log('fullscreen') },
+    { icon: CheckCircle2, label: t('toolbar.markDone'), onClick: () => console.log('done') },
+    { icon: Download, label: t('toolbar.download'), onClick: handleDownload },
+    { icon: Maximize, label: t('toolbar.fullscreen'), onClick: () => console.log('fullscreen') },
   );
 
   return (
@@ -86,7 +88,7 @@ export function NodeToolbar() {
 
           {/* More actions */}
           <button
-            title="More"
+            title={t('toolbar.more')}
             className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none"
           >
             <MoreHorizontal className="h-4 w-4" />
@@ -98,7 +100,7 @@ export function NodeToolbar() {
           {/* Delete */}
           <button
             onClick={handleDelete}
-            title="Delete"
+            title={t('toolbar.delete')}
             className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--error)] hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none"
           >
             <Trash2 className="h-4 w-4" />

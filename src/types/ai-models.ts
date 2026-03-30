@@ -9,7 +9,11 @@ export type AIProvider =
   | 'stability'
   | 'replicate'
   | 'local'
-  | 'custom';
+  | 'custom'
+  | 'jimeng'
+  | 'midjourney'
+  | 'google'
+  | 'grok';
 
 /** Capability categories a model can support */
 export type ModelCapability =
@@ -240,6 +244,25 @@ export const BUILTIN_MODELS: AIModelDefinition[] = [
     ],
     enabled: true,
   },
+  // -- GPT-4o Image --
+  {
+    id: 'gpt-4o-image',
+    name: 'GPT-4o Image',
+    provider: 'openai',
+    capabilities: ['image-generation'],
+    description: 'OpenAI GPT-4o native image generation',
+    apiModelId: 'gpt-4o',
+    endpointPath: '/images/generations',
+    supportsStreaming: false,
+    parameters: [
+      { key: 'size', label: 'Size', type: 'select', default: '1024x1024', options: [
+        { value: '1024x1024', label: '1024x1024' },
+        { value: '1792x1024', label: '1792x1024' },
+        { value: '1024x1792', label: '1024x1792' },
+      ]},
+    ],
+    enabled: true,
+  },
   // -- Anthropic text models --
   {
     id: 'claude-sonnet-4',
@@ -320,6 +343,152 @@ export const BUILTIN_MODELS: AIModelDefinition[] = [
     ],
     enabled: true,
   },
+  // -- Jimeng (即梦) Image Models --
+  {
+    id: 'jimeng-4.5',
+    name: '即梦 4.5',
+    provider: 'jimeng',
+    capabilities: ['image-generation'],
+    description: 'Latest Jimeng image generation model',
+    apiModelId: 'jimeng-4.5',
+    endpointPath: '/v1/images/generations',
+    supportsStreaming: false,
+    parameters: [
+      { key: 'width', label: 'Width', type: 'number', default: 1024, min: 512, max: 2048, step: 64 },
+      { key: 'height', label: 'Height', type: 'number', default: 1024, min: 512, max: 2048, step: 64 },
+      { key: 'quality', label: 'Quality', type: 'select', default: 'auto', options: [
+        { value: 'auto', label: 'Auto' },
+        { value: '1k', label: '1K' },
+        { value: '2k', label: '2K' },
+        { value: '4k', label: '4K' },
+      ]},
+    ],
+    enabled: false,
+  },
+  {
+    id: 'jimeng-3.0',
+    name: '即梦 3.0',
+    provider: 'jimeng',
+    capabilities: ['image-generation'],
+    description: 'Jimeng 3.0 image model',
+    apiModelId: 'jimeng-3.0',
+    endpointPath: '/v1/images/generations',
+    supportsStreaming: false,
+    parameters: [
+      { key: 'width', label: 'Width', type: 'number', default: 1024, min: 512, max: 2048, step: 64 },
+      { key: 'height', label: 'Height', type: 'number', default: 1024, min: 512, max: 2048, step: 64 },
+    ],
+    enabled: false,
+  },
+  {
+    id: 'nanobananapro',
+    name: 'Nano Banana Pro',
+    provider: 'jimeng',
+    capabilities: ['image-generation'],
+    description: 'Nano Banana Pro image generation',
+    apiModelId: 'nanobananapro',
+    endpointPath: '/v1/images/generations',
+    supportsStreaming: false,
+    parameters: [
+      { key: 'width', label: 'Width', type: 'number', default: 1024, min: 512, max: 2048, step: 64 },
+      { key: 'height', label: 'Height', type: 'number', default: 1024, min: 512, max: 2048, step: 64 },
+    ],
+    enabled: false,
+  },
+  // -- Jimeng Video Models --
+  {
+    id: 'jimeng-video-3.5',
+    name: '即梦视频 3.5 Pro',
+    provider: 'jimeng',
+    capabilities: ['video-generation'],
+    description: 'Jimeng video generation 3.5',
+    apiModelId: 'jimeng-video-3.5-pro',
+    endpointPath: '/v1/videos/generations',
+    supportsStreaming: false,
+    parameters: [
+      { key: 'duration', label: 'Duration', type: 'select', default: '5', options: [
+        { value: '5', label: '5s' },
+        { value: '10', label: '10s' },
+      ]},
+    ],
+    enabled: false,
+  },
+  // -- Midjourney --
+  {
+    id: 'midjourney-v6',
+    name: 'Midjourney V6',
+    provider: 'midjourney',
+    capabilities: ['image-generation'],
+    description: 'Midjourney V6 via API proxy',
+    apiModelId: 'mj-v6',
+    endpointPath: '/v1/imagine',
+    supportsStreaming: false,
+    parameters: [
+      { key: 'aspect_ratio', label: 'Aspect Ratio', type: 'select', default: '1:1', options: [
+        { value: '1:1', label: '1:1' },
+        { value: '16:9', label: '16:9' },
+        { value: '9:16', label: '9:16' },
+        { value: '4:3', label: '4:3' },
+        { value: '3:4', label: '3:4' },
+      ]},
+      { key: 'stylize', label: 'Stylize', type: 'number', default: 100, min: 0, max: 1000, step: 10, description: 'How artistic the output is' },
+      { key: 'chaos', label: 'Chaos', type: 'number', default: 0, min: 0, max: 100, step: 1, description: 'Variation in results' },
+      { key: 'oref', label: 'Character Ref (--oref)', type: 'number', default: 0, min: 0, max: 100, step: 10, description: 'Character consistency weight' },
+      { key: 'sref', label: 'Style Ref (--sref)', type: 'number', default: 0, min: 0, max: 100, step: 10, description: 'Style consistency weight' },
+    ],
+    enabled: false,
+  },
+  // -- Google Gemini --
+  {
+    id: 'gemini-3-pro',
+    name: 'Gemini 3 Pro',
+    provider: 'google',
+    capabilities: ['text-generation', 'vision'],
+    description: 'Google Gemini 3 Pro for text and vision',
+    apiModelId: 'gemini-3-pro-preview',
+    endpointPath: '/v1/models/gemini-3-pro-preview:generateContent',
+    supportsStreaming: true,
+    maxTokens: 8192,
+    contextWindow: 1000000,
+    parameters: [
+      { key: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 2, step: 0.1 },
+      { key: 'max_tokens', label: 'Max Tokens', type: 'number', default: 4096, min: 1, max: 8192, step: 1 },
+    ],
+    enabled: false,
+  },
+  {
+    id: 'gemini-image',
+    name: 'Gemini 3 Pro Image',
+    provider: 'google',
+    capabilities: ['image-generation'],
+    description: 'Gemini image generation via Yunwu proxy',
+    apiModelId: 'gemini-3-pro-image-preview',
+    endpointPath: '/v1/images/generations',
+    supportsStreaming: false,
+    parameters: [
+      { key: 'width', label: 'Width', type: 'number', default: 1024, min: 512, max: 2048, step: 64 },
+      { key: 'height', label: 'Height', type: 'number', default: 1024, min: 512, max: 2048, step: 64 },
+    ],
+    enabled: false,
+  },
+  // -- Grok --
+  {
+    id: 'grok-video',
+    name: 'Grok Video 3',
+    provider: 'grok',
+    capabilities: ['video-generation'],
+    description: 'Grok video generation',
+    apiModelId: 'grok-video-3',
+    endpointPath: '/v1/videos/generations',
+    supportsStreaming: false,
+    parameters: [
+      { key: 'duration', label: 'Duration', type: 'select', default: '8', options: [
+        { value: '5', label: '5s' },
+        { value: '8', label: '8s' },
+      ]},
+    ],
+    enabled: false,
+  },
   // -- Local / Custom --
   {
     id: 'local-llm',
@@ -384,6 +553,42 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
     activeKeyIndex: 0,
     enabled: true,
     defaultModelId: 'stable-diffusion-xl',
+  },
+  {
+    provider: 'jimeng',
+    displayName: '即梦 (Jimeng)',
+    baseUrl: 'https://api.jimeng.ai',
+    apiKeys: [],
+    activeKeyIndex: 0,
+    enabled: false,
+    defaultModelId: 'jimeng-4.5',
+  },
+  {
+    provider: 'midjourney',
+    displayName: 'Midjourney',
+    baseUrl: '',
+    apiKeys: [],
+    activeKeyIndex: 0,
+    enabled: false,
+    defaultModelId: 'midjourney-v6',
+  },
+  {
+    provider: 'google',
+    displayName: 'Google Cloud',
+    baseUrl: 'https://generativelanguage.googleapis.com',
+    apiKeys: [],
+    activeKeyIndex: 0,
+    enabled: false,
+    defaultModelId: 'gemini-3-pro',
+  },
+  {
+    provider: 'grok',
+    displayName: 'Grok (xAI)',
+    baseUrl: 'https://api.x.ai',
+    apiKeys: [],
+    activeKeyIndex: 0,
+    enabled: false,
+    defaultModelId: 'grok-video',
   },
   {
     provider: 'local',

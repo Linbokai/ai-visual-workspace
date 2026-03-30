@@ -64,7 +64,9 @@ interface AIModelState {
   removeApiKey: (provider: AIProvider, keyId: string) => void;
   rotateApiKey: (provider: AIProvider) => void;
   markKeyFailed: (provider: AIProvider, keyId: string) => void;
+  blacklistApiKey: (provider: AIProvider, keyId: string, errorCode?: number) => void;
   getActiveKey: (provider: AIProvider) => string | null;
+  getActiveApiKey: (provider: AIProvider) => string | null;
 
   // -- Model selection --
   setSelectedChatModel: (modelId: string) => void;
@@ -183,6 +185,30 @@ export const useAIModelStore = create<AIModelState>((set, get) => ({
     get().rotateApiKey(provider);
   },
 
+  blacklistApiKey: (provider, keyId, errorCode) => {
+    // Only blacklist on specific error codes that indicate the key is invalid/exhausted
+    const blacklistCodes = [1006, 401, 402, 403];
+    if (errorCode !== undefined && !blacklistCodes.includes(errorCode)) {
+      // For non-blacklist error codes, just mark as failed (increment failCount)
+      get().markKeyFailed(provider, keyId);
+      return;
+    }
+
+    // Immediately disable the key
+    set((state) => ({
+      providers: state.providers.map((p) => {
+        if (p.provider !== provider) return p;
+        const updatedKeys = p.apiKeys.map((k) =>
+          k.id === keyId ? { ...k, disabled: true, failCount: k.failCount + 1 } : k,
+        );
+        return { ...p, apiKeys: updatedKeys };
+      }),
+    }));
+    get()._persist();
+    // Auto-rotate to the next available key
+    get().rotateApiKey(provider);
+  },
+
   getActiveKey: (provider) => {
     const cfg = get().providers.find((p) => p.provider === provider);
     if (!cfg || cfg.apiKeys.length === 0) return null;
@@ -193,6 +219,11 @@ export const useAIModelStore = create<AIModelState>((set, get) => ({
       return valid?.key ?? null;
     }
     return key.key;
+  },
+
+  getActiveApiKey: (provider) => {
+    // Alias for getActiveKey - returns the current active key string for a provider
+    return get().getActiveKey(provider);
   },
 
   // -- Model selection --

@@ -1,4 +1,4 @@
-import { Image, Video, Type, Music, Upload, Group, Paintbrush, PenTool, Columns2, Film, BookOpen, Sparkles } from 'lucide-react';
+import { Image, Video, Type, Music, Upload, Group, Paintbrush, PenTool, Columns2, Film, BookOpen, Sparkles, Users, User, MapPin, LayoutGrid, Eye, HardDrive } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import { usePanelStore } from '@/stores/usePanelStore';
@@ -27,6 +27,51 @@ const advancedNodeOptions: Array<{
   { type: 'image-editor', labelKey: 'nodes.imageEditor', icon: Paintbrush, descKey: 'nodes.imageEditorDesc' },
   { type: 'doodle-image', labelKey: 'nodes.doodleToImage', icon: PenTool, descKey: 'nodes.doodleToImageDesc' },
   { type: 'compare', labelKey: 'nodes.compare', icon: Columns2, descKey: 'nodes.compareDesc' },
+  { type: 'mask-editor', labelKey: 'nodes.maskEditor', icon: Paintbrush, descKey: 'nodes.maskEditorDesc' },
+];
+
+const generationNodeOptions: Array<{
+  type: NodeType;
+  labelKey: string;
+  icon: React.ComponentType<{ className?: string }>;
+  descKey: string;
+}> = [
+  { type: 'gen-image', labelKey: 'nodes.genImage', icon: Sparkles, descKey: 'nodes.genImageDesc' },
+  { type: 'gen-video', labelKey: 'nodes.genVideo', icon: Film, descKey: 'nodes.genVideoDesc' },
+];
+
+const storyNodeOptions: Array<{
+  type: NodeType;
+  labelKey: string;
+  icon: React.ComponentType<{ className?: string }>;
+  descKey: string;
+}> = [
+  { type: 'novel-input', labelKey: 'nodes.novelInput', icon: BookOpen, descKey: 'nodes.novelInputDesc' },
+  { type: 'video-analyze', labelKey: 'nodes.videoAnalyze', icon: Film, descKey: 'nodes.videoAnalyzeDesc' },
+  { type: 'extract-characters-scenes', labelKey: 'nodes.extractCharactersScenes', icon: Users, descKey: 'nodes.extractCharactersScenesDesc' },
+  { type: 'storyboard-node', labelKey: 'nodes.storyboardNode', icon: LayoutGrid, descKey: 'nodes.storyboardNodeDesc' },
+];
+
+const characterNodeOptions: Array<{
+  type: NodeType;
+  labelKey: string;
+  icon: React.ComponentType<{ className?: string }>;
+  descKey: string;
+}> = [
+  { type: 'character-description', labelKey: 'nodes.characterDescription', icon: User, descKey: 'nodes.characterDescriptionDesc' },
+  { type: 'scene-description', labelKey: 'nodes.sceneDescription', icon: MapPin, descKey: 'nodes.sceneDescriptionDesc' },
+  { type: 'generate-character-image', labelKey: 'nodes.generateCharacterImage', icon: Sparkles, descKey: 'nodes.generateCharacterImageDesc' },
+  { type: 'generate-scene-image', labelKey: 'nodes.generateSceneImage', icon: Sparkles, descKey: 'nodes.generateSceneImageDesc' },
+];
+
+const outputNodeOptions: Array<{
+  type: NodeType;
+  labelKey: string;
+  icon: React.ComponentType<{ className?: string }>;
+  descKey: string;
+}> = [
+  { type: 'preview', labelKey: 'nodes.preview', icon: Eye, descKey: 'nodes.previewDesc' },
+  { type: 'local-save', labelKey: 'nodes.localSave', icon: HardDrive, descKey: 'nodes.localSaveDesc' },
 ];
 
 export function AddNodePanel() {
@@ -65,6 +110,90 @@ export function AddNodePanel() {
           {t('sidebar.advanced')}
         </p>
         {advancedNodeOptions.map(({ type, labelKey, icon: Icon, descKey }) => (
+          <button
+            key={type}
+            onClick={() => handleAdd(type)}
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none text-left"
+          >
+            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+              <Icon className="h-5 w-5 text-[var(--primary)]" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[var(--foreground)]">{t(labelKey)}</p>
+              <p className="text-xs text-[var(--muted-foreground)]">{t(descKey)}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <div className="pt-2 border-t border-[var(--border)]">
+        <p className="text-[10px] font-medium text-[var(--muted-foreground)] uppercase tracking-wider px-3 mb-2">
+          {t('nodes.aiGeneration')}
+        </p>
+        {generationNodeOptions.map(({ type, labelKey, icon: Icon, descKey }) => (
+          <button
+            key={type}
+            onClick={() => handleAdd(type)}
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none text-left"
+          >
+            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+              <Icon className="h-5 w-5 text-[var(--primary)]" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[var(--foreground)]">{t(labelKey)}</p>
+              <p className="text-xs text-[var(--muted-foreground)]">{t(descKey)}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <div className="pt-2 border-t border-[var(--border)]">
+        <p className="text-[10px] font-medium text-[var(--muted-foreground)] uppercase tracking-wider px-3 mb-2">
+          {t('nodes.storyAnalysis')}
+        </p>
+        {storyNodeOptions.map(({ type, labelKey, icon: Icon, descKey }) => (
+          <button
+            key={type}
+            onClick={() => handleAdd(type)}
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none text-left"
+          >
+            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+              <Icon className="h-5 w-5 text-[var(--primary)]" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[var(--foreground)]">{t(labelKey)}</p>
+              <p className="text-xs text-[var(--muted-foreground)]">{t(descKey)}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <div className="pt-2 border-t border-[var(--border)]">
+        <p className="text-[10px] font-medium text-[var(--muted-foreground)] uppercase tracking-wider px-3 mb-2">
+          {t('nodes.characterScene')}
+        </p>
+        {characterNodeOptions.map(({ type, labelKey, icon: Icon, descKey }) => (
+          <button
+            key={type}
+            onClick={() => handleAdd(type)}
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none text-left"
+          >
+            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+              <Icon className="h-5 w-5 text-[var(--primary)]" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[var(--foreground)]">{t(labelKey)}</p>
+              <p className="text-xs text-[var(--muted-foreground)]">{t(descKey)}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <div className="pt-2 border-t border-[var(--border)]">
+        <p className="text-[10px] font-medium text-[var(--muted-foreground)] uppercase tracking-wider px-3 mb-2">
+          {t('nodes.output')}
+        </p>
+        {outputNodeOptions.map(({ type, labelKey, icon: Icon, descKey }) => (
           <button
             key={type}
             onClick={() => handleAdd(type)}

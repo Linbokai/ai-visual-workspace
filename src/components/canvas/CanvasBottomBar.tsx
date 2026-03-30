@@ -1,4 +1,5 @@
-import { Map, Grid3x3, Maximize, HelpCircle, Undo2, Redo2, Minus, Plus, ChevronDown, Zap, Gauge, ImageIcon, Check, Loader2, AlertCircle } from 'lucide-react';
+import { Map, Grid3x3, Maximize, HelpCircle, Undo2, Redo2, Minus, Plus, ChevronDown, Zap, Gauge, ImageIcon, Check, Loader2, AlertCircle, AlignJustify } from 'lucide-react';
+import { autoArrangeNodes } from '@/lib/auto-arrange';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -70,7 +71,7 @@ export function CanvasBottomBar() {
       transition={{ duration: 0.25, ease: 'easeOut' }}
       className="fixed bottom-0 left-16 right-0 z-20 h-12 flex items-center justify-between px-4 border-t border-[var(--border)] bg-[var(--background)]/80 backdrop-blur-sm"
       role="toolbar"
-      aria-label="Canvas controls"
+      aria-label={t('canvas.canvasControls')}
     >
       <div className="flex items-center gap-1">
         <button
@@ -90,8 +91,8 @@ export function CanvasBottomBar() {
         <button
           onClick={handleRedo}
           disabled={!canRedo}
-          title="Redo (Ctrl+Shift+Z)"
-          aria-label="Redo"
+          title={`${t('common.redo')} (Ctrl+Shift+Z)`}
+          aria-label={t('common.redo')}
           className={cn(
             'p-1.5 rounded-lg transition-colors bg-transparent border-none',
             canRedo
@@ -108,13 +109,13 @@ export function CanvasBottomBar() {
           icon={<Map className="h-4 w-4" />}
           active={showMinimap}
           onClick={toggleMinimap}
-          tooltip="Minimap (M)"
+          tooltip={`${t('canvas.minimap')} (M)`}
         />
         <ToggleButton
           icon={<Grid3x3 className="h-4 w-4" />}
           active={showGrid}
           onClick={toggleGrid}
-          tooltip="Grid (G)"
+          tooltip={`${t('canvas.grid')} (G)`}
         />
         <ToggleButton
           icon={<Maximize className="h-4 w-4" />}
@@ -122,13 +123,33 @@ export function CanvasBottomBar() {
           onClick={handleFitView}
           tooltip={`${t('canvas.fitView')} (F)`}
         />
+
+        <div className="w-px h-5 bg-[var(--border)] mx-1" />
+
+        <ToggleButton
+          icon={<AlignJustify className="h-4 w-4" />}
+          active={false}
+          onClick={() => {
+            const nodes = useCanvasStore.getState().nodes;
+            if (nodes.length === 0) return;
+            const positions = autoArrangeNodes(nodes);
+            useCanvasStore.getState().setNodes(
+              nodes.map((node) => {
+                const pos = positions.get(node.id);
+                return pos ? { ...node, position: pos } : node;
+              })
+            );
+            setTimeout(() => fitView({ padding: 0.2, duration: 400 }), 50);
+          }}
+          tooltip={t('canvas.autoArrange')}
+        />
       </div>
 
       <div className="flex items-center gap-1">
         <button
           onClick={() => zoomOut({ duration: 200 })}
-          title="Zoom out"
-          aria-label="Zoom out"
+          title={t('canvas.zoomOut')}
+          aria-label={t('canvas.zoomOut')}
           className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer bg-transparent border-none"
         >
           <Minus className="h-3.5 w-3.5" />
@@ -138,7 +159,7 @@ export function CanvasBottomBar() {
           <button
             onClick={() => setZoomMenuOpen(!zoomMenuOpen)}
             className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer bg-transparent border-none min-w-[52px] justify-center"
-            aria-label="Zoom level"
+            aria-label={t('canvas.zoomLevel')}
             aria-expanded={zoomMenuOpen}
           >
             {Math.round(zoomLevel * 100)}%
@@ -174,8 +195,8 @@ export function CanvasBottomBar() {
 
         <button
           onClick={() => zoomIn({ duration: 200 })}
-          title="Zoom in"
-          aria-label="Zoom in"
+          title={t('canvas.zoomIn')}
+          aria-label={t('canvas.zoomIn')}
           className="p-1.5 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--hover-overlay)] transition-colors cursor-pointer bg-transparent border-none"
         >
           <Plus className="h-3.5 w-3.5" />
@@ -201,7 +222,7 @@ export function CanvasBottomBar() {
               'hover:bg-[var(--hover-overlay)]',
             )}
             title={t('performance.normal')}
-            aria-label="Performance mode"
+            aria-label={t('canvas.performanceMode')}
             aria-expanded={perfMenuOpen}
           >
             {perfMode === 'fast' && <Zap className="h-3.5 w-3.5" />}

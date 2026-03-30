@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 
-type Theme = 'light' | 'dark';
+type Theme = 'light' | 'dark' | 'solarized';
+
+const THEME_ORDER: Theme[] = ['dark', 'light', 'solarized'];
 
 interface ThemeState {
   theme: Theme;
@@ -10,7 +12,7 @@ interface ThemeState {
 
 function getInitialTheme(): Theme {
   const stored = localStorage.getItem('theme');
-  if (stored === 'light' || stored === 'dark') return stored;
+  if (stored === 'light' || stored === 'dark' || stored === 'solarized') return stored;
   if (window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
   return 'dark';
 }
@@ -27,7 +29,8 @@ export const useThemeStore = create<ThemeState>((set) => ({
   theme: initialTheme,
   toggleTheme: () =>
     set((state) => {
-      const next: Theme = state.theme === 'dark' ? 'light' : 'dark';
+      const currentIdx = THEME_ORDER.indexOf(state.theme);
+      const next = THEME_ORDER[(currentIdx + 1) % THEME_ORDER.length];
       applyTheme(next);
       return { theme: next };
     }),

@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
+import { useTranslation } from 'react-i18next';
 import {
   Columns2,
   Image,
@@ -22,12 +23,13 @@ interface CompareNodeDataType {
 }
 
 export function CompareNode({ id, data, selected }: NodeProps) {
+  const { t } = useTranslation();
   const nodeData = data as unknown as CompareNodeDataType;
   const status = nodeData.status || 'idle';
   const updateNode = useCanvasStore((s) => s.updateNode);
 
-  const labelA = nodeData.labelA ?? 'Before';
-  const labelB = nodeData.labelB ?? 'After';
+  const labelA = nodeData.labelA ?? t('properties.before');
+  const labelB = nodeData.labelB ?? t('properties.after');
   const splitPosition = nodeData.splitPosition ?? 50;
   const [isDragging, setIsDragging] = useState(false);
 
@@ -69,14 +71,14 @@ export function CompareNode({ id, data, selected }: NodeProps) {
           className="flex-1 bg-[var(--muted)] text-[var(--foreground)] text-[10px] rounded px-1.5 py-0.5 border border-[var(--border)] focus:outline-none text-center"
           value={labelA}
           onChange={(e) => updateNode(id, { labelA: e.target.value })}
-          placeholder="Label A"
+          placeholder={t('properties.labelA')}
         />
         <Columns2 className="h-3 w-3 text-[var(--muted-foreground)] flex-shrink-0" />
         <input
           className="flex-1 bg-[var(--muted)] text-[var(--foreground)] text-[10px] rounded px-1.5 py-0.5 border border-[var(--border)] focus:outline-none text-center"
           value={labelB}
           onChange={(e) => updateNode(id, { labelB: e.target.value })}
-          placeholder="Label B"
+          placeholder={t('properties.labelB')}
         />
       </div>
 
@@ -151,8 +153,8 @@ export function CompareNode({ id, data, selected }: NodeProps) {
           <div className="w-full h-full flex items-center justify-center">
             <div className="text-center">
               <Columns2 className="h-8 w-8 text-[var(--muted-foreground)] mx-auto mb-2" />
-              <p className="text-[10px] text-[var(--muted-foreground)]">Connect two image nodes</p>
-              <p className="text-[9px] text-[var(--muted-foreground)]">to compare side-by-side</p>
+              <p className="text-[10px] text-[var(--muted-foreground)]">{t('properties.connectTwoImages')}</p>
+              <p className="text-[9px] text-[var(--muted-foreground)]">{t('properties.toCompareSideBySide')}</p>
             </div>
           </div>
         )}

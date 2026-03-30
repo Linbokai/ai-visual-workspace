@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useThemeStore } from '@/stores/useThemeStore';
 import { useAIModelStore } from '@/stores/aiModelStore';
 import { testConnection } from '@/api/ai-service';
 import type { ConnectionTestResult, ProviderConfig } from '@/types/ai-models';
@@ -191,6 +192,8 @@ function FieldRow({
 function GeneralSection() {
   const [autoSave, setAutoSave] = useState(true);
   const { t, i18n } = useTranslation();
+  const theme = useThemeStore((s) => s.theme);
+  const setTheme = useThemeStore((s) => s.setTheme);
 
   const handleLanguageChange = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -219,13 +222,18 @@ function GeneralSection() {
         >
           <div className="flex items-center gap-2">
             <Moon className="h-4 w-4 text-[var(--muted-foreground)]" />
-            <select
-              disabled
-              className="h-9 w-36 rounded-lg border border-[var(--border)] bg-[var(--input)] px-3 text-sm text-[var(--foreground)] appearance-none cursor-not-allowed opacity-60"
-              defaultValue="dark"
-            >
-              <option value="dark">{t('settings.general.dark')}</option>
-            </select>
+            <div className="relative">
+              <select
+                className="h-9 w-36 rounded-lg border border-[var(--border)] bg-[var(--input)] px-3 pr-8 text-sm text-[var(--foreground)] appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
+                value={theme}
+                onChange={(e) => setTheme(e.target.value as 'light' | 'dark' | 'solarized')}
+              >
+                <option value="dark">{t('settings.general.dark')}</option>
+                <option value="light">{t('settings.general.light')}</option>
+                <option value="solarized">Solarized</option>
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--muted-foreground)] pointer-events-none" />
+            </div>
           </div>
         </FieldRow>
 
@@ -334,7 +342,7 @@ function ProviderCard({ config }: { config: ProviderConfig }) {
 
   const handleAddKey = () => {
     if (!newKeyValue.trim()) return;
-    addApiKey(config.provider, newKeyValue.trim(), newKeyLabel.trim() || `Key ${config.apiKeys.length + 1}`);
+    addApiKey(config.provider, newKeyValue.trim(), newKeyLabel.trim() || t('settings.api.keyLabel', { index: config.apiKeys.length + 1 }));
     setNewKeyValue('');
     setNewKeyLabel('');
   };

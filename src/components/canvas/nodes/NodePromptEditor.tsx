@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Video, Type, Music } from 'lucide-react';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import type { NodeType } from '@/types';
@@ -45,6 +46,7 @@ function parsePrompt(text: string): Array<{ type: 'text' | 'mention'; value: str
 }
 
 export function NodePromptEditor({ nodeId, prompt, onChange }: NodePromptEditorProps) {
+  const { t } = useTranslation();
   const nodes = useCanvasStore((s) => s.nodes);
   const edges = useCanvasStore((s) => s.edges);
 
@@ -214,7 +216,7 @@ export function NodePromptEditor({ nodeId, prompt, onChange }: NodePromptEditorP
                 }
               }, 150);
             }}
-            placeholder="Describe this node... Use @ to reference other nodes"
+            placeholder={t('properties.nodePromptPlaceholder')}
             className="w-full bg-transparent text-xs text-[var(--foreground)] resize-none outline-none placeholder:text-[var(--muted-foreground)]/50 min-h-[40px] border-none p-0"
             rows={2}
           />
@@ -252,7 +254,7 @@ export function NodePromptEditor({ nodeId, prompt, onChange }: NodePromptEditorP
         >
           {segments.length === 0 || (segments.length === 1 && segments[0].value === '') ? (
             <p className="text-[11px] text-[var(--muted-foreground)]/40 italic">
-              Click to add prompt... @ to reference nodes
+              {t('properties.clickToAddPrompt')}
             </p>
           ) : (
             <p className="text-[11px] text-[var(--muted-foreground)] leading-relaxed whitespace-pre-wrap break-words">

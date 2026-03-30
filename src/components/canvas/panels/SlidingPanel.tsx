@@ -9,12 +9,14 @@ import { AdvancedPanel } from './AdvancedPanel';
 import { VideoAnalyzer } from '../VideoAnalyzer';
 import { StoryboardPanel } from '../StoryboardPanel';
 import { PromptEngineer } from '../PromptEngineer';
+import { CharactersPanel } from './CharactersPanel';
 
 const panelTitles: Record<string, string> = {
   add: 'Add Node',
   assets: 'Assets',
   templates: 'Templates',
   history: 'History',
+  characters: 'Characters',
   advanced: 'Advanced',
   'video-analysis': 'Video Analysis',
   storyboard: 'Storyboard',
@@ -54,6 +56,7 @@ export function SlidingPanel() {
             {activePanel === 'assets' && <AssetsPanel />}
             {activePanel === 'templates' && <TemplatesPanel />}
             {activePanel === 'history' && <HistoryPanel />}
+            {activePanel === 'characters' && <CharactersPanel />}
             {activePanel === 'advanced' && <AdvancedPanel />}
             {activePanel === 'video-analysis' && <VideoAnalyzer />}
             {activePanel === 'storyboard' && <StoryboardPanel />}

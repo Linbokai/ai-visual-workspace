@@ -63,6 +63,42 @@ const createDefaultNodeData = (type: NodeType): NodeData => {
       return { label: 'New Audio', audioUrl: null, duration: 0, prompt: '' };
     case 'compare':
       return { label: 'Compare', imageUrlA: null, imageUrlB: null, labelA: 'Before', labelB: 'After', splitPosition: 50, prompt: '' };
+    case 'novel-input':
+      return { label: 'Novel Input', content: '', prompt: '', wordCount: 0 };
+    case 'video-analyze':
+      return { label: 'Video Analyze', videoUrl: null, scenes: [], keyframes: [], analysisStatus: 'idle', prompt: '' };
+    case 'extract-characters-scenes':
+      return { label: 'Extract Characters & Scenes', sourceText: '', characters: [], scenes: [], prompt: '' };
+    case 'character-description':
+      return { label: 'Character Description', character: null, description: '', prompt: '' };
+    case 'scene-description':
+      return { label: 'Scene Description', scene: null, description: '', prompt: '' };
+    case 'gen-image':
+      return { label: 'AI Image', imageUrl: null, width: 1024, height: 1024, format: 'png', prompt: '', model: 'jimeng-4.5' as const, progress: 0 };
+    case 'gen-video':
+      return { label: 'AI Video', videoUrl: null, thumbnailUrl: null, duration: 5, prompt: '', model: 'jimeng-video-3.5' as const, progress: 0 };
+    case 'generate-character-image':
+      return { label: 'Character Image', character: null, imageUrl: null, prompt: '', model: 'midjourney' as const, progress: 0 };
+    case 'generate-character-video':
+      return { label: 'Character Video', character: null, videoUrl: null, prompt: '', model: 'sora' as const, duration: 5, progress: 0 };
+    case 'generate-scene-image':
+      return { label: 'Scene Image', scene: null, imageUrl: null, prompt: '', model: 'midjourney' as const, progress: 0 };
+    case 'generate-scene-video':
+      return { label: 'Scene Video', scene: null, videoUrl: null, prompt: '', model: 'sora' as const, duration: 5, progress: 0 };
+    case 'create-character':
+      return { label: 'Create Character', character: null, referenceImages: [], notes: '', prompt: '' };
+    case 'create-scene':
+      return { label: 'Create Scene', scene: null, referenceImages: [], notes: '', prompt: '' };
+    case 'storyboard-node':
+      return { label: 'Storyboard', shots: [], prompt: '' };
+    case 'preview':
+      return { label: 'Preview', mediaUrl: null, mediaType: 'image' as const, prompt: '' };
+    case 'local-save':
+      return { label: 'Local Save', savePath: '', format: 'png', autoSave: false, lastSavedAt: null, prompt: '' };
+    case 'mask-editor':
+      return { label: 'Mask Editor', imageUrl: null, maskDataUrl: null, brushSize: 20, prompt: '', width: 512, height: 512 };
+    case 'group':
+      return { label: 'Group', content: '', prompt: '' };
     default:
       return { label: 'New Node', content: '', prompt: '' };
   }

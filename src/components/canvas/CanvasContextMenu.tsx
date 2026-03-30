@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Image, Video, Type, Music, Group, Paintbrush, PenTool, Columns2 } from 'lucide-react';
+import { Image, Video, Type, Music, Group, Paintbrush, PenTool, Columns2, BookOpen, Film, Users, User, MapPin, Sparkles, LayoutGrid, Eye, HardDrive } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useCanvasStore } from '@/stores/useCanvasStore';
@@ -26,6 +26,23 @@ const menuItems: Array<{
   { type: 'image-editor', labelKey: 'nodes.imageEditor', icon: Paintbrush, group: 'advanced' },
   { type: 'doodle-image', labelKey: 'nodes.doodleToImage', icon: PenTool, group: 'advanced' },
   { type: 'compare', labelKey: 'nodes.compareNode', icon: Columns2, group: 'advanced' },
+  { type: 'mask-editor', labelKey: 'nodes.maskEditor', icon: Paintbrush, group: 'advanced' },
+  // AI Generation
+  { type: 'gen-image', labelKey: 'nodes.genImage', icon: Sparkles, group: 'generation' },
+  { type: 'gen-video', labelKey: 'nodes.genVideo', icon: Film, group: 'generation' },
+  // Story & Analysis
+  { type: 'novel-input', labelKey: 'nodes.novelInput', icon: BookOpen, group: 'story' },
+  { type: 'video-analyze', labelKey: 'nodes.videoAnalyze', icon: Film, group: 'story' },
+  { type: 'extract-characters-scenes', labelKey: 'nodes.extractCharactersScenes', icon: Users, group: 'story' },
+  { type: 'storyboard-node', labelKey: 'nodes.storyboardNode', icon: LayoutGrid, group: 'story' },
+  // Character & Scene
+  { type: 'character-description', labelKey: 'nodes.characterDescription', icon: User, group: 'character' },
+  { type: 'scene-description', labelKey: 'nodes.sceneDescription', icon: MapPin, group: 'character' },
+  { type: 'generate-character-image', labelKey: 'nodes.generateCharacterImage', icon: Sparkles, group: 'character' },
+  { type: 'generate-scene-image', labelKey: 'nodes.generateSceneImage', icon: Sparkles, group: 'character' },
+  // Output
+  { type: 'preview', labelKey: 'nodes.preview', icon: Eye, group: 'output' },
+  { type: 'local-save', labelKey: 'nodes.localSave', icon: HardDrive, group: 'output' },
 ];
 
 export function CanvasContextMenu({ x, y, canvasPosition, onClose }: CanvasContextMenuProps) {
@@ -87,6 +104,46 @@ export function CanvasContextMenu({ x, y, canvasPosition, onClose }: CanvasConte
           onClick={() => handleAdd(type)}
           className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--foreground)] hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none text-left"
         >
+          <Icon className="h-4 w-4 text-[var(--primary)]" />
+          {t(labelKey)}
+        </button>
+      ))}
+      <div className="mx-3 my-1 h-px bg-[var(--border)]" />
+      <div className="px-3 py-1 text-[10px] font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
+        {t('nodes.aiGeneration')}
+      </div>
+      {menuItems.filter((m) => m.group === 'generation').map(({ type, labelKey, icon: Icon }) => (
+        <button key={type} onClick={() => handleAdd(type)} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--foreground)] hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none text-left">
+          <Icon className="h-4 w-4 text-[var(--primary)]" />
+          {t(labelKey)}
+        </button>
+      ))}
+      <div className="mx-3 my-1 h-px bg-[var(--border)]" />
+      <div className="px-3 py-1 text-[10px] font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
+        {t('nodes.storyAnalysis')}
+      </div>
+      {menuItems.filter((m) => m.group === 'story').map(({ type, labelKey, icon: Icon }) => (
+        <button key={type} onClick={() => handleAdd(type)} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--foreground)] hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none text-left">
+          <Icon className="h-4 w-4 text-[var(--primary)]" />
+          {t(labelKey)}
+        </button>
+      ))}
+      <div className="mx-3 my-1 h-px bg-[var(--border)]" />
+      <div className="px-3 py-1 text-[10px] font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
+        {t('nodes.characterScene')}
+      </div>
+      {menuItems.filter((m) => m.group === 'character').map(({ type, labelKey, icon: Icon }) => (
+        <button key={type} onClick={() => handleAdd(type)} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--foreground)] hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none text-left">
+          <Icon className="h-4 w-4 text-[var(--primary)]" />
+          {t(labelKey)}
+        </button>
+      ))}
+      <div className="mx-3 my-1 h-px bg-[var(--border)]" />
+      <div className="px-3 py-1 text-[10px] font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
+        {t('nodes.output')}
+      </div>
+      {menuItems.filter((m) => m.group === 'output').map(({ type, labelKey, icon: Icon }) => (
+        <button key={type} onClick={() => handleAdd(type)} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--foreground)] hover:bg-white/5 transition-colors cursor-pointer bg-transparent border-none text-left">
           <Icon className="h-4 w-4 text-[var(--primary)]" />
           {t(labelKey)}
         </button>

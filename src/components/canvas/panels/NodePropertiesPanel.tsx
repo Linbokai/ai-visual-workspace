@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Image,
@@ -22,6 +23,7 @@ import type {
   CompareNodeData,
   NodeData,
 } from '@/types';
+import type { TFunction } from 'i18next';
 
 // ---------------------------------------------------------------------------
 // Shared small components
@@ -44,6 +46,26 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 }
 
 // ---------------------------------------------------------------------------
+// nodeTypeConfig as a function that takes t
+// ---------------------------------------------------------------------------
+
+function getNodeTypeConfig(t: TFunction): Record<
+  string,
+  { icon: typeof Image; label: string; color: string }
+> {
+  return {
+    image: { icon: Image, label: t('nodes.image'), color: 'var(--node-image)' },
+    'image-editor': { icon: Paintbrush, label: t('nodes.imageEditor'), color: 'var(--node-image)' },
+    'doodle-image': { icon: PenTool, label: t('nodes.doodleToImage'), color: 'var(--node-image)' },
+    video: { icon: Video, label: t('nodes.video'), color: 'var(--node-video)' },
+    'doodle-video': { icon: Video, label: 'Doodle Video', color: 'var(--node-video)' },
+    text: { icon: Type, label: t('nodes.text'), color: 'var(--node-text)' },
+    audio: { icon: Music, label: t('nodes.audio'), color: 'var(--node-audio)' },
+    compare: { icon: Columns2, label: t('nodes.compare'), color: 'var(--primary)' },
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Per-type property editors
 // ---------------------------------------------------------------------------
 
@@ -54,6 +76,7 @@ function ImageProperties({
   nodeId: string;
   data: ImageNodeData;
 }) {
+  const { t } = useTranslation();
   const updateNode = useCanvasStore((s) => s.updateNode);
   const update = useCallback(
     (partial: Partial<NodeData>) => updateNode(nodeId, partial),
@@ -72,30 +95,30 @@ function ImageProperties({
     <>
       {/* Prompt */}
       <section className="mb-4">
-        <SectionHeader>Prompt</SectionHeader>
-        <FieldLabel>Prompt</FieldLabel>
+        <SectionHeader>{t('properties.prompt')}</SectionHeader>
+        <FieldLabel>{t('properties.prompt')}</FieldLabel>
         <textarea
           className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-2 resize-y min-h-[60px] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
           rows={3}
           value={data.prompt ?? ''}
           onChange={(e) => update({ prompt: e.target.value })}
-          placeholder="Describe the image..."
+          placeholder={t('properties.describeImage')}
         />
-        <FieldLabel>Negative Prompt</FieldLabel>
+        <FieldLabel>{t('properties.negativePrompt')}</FieldLabel>
         <textarea
           className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-2 resize-y min-h-[40px] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
           rows={2}
           value={data.negativePrompt ?? ''}
           onChange={(e) => update({ negativePrompt: e.target.value })}
-          placeholder="What to avoid..."
+          placeholder={t('properties.whatToAvoid')}
         />
       </section>
 
       {/* Generation */}
       <section className="mb-4">
-        <SectionHeader>Generation</SectionHeader>
+        <SectionHeader>{t('properties.generation')}</SectionHeader>
 
-        <FieldLabel>Model</FieldLabel>
+        <FieldLabel>{t('properties.model')}</FieldLabel>
         <select
           className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--primary)] mb-2"
           value={data.model ?? 'sdxl'}
@@ -108,7 +131,7 @@ function ImageProperties({
           <option value="sdxl">SDXL</option>
         </select>
 
-        <FieldLabel>Size Presets</FieldLabel>
+        <FieldLabel>{t('properties.sizePresets')}</FieldLabel>
         <div className="flex gap-1.5 mb-2">
           {sizePresets.map((p) => (
             <button
@@ -127,7 +150,7 @@ function ImageProperties({
 
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <FieldLabel>Width</FieldLabel>
+            <FieldLabel>{t('properties.width')}</FieldLabel>
             <input
               type="number"
               className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
@@ -139,7 +162,7 @@ function ImageProperties({
             />
           </div>
           <div>
-            <FieldLabel>Height</FieldLabel>
+            <FieldLabel>{t('properties.height')}</FieldLabel>
             <input
               type="number"
               className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
@@ -155,9 +178,9 @@ function ImageProperties({
 
       {/* Advanced */}
       <section className="mb-4">
-        <SectionHeader>Advanced</SectionHeader>
+        <SectionHeader>{t('properties.advanced')}</SectionHeader>
 
-        <FieldLabel>Sampling Steps: {data.samplingSteps ?? 20}</FieldLabel>
+        <FieldLabel>{t('properties.samplingSteps', { value: data.samplingSteps ?? 20 })}</FieldLabel>
         <input
           type="range"
           className="w-full accent-[var(--primary)] mb-2"
@@ -167,7 +190,7 @@ function ImageProperties({
           onChange={(e) => update({ samplingSteps: Number(e.target.value) })}
         />
 
-        <FieldLabel>CFG Scale: {data.cfgScale ?? 7}</FieldLabel>
+        <FieldLabel>{t('properties.cfgScale', { value: data.cfgScale ?? 7 })}</FieldLabel>
         <input
           type="range"
           className="w-full accent-[var(--primary)] mb-2"
@@ -177,7 +200,7 @@ function ImageProperties({
           onChange={(e) => update({ cfgScale: Number(e.target.value) })}
         />
 
-        <FieldLabel>Seed</FieldLabel>
+        <FieldLabel>{t('properties.seed')}</FieldLabel>
         <div className="flex gap-1.5">
           <input
             type="number"
@@ -187,7 +210,7 @@ function ImageProperties({
           />
           <button
             className="px-2 py-1.5 rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] hover:bg-[var(--active-overlay)] transition-colors"
-            title="Random seed"
+            title={t('properties.randomSeed')}
             onClick={() =>
               update({ seed: Math.floor(Math.random() * 2147483647) })
             }
@@ -207,6 +230,7 @@ function VideoProperties({
   nodeId: string;
   data: VideoNodeData;
 }) {
+  const { t } = useTranslation();
   const updateNode = useCanvasStore((s) => s.updateNode);
   const update = useCallback(
     (partial: Partial<NodeData>) => updateNode(nodeId, partial),
@@ -216,20 +240,20 @@ function VideoProperties({
   return (
     <>
       <section className="mb-4">
-        <SectionHeader>Prompt</SectionHeader>
+        <SectionHeader>{t('properties.prompt')}</SectionHeader>
         <textarea
           className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-2 resize-y min-h-[60px] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
           rows={3}
           value={data.prompt ?? ''}
           onChange={(e) => update({ prompt: e.target.value })}
-          placeholder="Describe the video..."
+          placeholder={t('properties.describeVideo')}
         />
       </section>
 
       <section className="mb-4">
-        <SectionHeader>Settings</SectionHeader>
+        <SectionHeader>{t('properties.settings')}</SectionHeader>
 
-        <FieldLabel>Model</FieldLabel>
+        <FieldLabel>{t('properties.model')}</FieldLabel>
         <select
           className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--primary)] mb-2"
           value={data.model ?? 'sora'}
@@ -242,7 +266,7 @@ function VideoProperties({
           <option value="kling">Kling</option>
         </select>
 
-        <FieldLabel>Duration: {data.duration ?? 1}s</FieldLabel>
+        <FieldLabel>{t('properties.duration', { value: data.duration ?? 1 })}</FieldLabel>
         <input
           type="range"
           className="w-full accent-[var(--primary)] mb-2"
@@ -252,7 +276,7 @@ function VideoProperties({
           onChange={(e) => update({ duration: Number(e.target.value) })}
         />
 
-        <FieldLabel>FPS</FieldLabel>
+        <FieldLabel>{t('properties.fps')}</FieldLabel>
         <select
           className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--primary)] mb-2"
           value={data.fps ?? 24}
@@ -264,7 +288,7 @@ function VideoProperties({
           <option value={60}>60</option>
         </select>
 
-        <FieldLabel>Resolution</FieldLabel>
+        <FieldLabel>{t('properties.resolution')}</FieldLabel>
         <select
           className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--primary)] mb-2"
           value={data.resolution ?? '1080p'}
@@ -276,24 +300,24 @@ function VideoProperties({
           <option value="4K">4K</option>
         </select>
 
-        <FieldLabel>Camera Motion</FieldLabel>
+        <FieldLabel>{t('properties.cameraMotion')}</FieldLabel>
         <select
           className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
           value={data.cameraMotion ?? 'none'}
           onChange={(e) => update({ cameraMotion: e.target.value })}
         >
-          <option value="none">None</option>
-          <option value="pan-left">Pan Left</option>
-          <option value="pan-right">Pan Right</option>
-          <option value="pan-up">Pan Up</option>
-          <option value="pan-down">Pan Down</option>
-          <option value="zoom-in">Zoom In</option>
-          <option value="zoom-out">Zoom Out</option>
-          <option value="orbit">Orbit</option>
-          <option value="dolly-in">Dolly In</option>
-          <option value="dolly-out">Dolly Out</option>
-          <option value="tilt-up">Tilt Up</option>
-          <option value="tilt-down">Tilt Down</option>
+          <option value="none">{t('properties.cameraMotions.none')}</option>
+          <option value="pan-left">{t('properties.cameraMotions.panLeft')}</option>
+          <option value="pan-right">{t('properties.cameraMotions.panRight')}</option>
+          <option value="pan-up">{t('properties.cameraMotions.panUp')}</option>
+          <option value="pan-down">{t('properties.cameraMotions.panDown')}</option>
+          <option value="zoom-in">{t('properties.cameraMotions.zoomIn')}</option>
+          <option value="zoom-out">{t('properties.cameraMotions.zoomOut')}</option>
+          <option value="orbit">{t('properties.cameraMotions.orbit')}</option>
+          <option value="dolly-in">{t('properties.cameraMotions.dollyIn')}</option>
+          <option value="dolly-out">{t('properties.cameraMotions.dollyOut')}</option>
+          <option value="tilt-up">{t('properties.cameraMotions.tiltUp')}</option>
+          <option value="tilt-down">{t('properties.cameraMotions.tiltDown')}</option>
         </select>
       </section>
     </>
@@ -307,6 +331,7 @@ function TextProperties({
   nodeId: string;
   data: TextNodeData;
 }) {
+  const { t } = useTranslation();
   const updateNode = useCanvasStore((s) => s.updateNode);
   const update = useCallback(
     (partial: Partial<NodeData>) => updateNode(nodeId, partial),
@@ -315,13 +340,13 @@ function TextProperties({
 
   return (
     <section className="mb-4">
-      <SectionHeader>Content</SectionHeader>
+      <SectionHeader>{t('properties.content')}</SectionHeader>
       <textarea
         className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-2 resize-y min-h-[120px] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
         rows={8}
         value={data.content ?? ''}
         onChange={(e) => update({ content: e.target.value })}
-        placeholder="Enter text content..."
+        placeholder={t('properties.enterTextContent')}
       />
     </section>
   );
@@ -334,6 +359,7 @@ function AudioProperties({
   nodeId: string;
   data: AudioNodeData;
 }) {
+  const { t } = useTranslation();
   const updateNode = useCanvasStore((s) => s.updateNode);
   const update = useCallback(
     (partial: Partial<NodeData>) => updateNode(nodeId, partial),
@@ -343,32 +369,32 @@ function AudioProperties({
   return (
     <>
       <section className="mb-4">
-        <SectionHeader>Prompt</SectionHeader>
+        <SectionHeader>{t('properties.prompt')}</SectionHeader>
         <textarea
           className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-2 resize-y min-h-[60px] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
           rows={3}
           value={data.prompt ?? ''}
           onChange={(e) => update({ prompt: e.target.value })}
-          placeholder="Describe the audio..."
+          placeholder={t('properties.describeAudio')}
         />
       </section>
 
       <section className="mb-4">
-        <SectionHeader>Voice</SectionHeader>
+        <SectionHeader>{t('properties.voice')}</SectionHeader>
 
-        <FieldLabel>Voice Style</FieldLabel>
+        <FieldLabel>{t('properties.voiceStyle')}</FieldLabel>
         <select
           className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--primary)] mb-2"
           value={data.voiceStyle ?? 'neutral'}
           onChange={(e) => update({ voiceStyle: e.target.value })}
         >
-          <option value="neutral">Neutral</option>
-          <option value="warm">Warm</option>
-          <option value="energetic">Energetic</option>
-          <option value="calm">Calm</option>
+          <option value="neutral">{t('properties.voiceStyles.neutral')}</option>
+          <option value="warm">{t('properties.voiceStyles.warm')}</option>
+          <option value="energetic">{t('properties.voiceStyles.energetic')}</option>
+          <option value="calm">{t('properties.voiceStyles.calm')}</option>
         </select>
 
-        <FieldLabel>Speed: {(data.speed ?? 1.0).toFixed(1)}x</FieldLabel>
+        <FieldLabel>{t('properties.speed', { value: (data.speed ?? 1.0).toFixed(1) })}</FieldLabel>
         <input
           type="range"
           className="w-full accent-[var(--primary)]"
@@ -381,9 +407,9 @@ function AudioProperties({
       </section>
 
       <section className="mb-4">
-        <SectionHeader>Settings</SectionHeader>
+        <SectionHeader>{t('properties.settings')}</SectionHeader>
 
-        <FieldLabel>Duration: {data.duration ?? 1}s</FieldLabel>
+        <FieldLabel>{t('properties.duration', { value: data.duration ?? 1 })}</FieldLabel>
         <input
           type="range"
           className="w-full accent-[var(--primary)]"
@@ -408,36 +434,37 @@ function ImageEditorProperties({
   nodeId: string;
   data: ImageEditorNodeData;
 }) {
+  const { t } = useTranslation();
   const updateNode = useCanvasStore((s) => s.updateNode);
   const update = useCallback(
     (partial: Partial<NodeData>) => updateNode(nodeId, partial),
     [nodeId, updateNode],
   );
 
-  const filters = ['none', 'grayscale', 'sepia', 'vintage', 'warm', 'cool', 'dramatic'];
+  const filters = ['none', 'grayscale', 'sepia', 'vintage', 'warm', 'cool', 'dramatic'] as const;
 
   return (
     <>
       <section className="mb-4">
-        <SectionHeader>Adjustments</SectionHeader>
-        <FieldLabel>Brightness: {data.brightness ?? 100}%</FieldLabel>
+        <SectionHeader>{t('properties.adjustments')}</SectionHeader>
+        <FieldLabel>{t('properties.brightness', { value: data.brightness ?? 100 })}</FieldLabel>
         <input type="range" className="w-full accent-[var(--primary)] mb-2" min={0} max={200} value={data.brightness ?? 100} onChange={(e) => update({ brightness: Number(e.target.value) })} />
-        <FieldLabel>Contrast: {data.contrast ?? 100}%</FieldLabel>
+        <FieldLabel>{t('properties.contrast', { value: data.contrast ?? 100 })}</FieldLabel>
         <input type="range" className="w-full accent-[var(--primary)] mb-2" min={0} max={200} value={data.contrast ?? 100} onChange={(e) => update({ contrast: Number(e.target.value) })} />
-        <FieldLabel>Saturation: {data.saturation ?? 100}%</FieldLabel>
+        <FieldLabel>{t('properties.saturation', { value: data.saturation ?? 100 })}</FieldLabel>
         <input type="range" className="w-full accent-[var(--primary)] mb-2" min={0} max={200} value={data.saturation ?? 100} onChange={(e) => update({ saturation: Number(e.target.value) })} />
-        <FieldLabel>Blur: {data.blur ?? 0}px</FieldLabel>
+        <FieldLabel>{t('properties.blur', { value: data.blur ?? 0 })}</FieldLabel>
         <input type="range" className="w-full accent-[var(--primary)] mb-2" min={0} max={20} value={data.blur ?? 0} onChange={(e) => update({ blur: Number(e.target.value) })} />
       </section>
       <section className="mb-4">
-        <SectionHeader>Filter</SectionHeader>
+        <SectionHeader>{t('properties.filter')}</SectionHeader>
         <select
           className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
           value={data.activeFilter ?? 'none'}
           onChange={(e) => update({ activeFilter: e.target.value })}
         >
           {filters.map((f) => (
-            <option key={f} value={f}>{f.charAt(0).toUpperCase() + f.slice(1)}</option>
+            <option key={f} value={f}>{t(`properties.filters.${f}`)}</option>
           ))}
         </select>
       </section>
@@ -452,6 +479,7 @@ function DoodleProperties({
   nodeId: string;
   data: DoodleNodeData;
 }) {
+  const { t } = useTranslation();
   const updateNode = useCanvasStore((s) => s.updateNode);
   const update = useCallback(
     (partial: Partial<NodeData>) => updateNode(nodeId, partial),
@@ -461,20 +489,20 @@ function DoodleProperties({
   return (
     <>
       <section className="mb-4">
-        <SectionHeader>Prompt</SectionHeader>
+        <SectionHeader>{t('properties.prompt')}</SectionHeader>
         <textarea
           className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-2 resize-y min-h-[60px] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
           rows={3}
           value={data.prompt ?? ''}
           onChange={(e) => update({ prompt: e.target.value })}
-          placeholder="Describe what to generate from the doodle..."
+          placeholder={t('properties.doodlePrompt')}
         />
       </section>
       <section className="mb-4">
-        <SectionHeader>Brush</SectionHeader>
-        <FieldLabel>Size: {data.brushSize ?? 4}px</FieldLabel>
+        <SectionHeader>{t('properties.brush')}</SectionHeader>
+        <FieldLabel>{t('properties.brushSize', { value: data.brushSize ?? 4 })}</FieldLabel>
         <input type="range" className="w-full accent-[var(--primary)] mb-2" min={1} max={20} value={data.brushSize ?? 4} onChange={(e) => update({ brushSize: Number(e.target.value) })} />
-        <FieldLabel>Color</FieldLabel>
+        <FieldLabel>{t('properties.brushColor')}</FieldLabel>
         <input type="color" className="w-8 h-8 rounded border border-[var(--border)] cursor-pointer" value={data.brushColor ?? '#ffffff'} onChange={(e) => update({ brushColor: e.target.value })} />
       </section>
     </>
@@ -488,6 +516,7 @@ function CompareProperties({
   nodeId: string;
   data: CompareNodeData;
 }) {
+  const { t } = useTranslation();
   const updateNode = useCanvasStore((s) => s.updateNode);
   const update = useCallback(
     (partial: Partial<NodeData>) => updateNode(nodeId, partial),
@@ -496,46 +525,35 @@ function CompareProperties({
 
   return (
     <section className="mb-4">
-      <SectionHeader>Labels</SectionHeader>
-      <FieldLabel>Label A</FieldLabel>
+      <SectionHeader>{t('properties.labels')}</SectionHeader>
+      <FieldLabel>{t('properties.labelA')}</FieldLabel>
       <input
         type="text"
         className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--primary)] mb-2"
-        value={data.labelA ?? 'Before'}
+        value={data.labelA ?? t('properties.before')}
         onChange={(e) => update({ labelA: e.target.value })}
+        placeholder={t('properties.labelA')}
       />
-      <FieldLabel>Label B</FieldLabel>
+      <FieldLabel>{t('properties.labelB')}</FieldLabel>
       <input
         type="text"
         className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--primary)] mb-2"
-        value={data.labelB ?? 'After'}
+        value={data.labelB ?? t('properties.after')}
         onChange={(e) => update({ labelB: e.target.value })}
+        placeholder={t('properties.labelB')}
       />
-      <FieldLabel>Split Position: {data.splitPosition ?? 50}%</FieldLabel>
+      <FieldLabel>{t('properties.splitPosition', { value: data.splitPosition ?? 50 })}</FieldLabel>
       <input type="range" className="w-full accent-[var(--primary)]" min={0} max={100} value={data.splitPosition ?? 50} onChange={(e) => update({ splitPosition: Number(e.target.value) })} />
     </section>
   );
 }
-
-const nodeTypeConfig: Record<
-  string,
-  { icon: typeof Image; label: string; color: string }
-> = {
-  image: { icon: Image, label: 'Image', color: 'var(--node-image)' },
-  'image-editor': { icon: Paintbrush, label: 'Image Editor', color: 'var(--node-image)' },
-  'doodle-image': { icon: PenTool, label: 'Doodle Image', color: 'var(--node-image)' },
-  video: { icon: Video, label: 'Video', color: 'var(--node-video)' },
-  'doodle-video': { icon: Video, label: 'Doodle Video', color: 'var(--node-video)' },
-  text: { icon: Type, label: 'Text', color: 'var(--node-text)' },
-  audio: { icon: Music, label: 'Audio', color: 'var(--node-audio)' },
-  compare: { icon: Columns2, label: 'Compare', color: 'var(--primary)' },
-};
 
 // ---------------------------------------------------------------------------
 // Main panel
 // ---------------------------------------------------------------------------
 
 export function NodePropertiesPanel() {
+  const { t } = useTranslation();
   const selectedNodeIds = useCanvasStore((s) => s.selectedNodeIds);
   const nodes = useCanvasStore((s) => s.nodes);
   const clearSelection = useCanvasStore((s) => s.clearSelection);
@@ -547,6 +565,7 @@ export function NodePropertiesPanel() {
 
   if (!selectedNode) return null;
 
+  const nodeTypeConfig = getNodeTypeConfig(t);
   const nodeType = selectedNode.type ?? 'text';
   const config = nodeTypeConfig[nodeType] ?? nodeTypeConfig.text;
   const IconComp = config.icon;
@@ -566,7 +585,7 @@ export function NodePropertiesPanel() {
         <button
           onClick={clearSelection}
           className="p-1 rounded-md text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--active-overlay)] transition-colors"
-          title="Close"
+          title={t('common.close')}
         >
           <X className="h-4 w-4" />
         </button>
@@ -576,7 +595,7 @@ export function NodePropertiesPanel() {
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {/* Label field (shared across all types) */}
         <section className="mb-4">
-          <FieldLabel>Label</FieldLabel>
+          <FieldLabel>{t('properties.label')}</FieldLabel>
           <input
             type="text"
             className="w-full rounded-md border border-[var(--border)] bg-[var(--muted)] text-[var(--foreground)] text-xs px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"

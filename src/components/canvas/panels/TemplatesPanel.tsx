@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, Layers, GitBranch, ArrowRight } from 'lucide-react';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import { usePanelStore } from '@/stores/usePanelStore';
@@ -22,6 +23,7 @@ const categoryColors: Record<string, string> = {
 };
 
 export function TemplatesPanel() {
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<TemplateCategory>('all');
   const [search, setSearch] = useState('');
   const nodes = useCanvasStore((s) => s.nodes);
@@ -99,7 +101,7 @@ export function TemplatesPanel() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]" />
         <input
           type="text"
-          placeholder="Search templates..."
+          placeholder={t('templates.searchTemplates')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full h-9 rounded-xl border border-[var(--border)] bg-white/5 pl-9 pr-3 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-1 focus:ring-white/10"
@@ -109,7 +111,7 @@ export function TemplatesPanel() {
       {/* Template List */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-32 text-center">
-          <p className="text-sm text-[var(--muted-foreground)]">No templates found</p>
+          <p className="text-sm text-[var(--muted-foreground)]">{t('templates.noTemplatesFound')}</p>
         </div>
       ) : (
         <div className="space-y-2.5">
@@ -172,18 +174,18 @@ export function TemplatesPanel() {
                     <div className="flex items-center gap-3 text-[10px] text-[var(--muted-foreground)]">
                       <span className="flex items-center gap-1">
                         <Layers className="w-3 h-3" />
-                        {nodeCount} node{nodeCount !== 1 ? 's' : ''}
+                        {t('templates.nodes', { count: nodeCount })}
                       </span>
                       <span className="flex items-center gap-1">
                         <GitBranch className="w-3 h-3" />
-                        {edgeCount} connection{edgeCount !== 1 ? 's' : ''}
+                        {t('templates.connections', { count: edgeCount })}
                       </span>
                     </div>
                     <button
                       onClick={() => handleApply(template)}
                       className="text-[11px] px-3 py-1 rounded-lg bg-[var(--primary)] text-white hover:opacity-90 transition-opacity cursor-pointer border-none font-medium"
                     >
-                      Use Template
+                      {t('templates.useTemplate')}
                     </button>
                   </div>
                 </div>

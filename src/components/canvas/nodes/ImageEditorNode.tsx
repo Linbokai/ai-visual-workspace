@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
+import { useTranslation } from 'react-i18next';
 import {
   Paintbrush,
   Loader2,
@@ -36,16 +37,6 @@ interface ImageEditorNodeDataType {
   activeFilter?: string;
 }
 
-const FILTERS = [
-  { id: 'none', label: 'None' },
-  { id: 'grayscale', label: 'B&W' },
-  { id: 'sepia', label: 'Sepia' },
-  { id: 'vintage', label: 'Vintage' },
-  { id: 'warm', label: 'Warm' },
-  { id: 'cool', label: 'Cool' },
-  { id: 'dramatic', label: 'Drama' },
-];
-
 function getFilterCss(filter: string, brightness: number, contrast: number, saturation: number, blur: number): string {
   const parts: string[] = [];
   parts.push(`brightness(${brightness / 100})`);
@@ -76,10 +67,21 @@ function getFilterCss(filter: string, brightness: number, contrast: number, satu
 }
 
 export function ImageEditorNode({ id, data, selected }: NodeProps) {
+  const { t } = useTranslation();
   const nodeData = data as unknown as ImageEditorNodeDataType;
   const status = nodeData.status || 'idle';
   const updateNode = useCanvasStore((s) => s.updateNode);
   const [activeTab, setActiveTab] = useState<'adjust' | 'filter' | 'crop'>('adjust');
+
+  const FILTERS = useMemo(() => [
+    { id: 'none', label: t('properties.filters.none') },
+    { id: 'grayscale', label: t('properties.filters.grayscale') },
+    { id: 'sepia', label: t('properties.filters.sepia') },
+    { id: 'vintage', label: t('properties.filters.vintage') },
+    { id: 'warm', label: t('properties.filters.warm') },
+    { id: 'cool', label: t('properties.filters.cool') },
+    { id: 'dramatic', label: t('properties.filters.dramatic') },
+  ], [t]);
 
   const brightness = nodeData.brightness ?? 100;
   const contrast = nodeData.contrast ?? 100;
@@ -126,13 +128,13 @@ export function ImageEditorNode({ id, data, selected }: NodeProps) {
                 : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
             )}
           >
-            {tab}
+            {t(`properties.${tab}`)}
           </button>
         ))}
         <button
           onClick={handleReset}
           className="p-1 mx-1 rounded text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer bg-transparent border-none"
-          title="Reset adjustments"
+          title={t('properties.resetAdjustments')}
         >
           <RotateCcw className="h-3 w-3" />
         </button>
@@ -162,7 +164,7 @@ export function ImageEditorNode({ id, data, selected }: NodeProps) {
           <>
             <div className="flex items-center gap-1.5">
               <Sun className="h-3 w-3 text-[var(--muted-foreground)] flex-shrink-0" />
-              <p className="text-[9px] text-[var(--muted-foreground)] w-10">Bright</p>
+              <p className="text-[9px] text-[var(--muted-foreground)] w-10">{t('properties.bright')}</p>
               <input
                 type="range"
                 className="flex-1 accent-[var(--primary)] h-1"
@@ -175,7 +177,7 @@ export function ImageEditorNode({ id, data, selected }: NodeProps) {
             </div>
             <div className="flex items-center gap-1.5">
               <Contrast className="h-3 w-3 text-[var(--muted-foreground)] flex-shrink-0" />
-              <p className="text-[9px] text-[var(--muted-foreground)] w-10">Contr</p>
+              <p className="text-[9px] text-[var(--muted-foreground)] w-10">{t('properties.contr')}</p>
               <input
                 type="range"
                 className="flex-1 accent-[var(--primary)] h-1"
@@ -188,7 +190,7 @@ export function ImageEditorNode({ id, data, selected }: NodeProps) {
             </div>
             <div className="flex items-center gap-1.5">
               <Droplets className="h-3 w-3 text-[var(--muted-foreground)] flex-shrink-0" />
-              <p className="text-[9px] text-[var(--muted-foreground)] w-10">Satur</p>
+              <p className="text-[9px] text-[var(--muted-foreground)] w-10">{t('properties.satur')}</p>
               <input
                 type="range"
                 className="flex-1 accent-[var(--primary)] h-1"
@@ -201,7 +203,7 @@ export function ImageEditorNode({ id, data, selected }: NodeProps) {
             </div>
             <div className="flex items-center gap-1.5">
               <Droplets className="h-3 w-3 text-[var(--muted-foreground)] flex-shrink-0" />
-              <p className="text-[9px] text-[var(--muted-foreground)] w-10">Blur</p>
+              <p className="text-[9px] text-[var(--muted-foreground)] w-10">{t('properties.blur')}</p>
               <input
                 type="range"
                 className="flex-1 accent-[var(--primary)] h-1"
@@ -238,7 +240,7 @@ export function ImageEditorNode({ id, data, selected }: NodeProps) {
           <div className="text-center py-2">
             <Crop className="h-5 w-5 text-[var(--muted-foreground)] mx-auto mb-1" />
             <p className="text-[9px] text-[var(--muted-foreground)]">
-              Drag handles on image to crop
+              {t('properties.dragHandlesToCrop')}
             </p>
             <p className="text-[9px] text-[var(--muted-foreground)]">
               {nodeData.width}x{nodeData.height}
