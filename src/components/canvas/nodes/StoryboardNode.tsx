@@ -1,6 +1,6 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { LayoutGrid, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, generateId } from '@/lib/utils';
 import { NodeStatusBadge } from './NodeStatusBadge';
 import { NodePromptEditor } from './NodePromptEditor';
 import { useCanvasStore } from '@/stores/useCanvasStore';
@@ -30,7 +30,7 @@ export function StoryboardNode({ id, data, selected }: NodeProps) {
 
   const addShot = () => {
     const newShot: Shot = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       shotNumber: shots.length + 1,
       description: '',
       imageUrl: null,

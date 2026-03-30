@@ -3,6 +3,7 @@ import { useStore as useStoreZustand } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { temporal, type TemporalState } from 'zundo';
 import type { CanvasNode, CanvasEdge, NodeType, NodeData, NodeStatus } from '@/types';
+import { generateId } from '@/lib/utils';
 
 interface CanvasState {
   projectId: string | null;
@@ -123,7 +124,7 @@ export const useCanvasStore = create<CanvasState>()(
         nodes: typeof nodesOrUpdater === 'function' ? nodesOrUpdater(state.nodes) : nodesOrUpdater,
       })),
     addNode: (type, position, data) => {
-      const id = crypto.randomUUID();
+      const id = generateId();
       const newNode: CanvasNode = {
         id,
         type,
@@ -161,7 +162,7 @@ export const useCanvasStore = create<CanvasState>()(
 
         const idMap = new Map<string, string>();
         nodesToDuplicate.forEach((n) => {
-          idMap.set(n.id, crypto.randomUUID());
+          idMap.set(n.id, generateId());
         });
 
         const newNodes: CanvasNode[] = nodesToDuplicate.map((n) => ({
@@ -179,7 +180,7 @@ export const useCanvasStore = create<CanvasState>()(
           .filter((e) => idSet.has(e.source) && idSet.has(e.target))
           .map((e) => ({
             ...e,
-            id: crypto.randomUUID(),
+            id: generateId(),
             source: idMap.get(e.source)!,
             target: idMap.get(e.target)!,
           }));
@@ -206,7 +207,7 @@ export const useCanvasStore = create<CanvasState>()(
       const edge = state.edges.find((e) => e.id === edgeId);
       if (!edge) return '';
 
-      const newNodeId = crypto.randomUUID();
+      const newNodeId = generateId();
       const newNode: CanvasNode = {
         id: newNodeId,
         type: nodeType,
@@ -256,7 +257,7 @@ export const useCanvasStore = create<CanvasState>()(
 
         const idMap = new Map<string, string>();
         state.clipboard.forEach((n) => {
-          idMap.set(n.id, crypto.randomUUID());
+          idMap.set(n.id, generateId());
         });
 
         const clipboardIdSet = new Set(state.clipboard.map((n) => n.id));
@@ -276,7 +277,7 @@ export const useCanvasStore = create<CanvasState>()(
           .filter((e) => clipboardIdSet.has(e.source) && clipboardIdSet.has(e.target))
           .map((e) => ({
             ...e,
-            id: crypto.randomUUID(),
+            id: generateId(),
             source: idMap.get(e.source)!,
             target: idMap.get(e.target)!,
           }));

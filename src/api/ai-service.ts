@@ -1,4 +1,5 @@
 import { useAIModelStore } from '@/stores/aiModelStore';
+import { generateId } from '@/lib/utils';
 import type {
   AIProvider,
   AIModelDefinition,
@@ -32,7 +33,7 @@ class RequestQueue {
   enqueue<T>(fn: () => Promise<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       this.queue.push({
-        id: crypto.randomUUID(),
+        id: generateId(),
         execute: fn as () => Promise<unknown>,
         resolve: resolve as (value: unknown) => void,
         reject,

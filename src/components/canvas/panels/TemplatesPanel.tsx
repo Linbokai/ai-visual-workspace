@@ -4,7 +4,7 @@ import { Search, Layers, GitBranch, ArrowRight } from 'lucide-react';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import { usePanelStore } from '@/stores/usePanelStore';
 import { mockTemplates, templateCategories, type TemplateCategory } from '@/lib/mock-templates';
-import { cn } from '@/lib/utils';
+import { cn, generateId } from '@/lib/utils';
 import type { Template, CanvasNode, CanvasEdge, NodeData } from '@/types';
 
 const nodeTypeEmoji: Record<string, string> = {
@@ -47,7 +47,7 @@ export function TemplatesPanel() {
     // Generate fresh UUIDs for all nodes and edges to avoid conflicts
     const idMap = new Map<string, string>();
     template.canvas_data.nodes.forEach((n) => {
-      idMap.set(n.id, crypto.randomUUID());
+      idMap.set(n.id, generateId());
     });
 
     // Offset positions so template nodes don't stack on top of existing ones
@@ -66,7 +66,7 @@ export function TemplatesPanel() {
 
     const newEdges: CanvasEdge[] = template.canvas_data.edges.map((e) => ({
       ...e,
-      id: crypto.randomUUID(),
+      id: generateId(),
       source: idMap.get(e.source) ?? e.source,
       target: idMap.get(e.target) ?? e.target,
     }));

@@ -9,6 +9,7 @@ import {
   AIServiceError,
 } from '@/api/ai-service';
 import { parseMockResponse } from '@/lib/ai-actions';
+import { generateId } from '@/lib/utils';
 import type { AIAction } from '@/lib/ai-actions';
 import type { ChatMessage, ChatMessageAction } from '@/types';
 import type { ChatCompletionMessage } from '@/types/ai-models';
@@ -122,7 +123,7 @@ export function useChat() {
 
       // 1. Add user message
       const userMsg: ChatMessage = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         role: 'user',
         content,
         context_nodes: selectedNodeIds,
@@ -132,7 +133,7 @@ export function useChat() {
       addMessage(userMsg);
 
       // 2. Create assistant placeholder
-      const aiMsgId = crypto.randomUUID();
+      const aiMsgId = generateId();
       const aiMsg: ChatMessage = {
         id: aiMsgId,
         role: 'assistant',

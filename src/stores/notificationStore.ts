@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { generateId } from '@/lib/utils';
 
 export type NotificationType = 'success' | 'error' | 'info' | 'warning';
 
@@ -25,7 +26,7 @@ export const useNotificationStore = create<NotificationState>((set) => ({
   notifications: [],
 
   addNotification: (notification) => {
-    const id = crypto.randomUUID();
+    const id = generateId();
     const duration = notification.duration ?? 4000;
 
     set((state) => ({

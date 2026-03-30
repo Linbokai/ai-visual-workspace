@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useNotificationStore } from '@/stores/notificationStore';
-import { cn } from '@/lib/utils';
+import { cn, generateId } from '@/lib/utils';
 import type { Project } from '@/types';
 
 interface ProjectCardProps {
@@ -72,7 +72,7 @@ export function ProjectCard({ project, layout = 'grid' }: ProjectCardProps) {
     setMenuOpen(false);
     const dup: Project = {
       ...project,
-      id: crypto.randomUUID(),
+      id: generateId(),
       name: `${project.name} ${t('projects.copy')}`,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),

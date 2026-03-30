@@ -9,6 +9,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { useProjectStore } from '@/stores/useProjectStore';
+import { generateId } from '@/lib/utils';
 import type { Project } from '@/types';
 
 interface CreateProjectDialogProps {
@@ -25,7 +26,7 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
   const handleCreate = () => {
     const trimmed = name.trim() || t('projects.untitledProject');
     const project: Project = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       name: trimmed,
       thumbnail: null,
       owner_id: '1',

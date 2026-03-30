@@ -6,6 +6,7 @@ import { useState, useRef } from 'react';
 import { useProjectStore } from '@/stores/useProjectStore';
 import { useNotificationStore } from '@/stores/notificationStore';
 import { motion } from 'framer-motion';
+import { generateId } from '@/lib/utils';
 import { Clock, Upload, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ProjectCard } from '@/components/projects/ProjectCard';
@@ -59,7 +60,7 @@ export function ProjectsPage() {
           if (p.id && p.name) {
             addProject({
               ...p,
-              id: crypto.randomUUID(),
+              id: generateId(),
               created_at: p.created_at || new Date().toISOString(),
               updated_at: new Date().toISOString(),
             });

@@ -7,6 +7,7 @@ import type {
   ModelCapability,
 } from '@/types/ai-models';
 import { BUILTIN_MODELS, DEFAULT_PROVIDERS } from '@/types/ai-models';
+import { generateId } from '@/lib/utils';
 
 // ---------------------------------------------------------------------------
 // localStorage persistence helpers
@@ -123,7 +124,7 @@ export const useAIModelStore = create<AIModelState>((set, get) => ({
 
   addApiKey: (provider, key, label) => {
     const entry: APIKeyEntry = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       key,
       label: label || `Key ${Date.now()}`,
       addedAt: new Date().toISOString(),

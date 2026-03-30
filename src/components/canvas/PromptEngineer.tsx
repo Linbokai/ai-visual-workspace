@@ -15,7 +15,7 @@ import {
   X,
   Search,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, generateId } from '@/lib/utils';
 import {
   PROMPT_SUBJECTS,
   PROMPT_STYLES,
@@ -196,7 +196,7 @@ export function PromptEngineer({ initialPrompt = '', onApplyPrompt, onClose, flo
   const handleSavePrompt = useCallback((prompt: string) => {
     if (!prompt.trim()) return;
     const newEntry: SavedPrompt = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       prompt: prompt.trim(),
       timestamp: Date.now(),
       isFavorite: false,
