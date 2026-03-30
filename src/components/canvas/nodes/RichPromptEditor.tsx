@@ -117,6 +117,7 @@ export function RichPromptEditor({
   // Track the last raw value WE set, to distinguish external vs internal changes
   const lastRawRef = useRef(prompt);
   const isComposing = useRef(false);
+  const isFocusedRef = useRef(false);
 
   const [showMention, setShowMention] = useState(false);
   const [mentionIdx, setMentionIdx] = useState(0);
@@ -158,7 +159,8 @@ export function RichPromptEditor({
   /* ── Sync prompt → DOM only when changed externally ────── */
   useEffect(() => {
     if (!editorRef.current) return;
-    // Only rewrite DOM if prompt changed from outside (not from our own editing)
+    // NEVER rewrite DOM while user is editing — this causes cursor jump
+    if (isFocusedRef.current) return;
     if (prompt !== lastRawRef.current) {
       lastRawRef.current = prompt;
       editorRef.current.innerHTML = rawToHtml(prompt, refImages, accentColor);
@@ -333,13 +335,20 @@ export function RichPromptEditor({
           onInput={handleInput}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
-          onFocus={() => setIsFocused(true)}
+          onFocus={() => { isFocusedRef.current = true; setIsFocused(true); }}
           onBlur={() => {
             setTimeout(() => {
               if (!menuRef.current?.contains(document.activeElement)) {
+                isFocusedRef.current = false;
                 setIsFocused(false);
                 setShowMention(false);
                 syncToParent();
+                // Re-render DOM with latest prompt now that editing is done
+                if (editorRef.current) {
+                  const raw = domToRaw(editorRef.current);
+                  const cleaned = raw.replace(/\n+$/, '');
+                  editorRef.current.innerHTML = rawToHtml(cleaned, refImages, accentColor);
+                }
               }
             }, 150);
           }}
