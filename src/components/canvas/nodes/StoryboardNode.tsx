@@ -1,5 +1,5 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { LayoutGrid, Plus, GripVertical } from 'lucide-react';
+import { LayoutGrid, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NodeStatusBadge } from './NodeStatusBadge';
 import { NodePromptEditor } from './NodePromptEditor';
@@ -55,7 +55,7 @@ export function StoryboardNode({ id, data, selected }: NodeProps) {
       <div className="max-h-[300px] overflow-y-auto nodrag">
         {shots.length > 0 ? (
           <div className="divide-y divide-[var(--border)]">
-            {shots.map((shot, i) => (
+            {shots.map((shot) => (
               <div key={shot.id} className="px-2 py-1.5 flex gap-2">
                 <div className="w-16 h-12 rounded bg-[var(--muted)] overflow-hidden flex-shrink-0 flex items-center justify-center">
                   {shot.imageUrl ? (

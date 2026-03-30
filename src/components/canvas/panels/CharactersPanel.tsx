@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, User, Plus, Trash2, Users } from 'lucide-react';
+import { Search, Plus, Trash2, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 

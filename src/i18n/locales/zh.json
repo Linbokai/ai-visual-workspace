@@ -213,7 +213,8 @@
     "videoAnalysis": "视频分析",
     "storyboard": "分镜脚本",
     "promptEngineer": "提示词工程",
-    "characters": "角色库"
+    "characters": "角色库",
+    "batch": "批量队列"
   },
   "nodes": {
     "image": "图片",
@@ -277,7 +278,11 @@
     "characterScene": "角色与场景",
     "output": "输出",
     "createCharacter": "创建角色",
-    "createScene": "创建场景"
+    "createCharacterDesc": "创建新角色并设置属性",
+    "createScene": "创建场景",
+    "createSceneDesc": "创建新场景并设置环境细节",
+    "generateCharacterVideoDesc": "生成角色参考视频",
+    "generateSceneVideoDesc": "生成场景概念视频"
   },
   "properties": {
     "label": "标签",

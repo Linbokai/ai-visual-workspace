@@ -10,6 +10,7 @@ import { VideoAnalyzer } from '../VideoAnalyzer';
 import { StoryboardPanel } from '../StoryboardPanel';
 import { PromptEngineer } from '../PromptEngineer';
 import { CharactersPanel } from './CharactersPanel';
+import { BatchPanel } from './BatchPanel';
 
 const panelTitles: Record<string, string> = {
   add: 'Add Node',
@@ -21,6 +22,7 @@ const panelTitles: Record<string, string> = {
   'video-analysis': 'Video Analysis',
   storyboard: 'Storyboard',
   'prompt-engineer': 'Prompt Engineer',
+  batch: 'Batch Queue',
 };
 
 export function SlidingPanel() {
@@ -61,6 +63,7 @@ export function SlidingPanel() {
             {activePanel === 'video-analysis' && <VideoAnalyzer />}
             {activePanel === 'storyboard' && <StoryboardPanel />}
             {activePanel === 'prompt-engineer' && <PromptEngineer />}
+            {activePanel === 'batch' && <BatchPanel />}
           </div>
         </motion.div>
       )}

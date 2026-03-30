@@ -213,7 +213,8 @@
     "videoAnalysis": "Video Analysis",
     "storyboard": "Storyboard",
     "promptEngineer": "Prompt Engineer",
-    "characters": "Characters"
+    "characters": "Characters",
+    "batch": "Batch Queue"
   },
   "nodes": {
     "image": "Image",
@@ -277,7 +278,11 @@
     "characterScene": "Character & Scene",
     "output": "Output",
     "createCharacter": "Create Character",
-    "createScene": "Create Scene"
+    "createCharacterDesc": "Author a new character with attributes",
+    "createScene": "Create Scene",
+    "createSceneDesc": "Author a new scene with environment details",
+    "generateCharacterVideoDesc": "Generate character reference videos",
+    "generateSceneVideoDesc": "Generate scene concept videos"
   },
   "properties": {
     "label": "Label",

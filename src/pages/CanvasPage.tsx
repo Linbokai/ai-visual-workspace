@@ -17,6 +17,7 @@ import {
   applyEdgeChanges,
   addEdge,
   BackgroundVariant,
+  SelectionMode,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -54,6 +55,9 @@ import { StoryboardNode } from '@/components/canvas/nodes/StoryboardNode';
 import { PreviewNode } from '@/components/canvas/nodes/PreviewNode';
 import { LocalSaveNode } from '@/components/canvas/nodes/LocalSaveNode';
 import { MaskEditorNode } from '@/components/canvas/nodes/MaskEditorNode';
+import { CreateCharacterNode } from '@/components/canvas/nodes/CreateCharacterNode';
+import { CreateSceneNode } from '@/components/canvas/nodes/CreateSceneNode';
+import { GenerateVideoNode } from '@/components/canvas/nodes/GenerateVideoNode';
 import { ProcessEdge } from '@/components/canvas/edges/ProcessEdge';
 import { CanvasContextMenu } from '@/components/canvas/CanvasContextMenu';
 import { ShortcutsHelp } from '@/components/canvas/ShortcutsHelp';
@@ -89,6 +93,9 @@ const MemoizedStoryboardNode = memo(StoryboardNode, areNodePropsEqual);
 const MemoizedPreviewNode = memo(PreviewNode, areNodePropsEqual);
 const MemoizedLocalSaveNode = memo(LocalSaveNode, areNodePropsEqual);
 const MemoizedMaskEditorNode = memo(MaskEditorNode, areNodePropsEqual);
+const MemoizedCreateCharacterNode = memo(CreateCharacterNode, areNodePropsEqual);
+const MemoizedCreateSceneNode = memo(CreateSceneNode, areNodePropsEqual);
+const MemoizedGenerateVideoNode = memo(GenerateVideoNode, areNodePropsEqual);
 
 const nodeTypes = {
   image: MemoizedImageNode,
@@ -105,13 +112,13 @@ const nodeTypes = {
   'character-description': MemoizedCharacterDescriptionNode,
   'scene-description': MemoizedSceneDescriptionNode,
   'gen-image': MemoizedGenerateImageNode,
-  'gen-video': MemoizedGenerateImageNode, // reuse same component
+  'gen-video': MemoizedGenerateVideoNode,
   'generate-character-image': MemoizedGenerateImageNode,
-  'generate-character-video': MemoizedGenerateImageNode,
+  'generate-character-video': MemoizedGenerateVideoNode,
   'generate-scene-image': MemoizedGenerateImageNode,
-  'generate-scene-video': MemoizedGenerateImageNode,
-  'create-character': MemoizedCharacterDescriptionNode, // reuse
-  'create-scene': MemoizedSceneDescriptionNode, // reuse
+  'generate-scene-video': MemoizedGenerateVideoNode,
+  'create-character': MemoizedCreateCharacterNode,
+  'create-scene': MemoizedCreateSceneNode,
   'storyboard-node': MemoizedStoryboardNode,
   'preview': MemoizedPreviewNode,
   'local-save': MemoizedLocalSaveNode,
@@ -275,11 +282,15 @@ function CanvasPageInner() {
             onSelectionChange={onSelectionChange}
             onPaneContextMenu={onPaneContextMenu}
             onPaneClick={closeContextMenu}
+            onNodeClick={closeContextMenu}
             onMoveStart={closeContextMenu}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             defaultEdgeOptions={defaultEdgeOptions}
             fitView
+            selectionOnDrag
+            selectionMode={SelectionMode.Partial}
+            panOnDrag={[1, 2]}
             deleteKeyCode="Delete"
             className="bg-[var(--background)]"
             proOptions={{ hideAttribution: true }}
@@ -294,7 +305,7 @@ function CanvasPageInner() {
               />
             )}
             <Controls
-              className="!bg-[var(--card)] !border-[var(--border)] !rounded-xl !shadow-lg [&>button]:!bg-[var(--card)] [&>button]:!border-[var(--border)] [&>button]:!text-[var(--foreground)] [&>button:hover]:!bg-[var(--active-overlay)]"
+              className="!bg-[var(--card)] !border-[var(--border)] !rounded-xl !shadow-lg !bottom-14 [&>button]:!bg-[var(--card)] [&>button]:!border-[var(--border)] [&>button]:!text-[var(--foreground)] [&>button:hover]:!bg-[var(--active-overlay)]"
             />
             {effectiveMinimap && (
               <MiniMap

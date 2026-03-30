@@ -10,6 +10,7 @@ import {
   Film,
   BookOpen,
   Sparkles,
+  Layers,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePanelStore } from '@/stores/usePanelStore';
@@ -31,6 +32,7 @@ const sidebarItems: Array<{
   { id: 'video-analysis', icon: Film, labelKey: 'sidebar.videoAnalysis', dividerBefore: true },
   { id: 'storyboard', icon: BookOpen, labelKey: 'sidebar.storyboard' },
   { id: 'prompt-engineer', icon: Sparkles, labelKey: 'sidebar.promptEngineer' },
+  { id: 'batch', icon: Layers, labelKey: 'sidebar.batch', dividerBefore: true },
 ];
 
 export function LeftSidebar() {

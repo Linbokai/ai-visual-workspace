@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { Eye, Maximize2, Image, Film, Music } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NodeStatusBadge } from './NodeStatusBadge';
-import { useCanvasStore } from '@/stores/useCanvasStore';
 import type { NodeStatus } from '@/types';
 
 interface PreviewNodeDataType {
@@ -13,7 +11,7 @@ interface PreviewNodeDataType {
   prompt?: string;
 }
 
-export function PreviewNode({ id, data, selected }: NodeProps) {
+export function PreviewNode({ data, selected }: NodeProps) {
   const nodeData = data as unknown as PreviewNodeDataType;
   const status = (nodeData as any).status || 'idle';
   const mediaType = nodeData.mediaType || 'image';

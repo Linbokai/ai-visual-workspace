@@ -1,5 +1,6 @@
-import { Image, Video, Type, Music, Upload, Group, Paintbrush, PenTool, Columns2, Film, BookOpen, Sparkles, Users, User, MapPin, LayoutGrid, Eye, HardDrive } from 'lucide-react';
+import { Image, Video, Type, Music, Upload, Group, Paintbrush, PenTool, Columns2, Film, BookOpen, Sparkles, Users, User, MapPin, LayoutGrid, Eye, HardDrive, UserPlus, MapPinPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useReactFlow } from '@xyflow/react';
 import { useCanvasStore } from '@/stores/useCanvasStore';
 import { usePanelStore } from '@/stores/usePanelStore';
 import type { LeftPanelType } from '@/stores/usePanelStore';
@@ -58,6 +59,8 @@ const characterNodeOptions: Array<{
   icon: React.ComponentType<{ className?: string }>;
   descKey: string;
 }> = [
+  { type: 'create-character', labelKey: 'nodes.createCharacter', icon: UserPlus, descKey: 'nodes.createCharacterDesc' },
+  { type: 'create-scene', labelKey: 'nodes.createScene', icon: MapPinPlus, descKey: 'nodes.createSceneDesc' },
   { type: 'character-description', labelKey: 'nodes.characterDescription', icon: User, descKey: 'nodes.characterDescriptionDesc' },
   { type: 'scene-description', labelKey: 'nodes.sceneDescription', icon: MapPin, descKey: 'nodes.sceneDescriptionDesc' },
   { type: 'generate-character-image', labelKey: 'nodes.generateCharacterImage', icon: Sparkles, descKey: 'nodes.generateCharacterImageDesc' },
@@ -79,10 +82,15 @@ export function AddNodePanel() {
   const closePanel = usePanelStore((s) => s.closeLeftPanel);
   const togglePanel = usePanelStore((s) => s.toggleLeftPanel);
   const { t } = useTranslation();
+  const { screenToFlowPosition } = useReactFlow();
 
   const handleAdd = (type: NodeType) => {
-    const x = 200 + Math.random() * 300;
-    const y = 100 + Math.random() * 200;
+    // Place node at center of current viewport
+    const centerScreen = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const flowPos = screenToFlowPosition(centerScreen);
+    // Add small random offset to avoid stacking
+    const x = flowPos.x + (Math.random() - 0.5) * 100;
+    const y = flowPos.y + (Math.random() - 0.5) * 80;
     addNode(type, { x, y });
     closePanel();
   };

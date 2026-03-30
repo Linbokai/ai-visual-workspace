@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type LeftPanelType = 'none' | 'add' | 'assets' | 'templates' | 'history' | 'characters' | 'advanced' | 'video-analysis' | 'storyboard' | 'prompt-engineer';
+export type LeftPanelType = 'none' | 'add' | 'assets' | 'templates' | 'history' | 'characters' | 'advanced' | 'video-analysis' | 'storyboard' | 'prompt-engineer' | 'batch';
 export type RightPanelTab = 'chat' | 'properties';
 
 interface PanelState {

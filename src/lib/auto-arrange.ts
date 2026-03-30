@@ -1,10 +1,3 @@
-interface NodePosition {
-  id: string;
-  position: { x: number; y: number };
-  width: number;
-  height: number;
-}
-
 interface ArrangeOptions {
   horizontalGap?: number;
   verticalGap?: number;
@@ -72,8 +65,6 @@ export function autoArrangeFlow(
   // Build adjacency list
   const children = new Map<string, string[]>();
   const parents = new Map<string, string[]>();
-  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
-
   for (const edge of edges) {
     if (!children.has(edge.source)) children.set(edge.source, []);
     children.get(edge.source)!.push(edge.target);

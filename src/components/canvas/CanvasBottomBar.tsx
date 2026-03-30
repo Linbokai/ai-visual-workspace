@@ -18,6 +18,8 @@ export function CanvasBottomBar() {
   const toggleGrid = usePanelStore((s) => s.toggleGrid);
   const zoomLevel = usePanelStore((s) => s.zoomLevel);
 
+  const chatPanelOpen = usePanelStore((s) => s.chatPanelOpen);
+
   const perfMode = usePerformanceStore((s) => s.mode);
   const setPerfMode = usePerformanceStore((s) => s.setMode);
   const saveStatus = usePerformanceStore((s) => s.saveStatus);
@@ -69,7 +71,10 @@ export function CanvasBottomBar() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="fixed bottom-0 left-16 right-0 z-20 h-12 flex items-center justify-between px-4 border-t border-[var(--border)] bg-[var(--background)]/80 backdrop-blur-sm"
+      className={cn(
+        "fixed bottom-0 left-16 z-20 h-12 flex items-center justify-between px-4 border-t border-[var(--border)] bg-[var(--background)]/80 backdrop-blur-sm",
+        chatPanelOpen ? 'right-[380px]' : 'right-0'
+      )}
       role="toolbar"
       aria-label={t('canvas.canvasControls')}
     >

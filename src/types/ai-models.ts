@@ -13,7 +13,8 @@ export type AIProvider =
   | 'jimeng'
   | 'midjourney'
   | 'google'
-  | 'grok';
+  | 'grok'
+  | 'deepseek';
 
 /** Capability categories a model can support */
 export type ModelCapability =
@@ -507,12 +508,29 @@ export const BUILTIN_MODELS: AIModelDefinition[] = [
   },
   // -- DeepSeek --
   {
+    id: 'deepseek-v3',
+    name: 'DeepSeek V3',
+    provider: 'deepseek',
+    capabilities: ['text-generation'],
+    description: 'DeepSeek V3 chat model',
+    apiModelId: 'deepseek-chat',
+    endpointPath: '/chat/completions',
+    supportsStreaming: true,
+    maxTokens: 8192,
+    contextWindow: 128000,
+    parameters: [
+      { key: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 2, step: 0.1 },
+      { key: 'max_tokens', label: 'Max Tokens', type: 'number', default: 4096, min: 1, max: 8192, step: 1 },
+    ],
+    enabled: false,
+  },
+  {
     id: 'deepseek-r1',
     name: 'DeepSeek R1',
-    provider: 'custom',
+    provider: 'deepseek',
     capabilities: ['text-generation'],
-    description: 'Advanced reasoning model',
-    apiModelId: 'deepseek-r1',
+    description: 'Advanced reasoning model with chain-of-thought',
+    apiModelId: 'deepseek-reasoner',
     endpointPath: '/chat/completions',
     supportsStreaming: true,
     maxTokens: 8192,
@@ -520,6 +538,49 @@ export const BUILTIN_MODELS: AIModelDefinition[] = [
     parameters: [
       { key: 'temperature', label: 'Temperature', type: 'number', default: 0.7, min: 0, max: 2, step: 0.1 },
       { key: 'max_tokens', label: 'Max Tokens', type: 'number', default: 4096, min: 1, max: 8192, step: 1 },
+    ],
+    enabled: false,
+  },
+  // -- OpenAI Video (Sora 2) --
+  {
+    id: 'sora-2',
+    name: 'Sora 2',
+    provider: 'openai',
+    capabilities: ['video-generation'],
+    description: 'OpenAI video generation model',
+    apiModelId: 'sora-2',
+    endpointPath: '/v1/videos/generations',
+    supportsStreaming: false,
+    parameters: [
+      { key: 'duration', label: 'Duration', type: 'select', default: '5', options: [
+        { value: '5', label: '5s' },
+        { value: '10', label: '10s' },
+        { value: '15', label: '15s' },
+        { value: '20', label: '20s' },
+      ]},
+      { key: 'resolution', label: 'Resolution', type: 'select', default: '1080p', options: [
+        { value: '720p', label: '720p' },
+        { value: '1080p', label: '1080p' },
+      ]},
+    ],
+    enabled: false,
+  },
+  // -- Google Veo 3 --
+  {
+    id: 'veo3',
+    name: 'Veo 3',
+    provider: 'google',
+    capabilities: ['video-generation'],
+    description: 'Google Veo 3 video generation',
+    apiModelId: 'veo-3',
+    endpointPath: '/v1/videos/generations',
+    supportsStreaming: false,
+    parameters: [
+      { key: 'duration', label: 'Duration', type: 'select', default: '8', options: [
+        { value: '5', label: '5s' },
+        { value: '8', label: '8s' },
+        { value: '16', label: '16s' },
+      ]},
     ],
     enabled: false,
   },
@@ -598,6 +659,15 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
     activeKeyIndex: 0,
     enabled: false,
     defaultModelId: 'local-llm',
+  },
+  {
+    provider: 'deepseek',
+    displayName: 'DeepSeek',
+    baseUrl: 'https://api.deepseek.com',
+    apiKeys: [],
+    activeKeyIndex: 0,
+    enabled: false,
+    defaultModelId: 'deepseek-v3',
   },
   {
     provider: 'custom',

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { Film, Loader2, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';

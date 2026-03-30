@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -46,7 +46,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider delayDuration={200}>
-        <BrowserRouter>
+        <HashRouter>
           <ErrorBoundary>
           <Suspense fallback={<PageSkeleton />}>
             <Routes>
@@ -69,7 +69,7 @@ export default function App() {
             </Routes>
           </Suspense>
           </ErrorBoundary>
-        </BrowserRouter>
+        </HashRouter>
         <ToastContainer />
       </TooltipProvider>
     </QueryClientProvider>

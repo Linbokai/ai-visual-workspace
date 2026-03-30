@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { Sparkles, Loader2, Image, ChevronDown } from 'lucide-react';
+import { Sparkles, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NodeStatusBadge } from './NodeStatusBadge';
 import { NodePromptEditor } from './NodePromptEditor';
